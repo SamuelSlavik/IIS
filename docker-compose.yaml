@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+  go:
+    build:
+      context: src
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - .:/opt/app/api
+  
