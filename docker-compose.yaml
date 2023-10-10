@@ -9,9 +9,11 @@ services:
       - '5432:5432'
   go:
     build:
-      context: src
+      context: ./src/api
       dockerfile: Dockerfile
       target: dev
     volumes:
-      - .:/opt/app/api
+      - .:/api
+    ports:
+      - '8080:8080'
   
