@@ -4,12 +4,12 @@ FROM golang:latest as dev
 
 WORKDIR /api
 
+RUN go install github.com/cosmtrek/air@latest
+
 COPY go.mod go.sum ./
 
 RUN go mod download
 
 COPY *.go ./
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /iis-api
-
-CMD ["/iis-api"]
+CMD ["air"]
