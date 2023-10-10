@@ -7,13 +7,13 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - '5432:5432'
-  go:
-    build:
-      context: ./src/api
-      dockerfile: Dockerfile
-      target: dev
-    volumes:
-      - .:/api
-    ports:
-      - '8080:8080'
+  #go:
+  #  build:
+  #    context: ./src/api
+  #    dockerfile: Dockerfile
+  #    target: dev
+  #  volumes:
+  #    - .:/api
+  #  ports:
+  #    - '8080:8080'
   
