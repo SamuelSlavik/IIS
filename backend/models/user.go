@@ -13,6 +13,7 @@ type User struct {
 	Email     string    `gorm:"not null;unique"`
 	Age       uint8     `gorm:"not null"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
+	Password  string    `gorm:"not null"`
 }
 
 type UserType struct {
