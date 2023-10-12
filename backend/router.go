@@ -12,7 +12,7 @@ import (
 func Router() {
 	db, _ := conn()
 	fmt.Print(db.Table("information_schema.tables"))
-	db.AutoMigrate(&models.User{}, &models.UserType{})
+	db.AutoMigrate(&models.User{}, &models.UserType{}, &models.Line{}, &models.VehicleType{}, &models.Vehicle{})
 }
 
 func conn() (*gorm.DB, error) {
