@@ -1,17 +1,12 @@
 package models
 
-import (
-	"gorm.io/gorm"
-)
-
 type Stop struct {
-	gorm.Model
-	ID   uint   `gorm:"primaryKey;not null"`
-	Name string `gorm:"not null"`
+	ID    uint    `gorm:"primaryKey;not null"`
+	Name  string  `gorm:"not null"`
+	Lines []*Line `gorm:"many2many:line_stops;"`
 }
 
 type TimeBetween struct {
-	gorm.Model
 	// TODO: pkacka
 	Time uint `gorm:"not null"`
 }
