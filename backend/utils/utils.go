@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"github.com/AdamPekny/IIS/backend/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -11,6 +10,8 @@ func Conn() (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	return db, err
 }
+<<<<<<< HEAD
+=======
 
 func Migrate_all() {
 	db, _ := Conn()
@@ -22,9 +23,15 @@ func Migrate_all() {
 	db.AutoMigrate(&models.Vehicle{}, &models.VehicleType{}, &models.Line{}, &models.Stop{})
 
 	// Migrate Line and Stop models
-	db.AutoMigrate(&models.Line{}, &models.Stop{}) // $models.TimeBetween{}
+	db.AutoMigrate(&models.Line{}, &models.Stop{}, models.TimeBetween{})
 
 	// Migrate Connection models
 	db.AutoMigrate(&models.Connection{})
 
 }
+
+func Add_into_db(record interface{}) error {
+	db, _ := Conn()
+	return db.Create(record).Error
+}
+>>>>>>> 869426f2f784e6ae7af1e4b9f331c624546cda69

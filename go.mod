@@ -5,6 +5,8 @@ go 1.18
 require github.com/labstack/echo/v4 v4.11.1
 
 require (
+	github.com/brianvoe/gofakeit v3.18.0+incompatible // indirect
+	github.com/brianvoe/gofakeit/v6 v6.23.2 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
