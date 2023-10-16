@@ -14,7 +14,7 @@ func Router() *gin.Engine {
 	router.GET("/api/users/list", func(ctx *gin.Context) {
 		var users []userauth.User
 		db, _ := utils.Conn()
-		db.Find(&users)
+		db.Preload("UserType").Find(&users)
 		ctx.IndentedJSON(http.StatusOK, users)
 	})
 
