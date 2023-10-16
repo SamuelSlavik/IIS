@@ -1,6 +1,7 @@
 package userauth
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -41,12 +42,16 @@ func Create_user(ctx *gin.Context) {
 		return
 	}
 
-	// Validate and create User
+	// Validate User
 	if err := ctx.BindJSON(&user); err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err)
 		return
 	}
 
+	fmt.Print(user.Email)
+	fmt.Print(user.Password)
+
+	// Create User
 	result := db.Create(&user)
 	if result.Error != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
