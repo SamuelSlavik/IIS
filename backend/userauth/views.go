@@ -12,16 +12,19 @@ import (
 func Create_user_type(ctx *gin.Context) {
 	var user_type UserType
 
-	if err := ctx.BindJSON(&user_type); err != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, err)
-		return
-	}
-
 	db, err := utils.Conn()
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, err)
 		return
 	}
+
+	if err := ctx.BindJSON(&user_type); err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	fmt.Print(user_type.ID)
+	fmt.Print(user_type.CodeName)
 
 	result := db.Create(&user_type)
 	if result.Error != nil {
