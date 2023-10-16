@@ -1,4 +1,6 @@
-package models
+package vehicles
+
+import "github.com/AdamPekny/IIS/backend/lines"
 
 type Vehicle struct {
 	ID               uint `gorm:"primaryKey;autoIncrement;not null"`
@@ -8,7 +10,7 @@ type Vehicle struct {
 	VehicleTypeRefer uint        //id cudzieho kluca i guess ??
 	VehicleType      VehicleType `gorm:"foreignKey:VehicleTypeRefer"`
 	LineRefer        string
-	Line             Line `gorm:"foreignKey:LineRefer"`
+	Line             lines.Line `gorm:"foreignKey:LineRefer"`
 }
 
 type VehicleType struct {
