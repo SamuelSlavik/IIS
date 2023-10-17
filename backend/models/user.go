@@ -1,4 +1,4 @@
-package userauth
+package models
 
 import (
 	"time"

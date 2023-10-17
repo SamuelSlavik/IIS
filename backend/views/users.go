@@ -1,4 +1,4 @@
-package userauth
+package views
 
 import (
 	"fmt"
@@ -6,11 +6,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/AdamPekny/IIS/backend/models"
 	utils "github.com/AdamPekny/IIS/backend/utils"
 )
 
 func Create_user_type(ctx *gin.Context) {
-	var user_type UserType
+	var user_type models.UserType
 
 	db, err := utils.Conn()
 	if err != nil {
@@ -36,7 +37,7 @@ func Create_user_type(ctx *gin.Context) {
 }
 
 func Create_user(ctx *gin.Context) {
-	var user User
+	var user models.User
 
 	// Connect to db
 	db, err := utils.Conn()
