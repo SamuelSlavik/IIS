@@ -7,7 +7,7 @@ type Vehicle struct {
 	ImageData       []byte
 	VehicleTypeName string      //id cudzieho kluca i guess ??
 	VehicleType     VehicleType `gorm:"foreignKey:VehicleTypeName;references:Type"`
-	LineName        string
+	Connections     []Connection
 }
 
 type VehicleType struct {

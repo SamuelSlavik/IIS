@@ -5,11 +5,9 @@ import (
 )
 
 type Line struct {
-	Name        string  `gorm:"primaryKey;unique;not null"`
-	InitialStop string  `gorm:"not null"`
-	FinalStop   string  `gorm:"not null"`
-	Stops       []*Stop `gorm:"many2many:line_stops;"`
-	Vehicles    []Vehicle
+	Name        string `gorm:"primaryKey;unique;not null"`
+	InitialStop string `gorm:"not null"`
+	FinalStop   string `gorm:"not null"`
 	Connections []Connection
 	Segments    []*Segment `gorm:"many2many:line_segments;"`
 }
@@ -32,6 +30,7 @@ type Connection struct {
 	ID            uint `gorm:"primaryKey;autoIncrement;not null"`
 	ArrivalTime   time.Time
 	DepartureTime time.Time
+	VehicleID     uint
 	// Dirrection idk aky typ lmao TODO: typ
 	LineName string
 }
