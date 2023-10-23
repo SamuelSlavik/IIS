@@ -15,13 +15,11 @@ func Router() *gin.Engine {
 	router.GET("/api/users/list", func(ctx *gin.Context) {
 		var users []models.User
 		db, _ := utils.Conn()
-		db.Preload("UserType").Find(&users)
+		db.Find(&users)
 		ctx.IndentedJSON(http.StatusOK, users)
 	})
 
 	router.POST("/api/users/create", views.Create_user)
-
-	router.POST("/api/users/type/create", views.Create_user_type)
 
 	return router
 }

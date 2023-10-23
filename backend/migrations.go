@@ -9,7 +9,7 @@ func Migrate_all() {
 	db, _ := utils.Conn()
 
 	// Migrate User models
-	db.AutoMigrate(&models.User{}, &models.UserType{})
+	db.AutoMigrate(&models.User{})
 
 	// Migrate Vehicle models
 	db.AutoMigrate(&models.Line{}, &models.Stop{}, &models.Connection{},

@@ -6,38 +6,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/AdamPekny/IIS/backend/models"
+	"github.com/AdamPekny/IIS/backend/serializers"
 	utils "github.com/AdamPekny/IIS/backend/utils"
 )
 
-func Create_user_type(ctx *gin.Context) {
-	var user_type models.UserType
-
-	db, err := utils.Conn()
-	if err != nil {
-		ctx.IndentedJSON(http.StatusInternalServerError, err)
-		return
-	}
-
-	if err := ctx.BindJSON(&user_type); err != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, err)
-		return
-	}
-
-	fmt.Print(user_type.ID)
-	fmt.Print(user_type.CodeName)
-
-	result := db.Create(&user_type)
-	if result.Error != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
-		return
-	}
-
-	ctx.IndentedJSON(http.StatusOK, result)
-}
-
 func Create_user(ctx *gin.Context) {
-	var user models.User
+	var user serializers.UserPublicSerializer
 
 	// Connect to db
 	db, err := utils.Conn()
@@ -55,8 +29,18 @@ func Create_user(ctx *gin.Context) {
 	fmt.Print(user.Email)
 	fmt.Print(user.Password)
 
+	if !user.Valid() {
+		fmt.Print("\n")
+		fmt.Print(user.ValidatorErrs)
+		fmt.Print("\n")
+		ctx.IndentedJSON(http.StatusBadRequest, user.ValidatorErrs)
+		return
+	}
+
+	user_model := user.Create_model()
+
 	// Create User
-	result := db.Create(&user)
+	result := db.Create(user_model)
 	if result.Error != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
 		return
