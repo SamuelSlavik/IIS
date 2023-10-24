@@ -1,15 +1,15 @@
 package serializers
 
 import (
-	"fmt"
-
 	models "github.com/AdamPekny/IIS/backend/models"
 	"github.com/AdamPekny/IIS/backend/utils"
 	"github.com/AdamPekny/IIS/backend/validators"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserPublicSerializer struct {
+// User Signup Serializer
+
+type UserSignupSerializer struct {
 	FirstName     string           `binding:"required"`
 	LastName      string           `binding:"required"`
 	Email         string           `binding:"required"`
@@ -20,14 +20,14 @@ type UserPublicSerializer struct {
 	ValidatorErrs []validators.ValidatorErr
 }
 
-func (pub_user *UserPublicSerializer) Valid() bool {
+func (pub_user *UserSignupSerializer) Valid() bool {
 	validators.Email_validator(pub_user.Email, &pub_user.ValidatorErrs)
 	validators.Password_match(pub_user.Password, pub_user.PasswordRpt, &pub_user.ValidatorErrs)
-	fmt.Print(pub_user.ValidatorErrs)
+
 	return len(pub_user.ValidatorErrs) == 0
 }
 
-func (pub_user UserPublicSerializer) copy_data(user *models.User) {
+func (pub_user UserSignupSerializer) copy_data(user *models.User) {
 	user.FirstName = pub_user.FirstName
 	user.LastName = pub_user.LastName
 	user.Email = pub_user.Email
@@ -36,7 +36,7 @@ func (pub_user UserPublicSerializer) copy_data(user *models.User) {
 	user.Password = pub_user.Password
 }
 
-func (pub_user UserPublicSerializer) Create_model() *models.User {
+func (pub_user UserSignupSerializer) Create_model() *models.User {
 	user := &models.User{}
 
 	pwd_hash, err := bcrypt.GenerateFromPassword([]byte(pub_user.Password), 14)
@@ -49,4 +49,18 @@ func (pub_user UserPublicSerializer) Create_model() *models.User {
 	pub_user.copy_data(user)
 
 	return user
+}
+
+// User Login Serializer
+
+type UserLoginSerializer struct {
+	Email         string `binding:"required"`
+	Password      string `binding:"required"`
+	ValidatorErrs []validators.ValidatorErr
+}
+
+func (pub_user *UserLoginSerializer) Valid() bool {
+	validators.Email_validator(pub_user.Email, &pub_user.ValidatorErrs)
+
+	return len(pub_user.ValidatorErrs) == 0
 }
