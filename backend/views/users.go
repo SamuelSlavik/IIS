@@ -93,9 +93,3 @@ func Login(ctx *gin.Context) {
 
 	ctx.IndentedJSON(http.StatusOK, gin.H{})
 }
-
-func Validate(ctx *gin.Context) {
-	ctx.IndentedJSON(http.StatusOK, gin.H{
-		"message": "logged in!",
-	})
-}
