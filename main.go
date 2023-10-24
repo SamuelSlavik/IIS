@@ -6,6 +6,7 @@ import (
 )
 
 func init() {
+	utils.LoadEnvVariables()
 	utils.Conn()
 }
 
