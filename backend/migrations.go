@@ -6,13 +6,10 @@ import (
 )
 
 func Migrate_all() {
-	db, _ := utils.Conn()
-
 	// Migrate User models
-	db.AutoMigrate(&models.User{})
+	utils.DB.AutoMigrate(&models.User{})
 
 	// Migrate Vehicle models
-	db.AutoMigrate(&models.Line{}, &models.Stop{}, &models.Connection{},
+	utils.DB.AutoMigrate(&models.Line{}, &models.Stop{}, &models.Connection{},
 		&models.Vehicle{}, &models.VehicleType{}, models.Segment{})
-
 }
