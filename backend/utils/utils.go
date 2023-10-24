@@ -7,10 +7,15 @@ import (
 	"gorm.io/gorm"
 )
 
-func Conn() (*gorm.DB, error) {
+var DB *gorm.DB
+
+func Conn() {
+	var err error
 	dsn := "host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable TimeZone=Europe/Prague"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	return db, err
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("Failed to connect to db")
+	}
 }
 
 type CustomDate struct {
