@@ -22,5 +22,8 @@ func Router() *gin.Engine {
 	router.POST("/api/users/signup", views.Signup)
 	router.POST("/api/users/login", views.Login)
 
+	router.GET("/api/vehicles/list", views.List_vehicles)
+
+	router.POST("/api/vehicles/create", views.Create_vehicle)
 	return router
 }
