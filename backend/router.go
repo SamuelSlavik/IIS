@@ -13,7 +13,7 @@ import (
 func Router() *gin.Engine {
 	router := gin.Default()
 
-	router.GET("/api/users/list", func(ctx *gin.Context) {
+	router.GET("/api/users/list", middleware.RequireAuth("admin"), func(ctx *gin.Context) {
 		var users []models.User
 		utils.DB.Find(&users)
 		ctx.IndentedJSON(http.StatusOK, users)
@@ -21,7 +21,6 @@ func Router() *gin.Engine {
 
 	router.POST("/api/users/signup", views.Signup)
 	router.POST("/api/users/login", views.Login)
-	router.GET("/api/users/validate", middleware.RequireAuth(), views.Validate)
 
 	return router
 }
