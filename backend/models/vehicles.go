@@ -6,9 +6,10 @@ type Vehicle struct {
 	Capacity        uint   `gorm:"not null"`
 	Brand           string
 	ImageData       []byte
-	VehicleTypeName string      //id cudzieho kluca i guess ??
+	VehicleTypeName string
 	VehicleType     VehicleType `gorm:"foreignKey:VehicleTypeName;references:Type"`
 	LineName        *string
+	Connections     []Connection
 }
 
 type VehicleType struct {
