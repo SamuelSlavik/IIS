@@ -19,7 +19,7 @@ func Create_vehicle(ctx *gin.Context) {
 	vehicle := serializers.VehicleSerializer{}
 
 	if err := ctx.BindJSON(&vehicle); err != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, err)
+		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 

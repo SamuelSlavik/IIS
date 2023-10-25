@@ -12,26 +12,20 @@ type VehicleSerializer struct {
 	Brand         string
 	ImageData     []byte
 	Type          string `binding:"required"`
-	LineName      string
+	LineName      *string
 	ValidatorErrs []validators.ValidatorErr
 }
 
-func (vehicle VehicleSerializer) Create_model() *models.Vehicle {
-	vehicle_model := &models.Vehicle{}
-
-	//copy data
-	vehicle_model.Capacity = vehicle.Capacity
-	vehicle_model.Registration = vehicle.Registration
-	vehicle_model.Brand = vehicle.Brand
-	vehicle_model.ImageData = vehicle.ImageData
-	vehicle_model.VehicleTypeName = vehicle.Type
-	if vehicle.LineName == "" {
-		vehicle_model.LineName = nil
-	} else {
-		vehicle_model.LineName = &vehicle.LineName
+func (vehicle VehicleSerializer) Create_model() (vehicle_model *models.Vehicle) {
+	vehicle_model = &models.Vehicle{
+		Capacity:        vehicle.Capacity,
+		Registration:    vehicle.Registration,
+		Brand:           vehicle.Brand,
+		ImageData:       vehicle.ImageData,
+		VehicleTypeName: vehicle.Type,
+		LineName:        vehicle.LineName,
 	}
-
-	return vehicle_model
+	return
 }
 
 func (vehicle *VehicleSerializer) Valid() bool {
