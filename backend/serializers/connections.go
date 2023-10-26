@@ -10,7 +10,6 @@ type ConnectionListSerializer struct {
 }
 
 type ShowConnectionSerializer struct {
-	DepartureTime time.Time
+	DepartureTime string
 	StopName      string
-	LineName      string
 }
