@@ -27,5 +27,6 @@ func Router() *gin.Engine {
 	router.POST("/api/vehicles/create", views.Create_vehicle)
 
 	router.GET("/api/connections", views.Get_connections)
+	router.GET("/api/connections/:id", views.Get_connection)
 	return router
 }
