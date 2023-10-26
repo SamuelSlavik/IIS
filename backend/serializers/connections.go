@@ -8,3 +8,9 @@ type ConnectionListSerializer struct {
 	DepartureTime time.Time
 	LineName      string
 }
+
+type ShowConnectionSerializer struct {
+	DepartureTime time.Time
+	StopName      string
+	LineName      string
+}

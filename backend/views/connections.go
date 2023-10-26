@@ -28,9 +28,23 @@ func Get_connection(ctx *gin.Context) {
 		//stopm := map[models.Stop]bool{}
 		stops := []models.Stop{}
 		utils.DB.Model(&line).Preload("Segments").First(&line, "Name = ?", connection.LineName) //todo error handling
-		for _, segment := range line.Segments {
-			utils.DB.Model(&segment).Preload("Stop1").Preload("Stop2").First(&segment)
+		stop1 := line.InitialStop
+
+		for {
+			fmt.Print(stop1, "-Zastavkalol\n")
+			var segment models.Segment
+			err := utils.DB.Preload("Stop1").Preload("Stop2").Joins("inner join line_segments on stop_name1=segment_stop_name1 AND stop_name2=segment_stop_name2").
+				Find(&segment, "stop_name1=? AND line_segments.line_name=?", stop1, line.Name).Error
+			if err != nil {
+				fmt.Print(err)
+				break
+			}
+			if segment.StopName2 == line.FinalStop {
+				stops = append(stops, segment.Stop2)
+				break
+			}
 			stops = append(stops, segment.Stop1)
+			stop1 = segment.StopName2
 		}
 		fmt.Print(stops, "\n")
 		for _, segment := range line.Segments {
