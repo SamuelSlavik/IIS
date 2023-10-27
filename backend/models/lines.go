@@ -30,7 +30,7 @@ type Connection struct {
 	ID            uint `gorm:"primaryKey;autoIncrement;not null"`
 	ArrivalTime   time.Time
 	DepartureTime time.Time
+	Dirrection    bool //TRUE: Initial->Final FALSE: Final->Initial
 	VehicleID     uint
-	// Dirrection idk aky typ lmao TODO: typ
-	LineName string
+	LineName      string
 }

@@ -1,12 +1,14 @@
 package models
 
 type Vehicle struct {
-	ID              uint `gorm:"primaryKey;autoIncrement;not null"`
-	Capacity        uint `gorm:"not null"`
+	ID              uint   `gorm:"primaryKey;autoIncrement;not null"`
+	Registration    string `gorm:"unique;not null"`
+	Capacity        uint   `gorm:"not null"`
 	Brand           string
 	ImageData       []byte
-	VehicleTypeName string      //id cudzieho kluca i guess ??
+	VehicleTypeName string
 	VehicleType     VehicleType `gorm:"foreignKey:VehicleTypeName;references:Type"`
+	LineName        *string
 	Connections     []Connection
 }
 

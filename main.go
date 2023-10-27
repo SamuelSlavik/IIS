@@ -2,7 +2,13 @@ package main
 
 import (
 	api "github.com/AdamPekny/IIS/backend"
+	"github.com/AdamPekny/IIS/backend/utils"
 )
+
+func init() {
+	utils.LoadEnvVariables()
+	utils.Conn()
+}
 
 func main() {
 	api.Migrate_all()
