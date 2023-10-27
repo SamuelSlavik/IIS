@@ -7,136 +7,95 @@ import (
 	api "github.com/AdamPekny/IIS/backend"
 	"github.com/AdamPekny/IIS/backend/models"
 	"github.com/AdamPekny/IIS/backend/utils"
-	"github.com/brianvoe/gofakeit"
+	"github.com/brianvoe/gofakeit/v6"
 )
 
-//go run ./backend/seeding/seeding.go pouzit raz na naseedovanie
+// go run ./backend/seeding/seeding.go pouzit raz na naseedovanie
+func init() {
+	utils.LoadEnvVariables()
+	utils.Conn()
+}
 
 func main() {
 	gofakeit.Seed(69420)
 	api.Migrate_all()
-	db, _ := utils.Conn()
-	// seed usertypes
-	userTypes := []models.UserType{{CodeName: "admin"}, {CodeName: "technic"}, {CodeName: "driver"}}
-	for _, v := range userTypes {
-		db.Create(&v)
-	}
-	//seed users
-	for i := 0; i < 10; i++ {
-		user := models.User{
-			FirstName: gofakeit.FirstName(),
-			LastName:  gofakeit.LastName(),
-			Email:     gofakeit.Email(),
-			BirthDate: gofakeit.Date(),
-			Password:  gofakeit.Password(false, false, false, false, false, 5), // nieco ako hash lmao lmao
-			Salt:      gofakeit.Password(false, false, false, false, false, 5),
-			UserType:  userTypes[rand.Intn(3)],
-		}
-		db.Create(&user)
-	}
-	// seed vehicle types
+	//users need to be seeded manually
+	//seed vehicle types
 	vehicleTypes := []models.VehicleType{{Type: "bus"}, {Type: "tram"}, {Type: "obrnena_dodavka"}}
 	for _, v := range vehicleTypes {
-		db.Create(&v)
+		utils.DB.Create(&v)
 	}
-	//seed lines
-	for i := 1; i <= 4; i++ {
-		line := models.Line{
-			Name:        fmt.Sprintf("Line %v", i),
-			FinalStop:   gofakeit.StreetName(),
-			InitialStop: gofakeit.StreetName(),
-		}
-		db.Create(&line)
-	}
-	lines := []models.Line{}
-	db.Find(&lines) //TODO error
-	// seed vehicles
+	//seed vehicles
 	for i := 0; i < 10; i++ {
 		vehicle := models.Vehicle{
-			Capacity: uint(gofakeit.Number(5, 70)),
+			Capacity:     uint(gofakeit.Number(5, 70)),
+			Registration: gofakeit.LetterN(3) + string(gofakeit.Number(1000, 9999)),
 			// Brand
 			// Image
 			VehicleType: vehicleTypes[rand.Intn(3)],
 		}
-		db.Create(&vehicle)
+		utils.DB.Create(&vehicle)
 	}
-	vehicles := []models.Vehicle{}
-	db.Find(&vehicles)
-	// seed connections
-	for i := 0; i < 10; i++ {
-		connection := models.Connection{
-			ArrivalTime:   gofakeit.Date(),
-			DepartureTime: gofakeit.Date(),
-			VehicleID:     vehicles[rand.Intn(len(vehicles)-1)].ID,
-			LineName:      lines[rand.Intn(len(lines)-1)].Name,
-		}
-		db.Create(&connection)
-
-	}
-	stopsMap := make(map[string]bool)
 	//seed stops
-	for i := 0; i < len(lines); i++ {
-		stop := models.Stop{
-			Name: lines[i].InitialStop,
-		}
-		stopsMap[stop.Name] = true
-		db.Create(&stop)
-		stop = models.Stop{
-			Name: lines[i].FinalStop,
-		}
-		stopsMap[stop.Name] = true
-		db.Create(&stop)
-	}
-	for i := 0; i < 15; i++ {
+	for i := 0; i < 22; i++ {
 		stop := models.Stop{
 			Name: gofakeit.StreetName(),
 		}
-		db.Create(&stop)
+		utils.DB.Create(&stop)
 	}
-	//seed segments
 	var stops []models.Stop
-
-	db.Find(&stops) //TODO error
-
-	for i := 0; i < len(stops)-1; i++ {
-		if ok := stopsMap[stops[i].Name]; ok {
-			continue
-		} else {
-			segment := models.Segment{
-				Stop1: stops[i],
-				Stop2: stops[i+1],
-				Time:  uint(rand.Intn(3) + 2),
-			}
-			db.Create(&segment)
+	utils.DB.Find(&stops)
+	//seed lines
+	for i := 1; i <= 2; i++ {
+		line := models.Line{
+			Name:        fmt.Sprintf("Line %v", i),
+			FinalStop:   stops[gofakeit.Number(0, 9)].Name,
+			InitialStop: stops[gofakeit.Number(10, 19)].Name,
 		}
+		utils.DB.Create(&line)
 	}
-	segments := []models.Segment{}
-	db.Find(&segments)
+	lines := []models.Line{}
+	utils.DB.Find(&lines)
+
+	vehicles := []models.Vehicle{}
+	utils.DB.Find(&vehicles)
+	// seed segments
 	for i := 0; i < len(lines); i++ {
-		// initial segment
-		segment := models.Segment{
+		initial_segment := models.Segment{
 			StopName1: lines[i].InitialStop,
-			StopName2: segments[gofakeit.Number(0, 9)].StopName1,
-			Time:      uint(rand.Intn(3) + 2),
+			StopName2: stops[gofakeit.Number(0, len(stops)-1)].Name,
+			Time:      uint(rand.Intn(3) + 1),
 		}
-		db.Create(&segment)
-		lines[i].Segments = append(lines[i].Segments, &segment)
-		db.Save(&lines[i])
-		// few other segments
-		for j := 0; j < 2; j++ {
-			findsegment := models.Segment{}
-			db.Where(&models.Segment{StopName1: lines[i].Segments[j].StopName2}).First(&findsegment)
-			lines[i].Segments = append(lines[i].Segments, &findsegment)
-			db.Save(&lines[i])
+		utils.DB.Create(&initial_segment)
+		lines[i].Segments = append(lines[i].Segments, &initial_segment)
+		utils.DB.Save(&lines[i])
+		for j := 0; j < 3; j++ {
+			next_segment := models.Segment{
+				StopName1: lines[i].Segments[len(lines[i].Segments)-1].StopName2,
+				StopName2: stops[gofakeit.Number(0, len(stops)-1)].Name,
+				Time:      uint(rand.Intn(3) + 1),
+			}
+			utils.DB.Create(&next_segment)
+			lines[i].Segments = append(lines[i].Segments, &next_segment)
+			utils.DB.Save(&lines[i])
 		}
-		// final segment
-		segment = models.Segment{
-			StopName1: segments[gofakeit.Number(10, 13)].StopName2,
+		final_segment := models.Segment{
+			StopName1: lines[i].Segments[len(lines[i].Segments)-1].StopName2,
 			StopName2: lines[i].FinalStop,
-			Time:      uint(rand.Intn(3) + 2),
+			Time:      uint(rand.Intn(3) + 1),
 		}
-		db.Create(&segment)
-		lines[i].Segments = append(lines[i].Segments, &segment)
-		db.Save(&lines[i])
+		utils.DB.Create(&final_segment)
+		lines[i].Segments = append(lines[i].Segments, &final_segment)
+		utils.DB.Save(&lines[i])
+	}
+	for i := 0; i < 8; i++ {
+		connection := models.Connection{
+			DepartureTime: gofakeit.Date(),
+			VehicleID:     vehicles[rand.Intn(len(vehicles)-1)].ID,
+			LineName:      lines[i%2].Name,
+			Dirrection:    i%2 == 1,
+		}
+		utils.DB.Create(&connection)
+
 	}
 }
