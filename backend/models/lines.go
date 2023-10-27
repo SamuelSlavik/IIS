@@ -28,9 +28,8 @@ type Stop struct {
 
 type Connection struct {
 	ID            uint `gorm:"primaryKey;autoIncrement;not null"`
-	ArrivalTime   time.Time
 	DepartureTime time.Time
-	Dirrection    bool //TRUE: Initial->Final FALSE: Final->Initial
-	VehicleID     uint
-	LineName      string
+	Dirrection    bool   //TRUE: Initial->Final FALSE: Final->Initial
+	VehicleID     uint   `gorm:"not null"`
+	LineName      string `gorm:"not null"`
 }
