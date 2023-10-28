@@ -14,7 +14,10 @@ import (
 func Router() *gin.Engine {
 	router := gin.Default()
 
-	router.Use(cors.Default())
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+
+	router.Use(cors.New(config))
 
 	router.GET("/api/users/list", middleware.RequireAuth("admin"), func(ctx *gin.Context) {
 		var users []models.User
