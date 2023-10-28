@@ -7,11 +7,14 @@ import (
 	"github.com/AdamPekny/IIS/backend/models"
 	"github.com/AdamPekny/IIS/backend/utils"
 	"github.com/AdamPekny/IIS/backend/views"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func Router() *gin.Engine {
 	router := gin.Default()
+
+	router.Use(cors.Default())
 
 	router.GET("/api/users/list", middleware.RequireAuth("admin"), func(ctx *gin.Context) {
 		var users []models.User
