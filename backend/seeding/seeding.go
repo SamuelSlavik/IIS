@@ -29,7 +29,7 @@ func main() {
 	for i := 0; i < 10; i++ {
 		vehicle := models.Vehicle{
 			Capacity:     uint(gofakeit.Number(5, 70)),
-			Registration: gofakeit.LetterN(3) + string(gofakeit.Number(1000, 9999)),
+			Registration: gofakeit.LetterN(3) + fmt.Sprint(gofakeit.Number(1000, 9999)),
 			// Brand
 			// Image
 			VehicleType: vehicleTypes[rand.Intn(3)],
