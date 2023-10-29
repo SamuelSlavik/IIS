@@ -91,6 +91,7 @@ func getStops(id uint) (*[]serializers.StopsSerializer, error) {
 					StopName:      segment.StopName1,
 					DepartureTime: dep_time.Format("15:04"),
 				})
+				dep_time = dep_time.Add(time.Minute * time.Duration(segment.Time))
 				stops = append(stops, serializers.StopsSerializer{
 					StopName:      segment.StopName2,
 					DepartureTime: dep_time.Format("15:04"),
