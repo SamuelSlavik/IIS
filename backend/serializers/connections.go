@@ -1,15 +1,13 @@
 package serializers
 
-import "time"
-
-type ConnectionListSerializer struct {
-	ID            uint
-	ArrivalTime   time.Time
-	DepartureTime time.Time
-	LineName      string
+type ConnectionSerializer struct {
+	ID        uint
+	LineName  string
+	Type      string
+	ListStops *[]StopsSerializer
 }
 
-type ShowConnectionSerializer struct {
+type StopsSerializer struct {
 	DepartureTime string
 	StopName      string
 }
