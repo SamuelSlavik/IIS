@@ -1,11 +1,7 @@
 package api
 
 import (
-	"net/http"
-
 	"github.com/AdamPekny/IIS/backend/middleware"
-	"github.com/AdamPekny/IIS/backend/models"
-	"github.com/AdamPekny/IIS/backend/utils"
 	"github.com/AdamPekny/IIS/backend/views"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -19,11 +15,9 @@ func Router() *gin.Engine {
 
 	router.Use(cors.New(config))
 
-	router.GET("/api/users/list", middleware.RequireAuth("admin"), func(ctx *gin.Context) {
-		var users []models.User
-		utils.DB.Find(&users)
-		ctx.IndentedJSON(http.StatusOK, users)
-	})
+	router.GET("/api/users/list", middleware.RequireAuth(), views.ListUsers)
+	router.GET("/api/users/get/:id", middleware.RequireAuth(), views.RetrieveUser)
+	router.GET("/api/users/get", middleware.RequireAuth(), views.RetrieveCurrentUser)
 
 	router.POST("/api/users/signup", views.Signup)
 	router.POST("/api/users/login", views.Login)

@@ -1,6 +1,8 @@
 package serializers
 
 import (
+	"time"
+
 	models "github.com/AdamPekny/IIS/backend/models"
 	"github.com/AdamPekny/IIS/backend/utils"
 	"github.com/AdamPekny/IIS/backend/validators"
@@ -20,33 +22,33 @@ type UserSignupSerializer struct {
 	ValidatorErrs []validators.ValidatorErr
 }
 
-func (pub_user *UserSignupSerializer) Valid() bool {
-	validators.Email_validator(pub_user.Email, &pub_user.ValidatorErrs)
-	validators.Password_match(pub_user.Password, pub_user.PasswordRpt, &pub_user.ValidatorErrs)
+func (u *UserSignupSerializer) Valid() bool {
+	validators.Email_validator(u.Email, &u.ValidatorErrs)
+	validators.Password_match(u.Password, u.PasswordRpt, &u.ValidatorErrs)
 
-	return len(pub_user.ValidatorErrs) == 0
+	return len(u.ValidatorErrs) == 0
 }
 
-func (pub_user UserSignupSerializer) copy_data(user *models.User) {
-	user.FirstName = pub_user.FirstName
-	user.LastName = pub_user.LastName
-	user.Email = pub_user.Email
-	user.BirthDate = pub_user.BirthDate.Time
-	user.Role = pub_user.Role
-	user.Password = pub_user.Password
+func (u UserSignupSerializer) copy_data(user *models.User) {
+	user.FirstName = u.FirstName
+	user.LastName = u.LastName
+	user.Email = u.Email
+	user.BirthDate = u.BirthDate.Time
+	user.Role = u.Role
+	user.Password = u.Password
 }
 
-func (pub_user UserSignupSerializer) Create_model() *models.User {
+func (u UserSignupSerializer) ToModel() *models.User {
 	user := &models.User{}
 
-	pwd_hash, err := bcrypt.GenerateFromPassword([]byte(pub_user.Password), 14)
+	pwd_hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), 14)
 	if err != nil {
 		return nil
 	}
 
-	pub_user.Password = string(pwd_hash)
+	u.Password = string(pwd_hash)
 
-	pub_user.copy_data(user)
+	u.copy_data(user)
 
 	return user
 }
@@ -59,8 +61,38 @@ type UserLoginSerializer struct {
 	ValidatorErrs []validators.ValidatorErr
 }
 
-func (pub_user *UserLoginSerializer) Valid() bool {
-	validators.Email_validator(pub_user.Email, &pub_user.ValidatorErrs)
+func (u *UserLoginSerializer) Valid() bool {
+	validators.Email_validator(u.Email, &u.ValidatorErrs)
 
-	return len(pub_user.ValidatorErrs) == 0
+	return len(u.ValidatorErrs) == 0
+}
+
+
+// User public serializer
+
+type UserPublicSerializer struct {
+	ID 			  	uint
+	FirstName     	string
+	LastName 	  	string
+	Email         	string `binding:"required"`
+	BirthDate 		time.Time
+	Role 			models.Role `binding:"required"`
+	CreatedAt 		time.Time
+	ValidatorErrs 	[]validators.ValidatorErr 
+}
+
+func (u *UserPublicSerializer) Valid() bool {
+	validators.Email_validator(u.Email, &u.ValidatorErrs)
+
+	return len(u.ValidatorErrs) == 0
+}
+
+func (u *UserPublicSerializer) FromModel(user models.User) {
+	u.ID = user.ID
+	u.FirstName = user.FirstName
+	u.LastName = user.LastName
+	u.Email = user.Email
+	u.BirthDate = user.BirthDate
+	u.Role = user.Role
+	u.CreatedAt = user.CreatedAt
 }

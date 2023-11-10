@@ -31,7 +31,7 @@ func Signup(ctx *gin.Context) {
 		return
 	}
 
-	user_model := user_serializer.Create_model()
+	user_model := user_serializer.ToModel()
 
 	// Create User
 	result := utils.DB.Create(user_model)
@@ -46,6 +46,7 @@ func Signup(ctx *gin.Context) {
 func Login(ctx *gin.Context) {
 	var user_serializer serializers.UserLoginSerializer
 	var user_model models.User
+	var user_public serializers.UserPublicSerializer
 
 	// Validate and bind User to serializer
 	if err := ctx.BindJSON(&user_serializer); err != nil {
@@ -91,5 +92,86 @@ func Login(ctx *gin.Context) {
 	ctx.SetSameSite(http.SameSiteLaxMode)
 	ctx.SetCookie("Authorization", token_string, 3600, "", "", false, true)
 
-	ctx.IndentedJSON(http.StatusOK, gin.H{})
+	user_public.FromModel(user_model)
+
+	ctx.IndentedJSON(http.StatusOK, user_public)
+}
+
+
+func ListUsers(ctx *gin.Context) {
+	var user_models []models.User
+	var user_serializers []serializers.UserPublicSerializer
+
+	res := utils.DB.Find(&user_models)
+
+	if res.Error != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"Error": "Could not retrieve users!",
+		})
+		return
+	}
+
+	for _, user := range user_models {
+		user_serialized := serializers.UserPublicSerializer{}
+		user_serialized.FromModel(user)
+		user_serializers = append(user_serializers, user_serialized)
+	}
+
+	ctx.IndentedJSON(http.StatusOK, user_serializers)
+}
+
+
+func RetrieveUser(ctx *gin.Context) {
+	var user_model models.User
+	var user_serializer serializers.UserPublicSerializer
+
+	uid, ok := ctx.Params.Get("id")
+
+	if !ok {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"Error": "No UID provided!",
+		})
+		return
+	}
+
+	res := utils.DB.First(&user_model, uid)
+
+	if res.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"Error": "No user with enterd UID!",
+		})
+		return
+	}
+
+	user_serializer = serializers.UserPublicSerializer{}
+	user_serializer.FromModel(user_model)
+
+	ctx.IndentedJSON(http.StatusOK, user_serializer)
+}
+
+
+func RetrieveCurrentUser(ctx *gin.Context) {
+	user_serializer := serializers.UserPublicSerializer{}
+
+	user_ctx, exists := ctx.Get("user")
+
+	if !exists {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"Error": "User not found!",
+		})
+		return
+	}
+
+	user_model, ok := user_ctx.(models.User)
+
+	if !ok {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"Error": "Not a valid user!",
+		})
+		return
+	}
+
+	user_serializer.FromModel(user_model)
+
+	ctx.IndentedJSON(http.StatusOK, user_serializer)
 }
