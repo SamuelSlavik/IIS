@@ -1,8 +1,28 @@
-import './app.css'
-import App from './App.svelte'
+import './assets/main.css'
 
-const app = new App({
-  target: document.getElementById('app'),
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+
+import App from './App.vue'
+import router from './router'
+import axios from "axios";
+
+const app = createApp(App)
+
+app.use(createPinia())
+app.use(router)
+
+app.mount('#app')
+
+axios.interceptors.response.use(undefined, function (error) {
+    if (error) {
+        const originalRequest = error.config;
+        if (error.response.status === 401 && !originalRequest._retry) {
+
+            originalRequest._retry = true;
+            store.dispatch('LogOut')
+            return router.push('/login')
+        }
+    }
 })
 
-export default app
