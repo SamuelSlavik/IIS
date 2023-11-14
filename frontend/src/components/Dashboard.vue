@@ -1,4 +1,18 @@
 <script setup lang="ts">
+import {useUserStore} from "@/stores/user-store";
+import {useRouter} from "vue-router";
+
+const user = useUserStore()
+const router = useRouter();
+
+const logOut = async () => {
+  user.logOut()
+
+  await router.push('/')
+
+
+  // TODO endpoint for forgetting a cookie
+}
 
 </script>
 
@@ -6,10 +20,10 @@
   <div class="dashboard">
     <div class="dashboard-content">
       <div>
-        <h2>Arthur Dent</h2>
-        <p>arthur@protonmail.com</p>
+        <h2>{{ user.firstName + " " + user.lastName }}</h2>
+        <p>{{user.email}}</p>
         <br/>
-        <p>Admin</p>
+        <p>{{user.role}}</p>
       </div>
       <div class="hr"></div>
       <div>
@@ -22,7 +36,7 @@
       </div>
       <div class="hr"></div>
       <div>
-        <button class="small-button">Edit profile</button>
+        <button :onclick="logOut" class="small-button">Log Out</button>
       </div>
     </div>
   </div>

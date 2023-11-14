@@ -96,6 +96,5 @@ func main() {
 			Dirrection:    i%2 == 1,
 		}
 		utils.DB.Create(&connection)
-
 	}
 }

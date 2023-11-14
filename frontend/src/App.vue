@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import Navigation from './components/Navigation.vue'
+import Notification from "@/components/Notification.vue";
 </script>
 
 <template>
@@ -9,6 +10,8 @@ import Navigation from './components/Navigation.vue'
   </div>
 
   <RouterView />
+
+  <Notification />
 </template>
 
 <style scoped>

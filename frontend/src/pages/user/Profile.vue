@@ -1,13 +1,42 @@
 <script setup lang="ts">
 
 import Dashboard from "@/components/Dashboard.vue";
+import {onMounted, ref} from "vue";
+import axios from "axios";
+import {Endpoints} from "@/lib/variables";
+import {useNotificationStore} from "@/stores/notification-store";
+import {useUserStore} from "@/stores/user-store";
+import type {User} from "@/lib/models";
+import Loader from "@/components/Loader.vue";
+
+const notifications = useNotificationStore()
+const user = useUserStore()
+const loading = ref<boolean>(false)
+
+const getUser = async () => {
+  try {
+    loading.value = true
+    const response = await axios.get<User>(Endpoints.retrieveUser, {withCredentials: true})
+    user.setUserData(response.data)
+  } catch (error) {
+    notifications.addNotification("Failed to get user: " + error, "error")
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  getUser()
+})
 </script>
 
 <template>
   <div class="profile-wrapper">
-    <Dashboard />
+    <Loader v-if="loading"/>
+    <Dashboard v-else/>
     <div class="profile">
-      <div class="profile-content">
+      <Loader v-if="loading"/>
+      <div class="profile-content" v-else>
         <h1>Welcome!</h1>
       </div>
     </div>

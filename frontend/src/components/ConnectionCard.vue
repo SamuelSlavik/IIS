@@ -1,23 +1,33 @@
 <script setup lang="ts">
 import Tram from 'vue-material-design-icons/Tram.vue';
+import Bus from 'vue-material-design-icons/Bus.vue';
 import Settings from 'vue-material-design-icons/Cog.vue';
+import type {ConnectionStop} from "@/lib/models";
 
+interface Props {
+  id: string
+  lineName: string
+  type: string
+  stops: ConnectionStop[]
+}
+const props = defineProps<Props>()
 
 </script>
 
 <template>
   <div class="card">
     <div class="connection-title">
-      <Tram class="connection-icon"/>
-      <h2>12</h2>
+      <Tram v-if="props.type === 'tram'" class="connection-icon"/>
+      <Bus v-if="props.type === 'bus'" class="connection-icon"/>
+      <h2>{{ props.lineName }}</h2>
     </div>
     <div class="connection-route">
       <ul>
-        <li><div><span>12:00</span><span>Initial stop</span></div></li>
-        <li><div><span>12:32</span><span>Final stop</span></div></li>
+        <li><div><span>{{props.stops[0].DepartureTime}}</span><span>{{props.stops[0].StopName}}</span></div></li>
+        <li><div><span>{{props.stops[stops.length -1].DepartureTime}}</span><span>{{props.stops[stops.length -1].StopName}}</span></div></li>
       </ul>
     </div>
-    <button class="small-button">Myabe a button</button>
+    <button class="small-button">Maybe a button</button>
     <div class="connection-context-icon">
       <Settings class="connection-icon"/>
     </div>

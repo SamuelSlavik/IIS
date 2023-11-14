@@ -2,6 +2,9 @@
 import MenuIcon from 'vue-material-design-icons/Menu.vue';
 import Close from 'vue-material-design-icons/Close.vue';
 import {ref} from "vue";
+import {useUserStore} from "@/stores/user-store";
+
+const user = useUserStore()
 
 const displayMenu = ref<boolean>(false)
 
@@ -21,8 +24,8 @@ const toggleMenu = () => {
       </div>
       <div v-if="displayMenu" class="menu">
         <router-link to="/" :onclick="toggleMenu">Homepage</router-link>
-        <router-link to="/login" :onclick="toggleMenu">Login</router-link>
-        <router-link to="/profile" :onclick="toggleMenu">Profile</router-link>
+        <router-link v-if="!user.id" to="/login" :onclick="toggleMenu">Login</router-link>
+        <router-link v-if="user.id" to="/profile" :onclick="toggleMenu">Profile</router-link>
       </div>
     </div>
   </div>

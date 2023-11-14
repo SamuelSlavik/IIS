@@ -1,18 +1,44 @@
 <script setup lang="ts">
 import {ref} from "vue";
+import axios from "axios";
+import {Endpoints} from "@/lib/variables";
+import { useNotificationStore } from "@/stores/notification-store";
+import { useUserStore } from "@/stores/user-store";
+import Loader from "@/components/Loader.vue";
+import { useRouter } from 'vue-router';
+
+const notifications = useNotificationStore();
+const router = useRouter();
+const user = useUserStore()
 
 const email =ref<string>("")
 const password = ref<string>("")
 
-const submit = async () => {
-  alert(email.value)
+const loading = ref<boolean>(false)
+
+const login = async () => {
+  loading.value = true
+  try {
+    const response = await axios.post(Endpoints.login,
+        {Email: email.value, Password: password.value},
+        { withCredentials: true }
+    )
+    if (response.status === 200) {
+      await router.push('/profile');
+    }
+  } catch (e) {
+    notifications.addNotification("Logging in failed: " + e, "error")
+  } finally {
+    loading.value = false
+  }
 }
 
 </script>
 
 <template>
 <div class="container">
-  <form :onsubmit="submit" class="login-form">
+  <Loader v-if="loading"/>
+  <form @submit.prevent="login" class="login-form">
     <input
       type="email"
       name="email"
