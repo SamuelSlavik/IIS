@@ -6,6 +6,7 @@ import { useNotificationStore } from "@/stores/notification-store";
 import { useUserStore } from "@/stores/user-store";
 import Loader from "@/components/Loader.vue";
 import { useRouter } from 'vue-router';
+import {User} from "@/lib/models";
 
 const notifications = useNotificationStore();
 const router = useRouter();
@@ -24,7 +25,16 @@ const login = async () => {
         { withCredentials: true }
     )
     if (response.status === 200) {
-      await router.push('/profile');
+      try {
+        const response = await axios.get<User>(Endpoints.retrieveCurrentUser, {withCredentials: true})
+        user.setUserData(response.data)
+
+        if (response.status === 200) {
+          await router.push('/profile');
+        }
+      } catch (error) {
+        notifications.addNotification("Failed to get user: " + error, "error")
+      }
     }
   } catch (e) {
     notifications.addNotification("Logging in failed: " + e, "error")
@@ -70,17 +80,17 @@ const login = async () => {
     gap: 2rem;
   }
 
-  input {
+  input, select {
     width: 100%;
     padding: 1rem;
     outline: none;
     border-radius: 4px;
     border: 1px solid rgba(60, 60, 67, .12);
   }
-  input:invalid {
+  input:invalid, select:invalid {
     border: 1px solid #ff453a;
   }
-  input:hover, input:focus {
+  input:hover, input:focus, select:hover, select:focus {
     border: 1px solid #00bd7e;
   }
 

@@ -1,9 +1,12 @@
 <script setup lang="ts">
-
 import {ref} from "vue";
 import type {UserRegistration} from "@/lib/models";
 import axios from "axios";
 import {Endpoints} from "@/lib/variables";
+import router from "@/router";
+import {useNotificationStore} from "@/stores/notification-store";
+
+const notifications = useNotificationStore()
 
 const newUser = ref<UserRegistration>({
   firstName: "",
@@ -18,25 +21,27 @@ const newUser = ref<UserRegistration>({
 const registerNewUser = async () => {
   try {
     const response = await axios.post(Endpoints.signup, newUser.value)
-    alert(response.data)
+    if (response.status === 200) {
+      alert("User created")
+    }
+    await router.push('/profile/users');
   } catch (e) {
-    alert(e)
-  } finally {
-    alert("finally")
+    notifications.addNotification("Failed to create user: " + e, "error")
   }
 }
-
 </script>
 
 <template>
-  <div class="container">
-    <form @submit.prevent="registerNewUser" class="login-form">
+  <div>
+    <h2>Create new user</h2>
+    <br/>
+    <form @submit.prevent="registerNewUser" class="form">
       <input
           type="text"
           name="first-name"
           placeholder="First name"
           v-model="newUser.firstName"
-
+          required
       />
       <input
           type="text"
@@ -71,15 +76,13 @@ const registerNewUser = async () => {
           name="password-rpt"
           placeholder="Repeat password"
           v-model="newUser.passwordRpt"
-
       />
-      <input
-          type="text"
-          name="role"
-          placeholder="Role"
-          v-model="newUser.role"
-
-      />
+      <select v-model="newUser.role">
+        <option value="superuser">Superuser</option>
+        <option value="technician">Technician</option>
+        <option value="dispatcher">Dispatcher</option>
+        <option value="driver">Driver</option>
+      </select>
       <button
           type="submit"
       >Register Account</button>
@@ -88,5 +91,12 @@ const registerNewUser = async () => {
 </template>
 
 <style>
-
+.form {
+  width: 100%;
+  max-width: 400px;
+  margin-left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
 </style>

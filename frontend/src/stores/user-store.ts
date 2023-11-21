@@ -30,6 +30,9 @@ export const useUserStore : any = defineStore(
                 this.birthDate = '';
                 this.email = '';
                 this.role = '';
+            },
+            checkAuthentication (): boolean {
+                return this.id ? true : false;
             }
         },
     });
