@@ -11,7 +11,8 @@ func Router() *gin.Engine {
 	router := gin.Default()
 
 	config := cors.DefaultConfig()
-	config.AllowAllOrigins = true
+	config.AllowCredentials = true
+	config.AllowOrigins = []string{"http://localhost:5173"}
 
 	router.Use(cors.New(config))
 
@@ -20,7 +21,9 @@ func Router() *gin.Engine {
 	router.GET("/api/users/get", middleware.RequireAuth(), views.RetrieveCurrentUser)
 
 	router.POST("/api/users/signup", views.Signup)
+	router.DELETE("/api/users/delete/:id", middleware.RequireAuth(), views.DeleteUser)
 	router.POST("/api/users/login", views.Login)
+	router.GET("/api/users/logout", views.Logout)
 
 	router.GET("/api/vehicles/list", views.List_vehicles)
 
