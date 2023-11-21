@@ -43,6 +43,35 @@ func Signup(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, result)
 }
 
+func DeleteUser(ctx *gin.Context) {
+	userID := ctx.Param("id")
+
+	if userID == "" {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "User ID is required"})
+		return
+	}
+
+	// Fetch user from the database
+	var user models.User
+	result := utils.DB.First(&user, "id = ?", userID)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		ctx.IndentedJSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	} else if result.Error != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	// Delete user from the database
+	deleteResult := utils.DB.Delete(&user)
+	if deleteResult.Error != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	ctx.IndentedJSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
+}
+
 func Login(ctx *gin.Context) {
 	var user_serializer serializers.UserLoginSerializer
 	var user_model models.User
@@ -97,6 +126,11 @@ func Login(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, user_public)
 }
 
+func Logout(ctx *gin.Context) {
+	ctx.SetSameSite(http.SameSiteLaxMode)
+	ctx.SetCookie("Authorization", "", -1, "", "", false, true)
+	ctx.JSON(http.StatusOK, gin.H{"message": "Logout successful"})
+}
 
 func ListUsers(ctx *gin.Context) {
 	var user_models []models.User
@@ -119,7 +153,6 @@ func ListUsers(ctx *gin.Context) {
 
 	ctx.IndentedJSON(http.StatusOK, user_serializers)
 }
-
 
 func RetrieveUser(ctx *gin.Context) {
 	var user_model models.User
@@ -148,7 +181,6 @@ func RetrieveUser(ctx *gin.Context) {
 
 	ctx.IndentedJSON(http.StatusOK, user_serializer)
 }
-
 
 func RetrieveCurrentUser(ctx *gin.Context) {
 	user_serializer := serializers.UserPublicSerializer{}

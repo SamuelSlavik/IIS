@@ -12,12 +12,31 @@ export class Endpoints {
     static get login(): string {
         return `${Endpoints.baseUrl}/users/login`;
     }
+    static get logout(): string {
+        return `${Endpoints.baseUrl}/users/logout`;
+    }
 
     static get signup(): string {
         return `${Endpoints.baseUrl}/users/signup`;
     }
 
-    static get retrieveUser(): string {
+    static deleteUser(id: string): string {
+        return `${Endpoints.baseUrl}/users/delete/${id}`;
+    }
+
+    static get retrieveCurrentUser(): string {
         return `${Endpoints.baseUrl}/users/get`;
+    }
+
+    static retrieveUser(id: string): string {
+        return `${Endpoints.baseUrl}/users/get/${id}`;
+    }
+
+    static get listUsers(): string {
+        return `${Endpoints.baseUrl}/users/list`;
+    }
+
+    static get listVehicles(): string {
+        return `${Endpoints.baseUrl}/vehicles/list`;
     }
 }

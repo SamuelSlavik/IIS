@@ -26,5 +26,37 @@ export interface User {
     LastName: string;
     BirthDate: string;
     Email: string;
-    Role: string;
+    Role: Roles | undefined;
 }
+
+export enum Roles {
+    Admin = "admin",
+    Superuser = "superuser",
+    Technician = "technician",
+    Dispatcher = "dispatcher",
+    Driver = "driver",
+}
+
+export interface Vehicle {
+    ID: string
+    Registration: string
+    Capacity: number
+    Brand: string
+    ImageData: string
+    VehicleType: VehicleType
+    VehicleTypeName: string
+    LineName: string
+    Connections: Connection[]
+}
+
+export interface VehicleType {
+    ID: string
+    Type: VehicleTypeEnum
+}
+
+export enum VehicleTypeEnum {
+    Bus = "bus",
+    Tram = "tram",
+    ObrnenaDodavka = "obrnena_dodavka",
+}
+

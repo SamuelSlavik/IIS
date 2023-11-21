@@ -8,18 +8,22 @@ import {useNotificationStore} from "@/stores/notification-store";
 import {useUserStore} from "@/stores/user-store";
 import type {User} from "@/lib/models";
 import Loader from "@/components/Loader.vue";
+import router from "@/router";
 
 const notifications = useNotificationStore()
 const user = useUserStore()
 const loading = ref<boolean>(false)
 
+const route = router.currentRoute.value.path
+
 const getUser = async () => {
   try {
     loading.value = true
-    const response = await axios.get<User>(Endpoints.retrieveUser, {withCredentials: true})
+    const response = await axios.get<User>(Endpoints.retrieveCurrentUser, {withCredentials: true})
     user.setUserData(response.data)
   } catch (error) {
     notifications.addNotification("Failed to get user: " + error, "error")
+    await router.push('/login')
   } finally {
     loading.value = false
   }
@@ -37,7 +41,7 @@ onMounted(() => {
     <div class="profile">
       <Loader v-if="loading"/>
       <div class="profile-content" v-else>
-        <h1>Welcome!</h1>
+        <router-view></router-view>
       </div>
     </div>
   </div>
