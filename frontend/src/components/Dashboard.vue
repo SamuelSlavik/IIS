@@ -50,6 +50,9 @@ const logOut = async () => {
         <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/requests/new">Create maintenance request</router-link></p>
         <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/requests">Manage maintenance requests</router-link></p>
         <br/>
+        <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/stops">Manage stops</router-link></p>
+        <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/stops/new">Create stop</router-link></p>
+        <br/>
         <p v-if="user.role === 'admin' || user.role === 'technician'"><router-link to="/profile/technician/requests">My maintenance requests</router-link></p>
         <br/>
         <p v-if="user.role === 'admin' || user.role === 'dispatcher'"><router-link to="/profile/dispatcher/lines">Manage lines</router-link></p>

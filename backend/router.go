@@ -31,5 +31,12 @@ func Router() *gin.Engine {
 
 	router.GET("/api/connections", views.ListConnections)
 	router.GET("/api/connections/:id", views.GetConnection)
+
+	router.GET("/api/stops", views.ListStops)
+	router.GET("/api/stops/get/:id", views.GetStop)
+	//router.DELETE("/api/stops/delete/:id", views.DeleteStop)
+	router.PUT("/api/stops/edit/:id", views.EditStop)
+	router.POST("/api/stops/create", views.CreateStop)
+
 	return router
 }

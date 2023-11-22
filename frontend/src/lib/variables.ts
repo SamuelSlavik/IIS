@@ -39,4 +39,20 @@ export class Endpoints {
     static get listVehicles(): string {
         return `${Endpoints.baseUrl}/vehicles/list`;
     }
+
+    static get listStops(): string {
+        return `${Endpoints.baseUrl}/stops`;
+    }
+    static stopDetail(id: string): string {
+        return `${Endpoints.baseUrl}/stops/get/${id}`;
+    }
+    static editStop(id: string): string {
+        return `${Endpoints.baseUrl}/stops/edit/${id}`;
+    }
+    static deleteStop(id: string): string {
+        return `${Endpoints.baseUrl}/stops/delete/${id}`;
+    }
+    static get createStop(): string {
+        return `${Endpoints.baseUrl}/stops/create`;
+    }
 }
