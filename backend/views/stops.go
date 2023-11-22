@@ -6,16 +6,24 @@ import (
 	"github.com/AdamPekny/IIS/backend/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
 )
 
 func ListStops(ctx *gin.Context) {
 	var stopModels []models.Stop
 	var stopSerializers []serializers.StopSerializer
 
-	// TODO - implement active status
+	// Retrieve the query parameter from the URL
+	query := ctx.Query("query")
 
-	// Fetch all stops from the database and order by name
-	res := utils.DB.Order("name").Find(&stopModels)
+	// Build the query to filter stops by name if the query parameter is provided
+	dbQuery := utils.DB.Order("name")
+	if query != "" {
+		dbQuery = dbQuery.Where("LOWER(name) LIKE ?", "%"+strings.ToLower(query)+"%")
+	}
+
+	// Fetch stops from the database based on the query
+	res := dbQuery.Find(&stopModels)
 
 	if res.Error != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{

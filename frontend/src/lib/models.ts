@@ -70,3 +70,9 @@ export interface Stop {
 export interface NewStop {
     Name: string
 }
+
+export interface LineInList {
+    Name: string
+    InitialStop: string
+    FinalStop: string
+}

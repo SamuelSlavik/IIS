@@ -113,10 +113,6 @@ const router = createRouter({
           component: Stops
         },
         {
-          path: 'superuser/stops/detail/:id',
-          component: NewStop
-        },
-        {
           path: 'superuser/stops/edit/:id',
           component: EditStop
         },

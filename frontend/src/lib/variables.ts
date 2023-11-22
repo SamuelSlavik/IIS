@@ -40,8 +40,15 @@ export class Endpoints {
         return `${Endpoints.baseUrl}/vehicles/list`;
     }
 
-    static get listStops(): string {
+    static listStops(query?: string): string {
+        if (query) {
+            return `${Endpoints.baseUrl}/stops?query=${query}`;
+        }
         return `${Endpoints.baseUrl}/stops`;
+    }
+
+    static listStopsByQuery(query:string): string {
+        return `${Endpoints.baseUrl}/stops/${query}`;
     }
     static stopDetail(id: string): string {
         return `${Endpoints.baseUrl}/stops/get/${id}`;
@@ -54,5 +61,9 @@ export class Endpoints {
     }
     static get createStop(): string {
         return `${Endpoints.baseUrl}/stops/create`;
+    }
+
+    static get listLines(): string {
+        return `${Endpoints.baseUrl}/lines`;
     }
 }

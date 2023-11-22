@@ -7,16 +7,19 @@ import axios from "axios";
 import {useNotificationStore} from "@/stores/notification-store";
 import Delete from "vue-material-design-icons/Delete.vue";
 import Pencil from "vue-material-design-icons/Pencil.vue";
+import Magnify from "vue-material-design-icons/Magnify.vue";
 
 const loading = ref<boolean>(false)
 const notifications = useNotificationStore()
+
+const query = ref<string>("")
 
 const stops = ref<Stop[]>([])
 
 const loadStops = async () => {
   try {
     loading.value = true
-    const response = await axios.get(Endpoints.listStops, {withCredentials: true})
+    const response = await axios.get(Endpoints.listStops(query.value), {withCredentials: true})
     stops.value = response.data
     console.log(stops.value)
 
@@ -54,12 +57,26 @@ onMounted(() => {
   <div>
     <div class="header"><h2>Manage stops</h2></div>
 
+    <div class="toolbar">
+      <form @submit.prevent="loadStops" class="search-form">
+        <input
+          type="text"
+          name="query"
+          placeholder="Search stops"
+          v-model="query"
+        />
+        <button type="submit" class="small-button">
+          <Magnify size="24px"/>
+        </button>
+      </form>
+    </div>
+
     <Loader v-if="loading"/>
     <div v-else>
       <div class="table">
         <div v-for="(stop, index) in stops" :key="stop.ID">
           <div class="list-item">
-            <router-link :to="'/profile/superuser/stops/detail/' + stop.ID" class="list-item__name">
+            <router-link :to="'/profile/superuser/stops/edit/' + stop.ID" class="list-item__name">
               <b>{{ stop.Name }}</b>
             </router-link>
             <p v-if="stop.Active" class="list-item__role green">
@@ -78,5 +95,9 @@ onMounted(() => {
 </template>
 
 <style>
-
+.search-form {
+  display: flex;
+  justify-content: space-between;
+  gap: 0;
+}
 </style>
