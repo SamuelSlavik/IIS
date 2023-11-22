@@ -48,7 +48,7 @@ func main() {
 	//seed lines
 	for i := 1; i <= 2; i++ {
 		line := models.Line{
-			Name:        fmt.Sprintf("Line %v", i),
+			Name:        fmt.Sprintf("Line%v", i),
 			FinalStop:   stops[gofakeit.Number(0, 9)].Name,
 			InitialStop: stops[gofakeit.Number(10, 19)].Name,
 		}
@@ -60,7 +60,7 @@ func main() {
 	vehicles := []models.Vehicle{}
 	utils.DB.Find(&vehicles)
 	// seed segments
-	for i := 0; i < len(lines); i++ {
+	/*for i := 0; i < len(lines); i++ {
 		initial_segment := models.Segment{
 			StopName1: lines[i].InitialStop,
 			StopName2: stops[gofakeit.Number(0, len(stops)-1)].Name,
@@ -87,7 +87,7 @@ func main() {
 		utils.DB.Create(&final_segment)
 		lines[i].Segments = append(lines[i].Segments, &final_segment)
 		utils.DB.Save(&lines[i])
-	}
+	}*/
 	for i := 0; i < 8; i++ {
 		connection := models.Connection{
 			DepartureTime: gofakeit.Date(),
