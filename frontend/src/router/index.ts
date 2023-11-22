@@ -10,6 +10,24 @@ import NewVehicle from "@/pages/user/superuser/NewVehicle.vue";
 import UserDetail from "@/pages/user/admin/UserDetail.vue";
 import MaintenanceRequests from "@/pages/user/superuser/Requests.vue";
 import NewMaintenanceRequest from "@/pages/user/superuser/NewRequest.vue";
+import Connections from "@/pages/user/superuser/Connections.vue";
+import NewStop from "@/pages/user/superuser/NewStop.vue";
+import Stops from "@/pages/user/superuser/Stops.vue";
+import Lines from "@/pages/user/superuser/Lines.vue";
+import LineDetail from "@/pages/user/superuser/LineDetail.vue";
+import NewLine from "@/pages/user/superuser/NewLine.vue";
+import EditLine from "@/pages/user/superuser/EditLine.vue";
+import EditStop from "@/pages/user/superuser/EditStop.vue";
+import EditRequest from "@/pages/user/superuser/EditRequest.vue";
+import RequestDetail from "@/pages/user/superuser/RequestDetail.vue";
+import EditUser from "@/pages/user/admin/EditUser.vue";
+import VehicleDetail from "@/pages/user/superuser/VehicleDetail.vue";
+import EditVehicle from "@/pages/user/superuser/EditVehicle.vue";
+import MyRequests from "@/pages/user/technician/MyRequests.vue";
+import MyRequestDetail from "@/pages/user/technician/MyRequestDetail.vue";
+import MyRequestComplete from "@/pages/user/technician/MyRequestComplete.vue";
+import MyPlan from "@/pages/user/driver/MyPlan.vue";
+import NewMalfunction from "@/pages/user/driver/NewMalfunction.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -47,12 +65,24 @@ const router = createRouter({
           component: UserDetail
         },
         {
+          path: 'users/edit/:id',
+          component: EditUser
+        },
+        {
           path: 'superuser/vehicles',
           component: VehiclesList
         },
         {
           path: 'superuser/vehicles/new',
           component: NewVehicle
+        },
+        {
+          path: 'superuser/vehicles/detail/:id',
+          component: VehicleDetail
+        },
+        {
+          path: 'superuser/vehicles/edit/:id',
+          component: EditVehicle
         },
         {
           path: 'superuser/requests',
@@ -62,6 +92,71 @@ const router = createRouter({
           path: 'superuser/requests/new',
           component: NewMaintenanceRequest
         },
+        {
+          path: 'superuser/requests/detail/:id',
+          component: RequestDetail
+        },
+        {
+          path: 'superuser/requests/edit/:id',
+          component: EditRequest
+        },
+        {
+          path: 'superuser/connections',
+          component: Connections
+        },
+        {
+          path: 'superuser/stops/new',
+          component:  NewStop
+        },
+        {
+          path: 'superuser/stops',
+          component: Stops
+        },
+        {
+          path: 'superuser/stops/detail/:id',
+          component: NewStop
+        },
+        {
+          path: 'superuser/stops/edit/:id',
+          component: EditStop
+        },
+        {
+          path: 'superuser/lines',
+          component: Lines
+        },
+        {
+          path: 'superuser/lines/detail/:id',
+          component: LineDetail
+        },
+        {
+          path: 'superuser/lines/new',
+          component: NewLine
+        },
+        {
+          path: 'superuser/lines/edit/:id',
+          component: EditLine
+        },
+        {
+          path: 'technician/requests',
+          component: MyRequests
+        },
+        {
+          path: 'technician/requests/detail/:id',
+          component: MyRequestDetail
+        },
+        {
+          path: 'technician/requests/complete/:id',
+          component: MyRequestComplete
+        },
+        {
+          path: 'driver/my-plan',
+          component: MyPlan
+        },
+        {
+          path: 'driver/report/new',
+          component: NewMalfunction
+        },
+
 
       ]
     }
