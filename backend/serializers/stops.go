@@ -17,10 +17,10 @@ type StopCreateRequest struct {
 	Name string `binding:"required"`
 }
 
-func (u *StopSerializer) FromModel(stop models.Stop) {
-	u.ID = stop.ID
-	u.Name = stop.Name
-	u.Active = true
+func (s *StopSerializer) FromModel(stop models.Stop) {
+	s.ID = stop.ID
+	s.Name = stop.Name
+	s.Active = true
 
 	// TODO - implement active status
 }
