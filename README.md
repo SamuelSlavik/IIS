@@ -54,8 +54,6 @@ https://github.com/cosmtrek/air/blob/master/README.md
     MAINTENANCE REQUEST:
     /api/maintenreq/create     - create MAINTENANCE REQUEST
 ### PUT
-    USER:
-    /api/users/update/:id   - retrieve currently logged in user *
     LINES:
     /api/lines/update/:name - update line and segments
     VEHICLES:
@@ -63,6 +61,8 @@ https://github.com/cosmtrek/air/blob/master/README.md
     STOPS:
     /api/stops/update/:id       - update stop
 ### PATCH
+    USER:
+    /api/users/update/:id   - update user information (not role) *
     CONNECTIONS:
     /api/conncections/update/:id - update connection (without driver and vehicle)
     /api/conncections/assign/:id - assign driver + vehicle 

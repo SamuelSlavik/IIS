@@ -96,3 +96,36 @@ func (u *UserPublicSerializer) FromModel(user models.User) {
 	u.Role = user.Role
 	u.CreatedAt = user.CreatedAt
 }
+
+// User update serializer
+
+type UserUpdateSerializer struct {
+	FirstName     string           
+	LastName      string           
+	Email         string           
+	BirthDate     utils.CustomDate 
+	ValidatorErrs []validators.ValidatorErr
+}
+
+func (u *UserUpdateSerializer) Valid() bool {
+	if u.Email != "" {
+		validators.Email_validator(u.Email, &u.ValidatorErrs)
+	}
+
+	return len(u.ValidatorErrs) == 0
+}
+
+func (u UserUpdateSerializer) copy_data(user *models.User) {
+	user.FirstName = u.FirstName
+	user.LastName = u.LastName
+	user.Email = u.Email
+	user.BirthDate = u.BirthDate.Time
+}
+
+func (u UserUpdateSerializer) ToModel() *models.User {
+	user := &models.User{}
+
+	u.copy_data(user)
+
+	return user
+}
