@@ -125,8 +125,8 @@ func GetConnectionByLine(ctx *gin.Context) {
 		connection := serializers.ConnectionLineSerializer{
 			ConnectionID:  model.ID,
 			LineName:      model.LineName,
-			ArrivalTime:   "00:00",
-			DepartureTime: model.DepartureTime.Format("2006-01-02 15:04"), //todo
+			ArrivalTime:   model.ArrivalTime.Format("2006-01-02 15:04"),
+			DepartureTime: model.DepartureTime.Format("2006-01-02 15:04"),
 			Dirrection:    model.Dirrection,
 		}
 		connections = append(connections, connection)
@@ -150,8 +150,8 @@ func GetConnectionByLineAndDate(ctx *gin.Context) {
 		connection := serializers.ConnectionLineSerializer{
 			ConnectionID:  model.ID,
 			LineName:      model.LineName,
-			ArrivalTime:   "00:00",
-			DepartureTime: model.DepartureTime.Format("2006-01-02 15:04"), //todo
+			ArrivalTime:   model.ArrivalTime.Format("2006-01-02 15:04"),
+			DepartureTime: model.DepartureTime.Format("2006-01-02 15:04"),
 			Dirrection:    model.Dirrection,
 		}
 		connections = append(connections, connection)
