@@ -40,11 +40,11 @@ const deleteUser = async(id: string) => {
   try {
     const response = await axios.delete(Endpoints.deleteUser(id), {withCredentials: true})
     if (response.status === 200) {
-      notifications.value.push("User deleted")
+      notifications.addNotification("User deleted", "success")
       loadUsers()
     }
   } catch (error) {
-    notifications.value.push("Failed to delete user: " + error)
+    notifications.addNotification("Failed to delete user: " + error, "error")
   } finally {
   }
 }
