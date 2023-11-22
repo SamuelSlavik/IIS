@@ -21,11 +21,6 @@ type Segment struct {
 	LineName  string
 }
 
-type Stop struct {
-	ID   uint   `gorm:"primaryKey;not null;autoIncrement"`
-	Name string `gorm:"not null;unique"`
-}
-
 type Connection struct {
 	ID            uint `gorm:"primaryKey;autoIncrement;not null"`
 	DepartureTime time.Time
