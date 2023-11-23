@@ -111,10 +111,10 @@ func main() {
 	}
 	for i := 0; i < 8; i++ {
 		connection := models.Connection{
-			DepartureTime: gofakeit.Date(),
-			VehicleID:     vehicles[rand.Intn(len(vehicles)-1)].ID,
-			LineName:      lines[i%2].Name,
-			Dirrection:    i%2 == 1,
+			DepartureTime:       gofakeit.Date(),
+			VehicleRegistration: vehicles[rand.Intn(len(vehicles)-1)].Registration,
+			LineName:            lines[i%2].Name,
+			Dirrection:          i%2 == 1,
 		}
 		utils.DB.Create(&connection)
 	}
