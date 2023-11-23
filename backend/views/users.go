@@ -228,6 +228,7 @@ func UpdateUser(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid ID provided",
 		})
+		return
 	}
 
 	uid := uint(id)
