@@ -18,4 +18,6 @@ type ConnectionLineSerializer struct {
 	DepartureTime string
 	ArrivalTime   string
 	Dirrection    bool
+	InitialStop   string
+	FinalStop     string
 }
