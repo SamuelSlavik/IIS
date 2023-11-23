@@ -29,7 +29,7 @@ func Router() *gin.Engine {
 	router.PATCH("/api/users/update/:id", middleware.RequireAuth(), views.UpdateUser)
 
 	router.DELETE("/api/users/delete/:id", middleware.RequireAuth(string(models.AdminRole)), views.DeleteUser)
-	
+
 	// Vehicles
 	router.GET("/api/vehicles/list", views.List_vehicles)
 	router.POST("/api/vehicles/create", views.Create_vehicle)
@@ -39,13 +39,13 @@ func Router() *gin.Engine {
 	router.GET("/api/connections/get/:id", views.GetConnectionById)
 	router.GET("/api/connections/list/:line", views.ListConnectionsByLine)
 	router.GET("/api/connections/list/:line/:date", views.ListConnectionsByLineAndDate)
+	router.POST("/api/connections/create", views.CreateConnection)
 
 	router.GET("/api/stops", views.ListStops)
 	router.GET("/api/stops/get/:id", views.GetStop)
 	//router.DELETE("/api/stops/delete/:id", views.DeleteStop)
 	router.PUT("/api/stops/edit/:id", views.EditStop)
 	router.POST("/api/stops/create", views.CreateStop)
-
 
 	router.GET("/api/lines", views.ListLines)
 	router.GET("/api/lines/get/:id", views.GetLine)
