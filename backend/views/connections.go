@@ -190,12 +190,12 @@ func CreateConnection(ctx *gin.Context) {
 		return
 	}
 
-	//connection_model := connection.Create_model()
+	connection_model := connection.CreateModel()
 
-	/*if result := utils.DB.Create(connection_model); result.Error != nil {
+	if result := utils.DB.Create(connection_model); result.Error != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
 		return
 	} else {
 		ctx.IndentedJSON(http.StatusOK, result)
-	}*/
+	}
 }
