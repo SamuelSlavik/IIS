@@ -7,7 +7,6 @@ import (
 	"gorm.io/gorm"
 )
 
-
 type Role string
 
 const (
@@ -20,25 +19,26 @@ const (
 
 type User struct {
 	gorm.Model
-	FirstName string    `gorm:"not null"`
-	LastName  string    `gorm:"not null"`
-	Email     string    `gorm:"not null"` // Unique among non deleted users
-	BirthDate time.Time `gorm:"not null"`
-	Password  string    `gorm:"not null"`
-	Role      Role      `gorm:"not null"`
+	FirstName   string       `gorm:"not null"`
+	LastName    string       `gorm:"not null"`
+	Email       string       `gorm:"not null"` // Unique among non deleted users
+	BirthDate   time.Time    `gorm:"not null"`
+	Password    string       `gorm:"not null"`
+	Role        Role         `gorm:"not null"`
+	Connections []Connection `gorm:"foreignKey:DriverID"`
 }
 
 func uniqueEmailCheck(tx *gorm.DB, email string) (err error) {
 	var existing_user User
 	result := tx.Where("email = ?", email).First(&existing_user)
 
-    if result.Error == nil {
-        // User with the same email already exists, return an error
-        return fmt.Errorf("User with email %s already exists", email)
-    } else if result.Error != gorm.ErrRecordNotFound {
-        // Some other error occurred, return the error
-        return result.Error
-    }
+	if result.Error == nil {
+		// User with the same email already exists, return an error
+		return fmt.Errorf("User with email %s already exists", email)
+	} else if result.Error != gorm.ErrRecordNotFound {
+		// Some other error occurred, return the error
+		return result.Error
+	}
 
 	return nil
 }
@@ -52,10 +52,10 @@ func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {
 
 	result := tx.Where("id = ?", u.ID).First(&existing_user)
 
-    if result.Error != nil {
-        // User with the same email already exists, return an error
-        return fmt.Errorf("User not found")
-    }
+	if result.Error != nil {
+		// User with the same email already exists, return an error
+		return fmt.Errorf("User not found")
+	}
 
 	// Check if the email field is being updated
 	if tx.Statement.Changed("Email") {
