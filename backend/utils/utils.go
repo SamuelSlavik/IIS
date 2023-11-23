@@ -1,10 +1,13 @@
 package utils
 
 import (
+	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -46,4 +49,14 @@ func (d *CustomDate) UnmarshalJSON(b []byte) error {
 
 	d.Time = parsedDate
 	return nil
+}
+
+func GetIDFromURL(ctx *gin.Context) (uint, error) {
+	id, err := strconv.Atoi(ctx.Param("id"))
+
+	if err != nil || id < 0 {
+		return 0, fmt.Errorf("invalid ID found: %s", ctx.Param("id"))
+	}
+
+	return uint(id), nil
 }

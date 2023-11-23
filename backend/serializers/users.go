@@ -1,6 +1,7 @@
 package serializers
 
 import (
+	"fmt"
 	"time"
 
 	models "github.com/AdamPekny/IIS/backend/models"
@@ -23,8 +24,9 @@ type UserSignupSerializer struct {
 }
 
 func (u *UserSignupSerializer) Valid() bool {
-	validators.Email_validator(u.Email, &u.ValidatorErrs)
-	validators.Password_match(u.Password, u.PasswordRpt, &u.ValidatorErrs)
+	validators.EmailValidator(u.Email, &u.ValidatorErrs)
+	validators.PasswordMatch(u.Password, u.PasswordRpt, &u.ValidatorErrs)
+	validators.RoleValidator(string(u.Role), &u.ValidatorErrs)
 
 	return len(u.ValidatorErrs) == 0
 }
@@ -62,7 +64,7 @@ type UserLoginSerializer struct {
 }
 
 func (u *UserLoginSerializer) Valid() bool {
-	validators.Email_validator(u.Email, &u.ValidatorErrs)
+	validators.EmailValidator(u.Email, &u.ValidatorErrs)
 
 	return len(u.ValidatorErrs) == 0
 }
@@ -82,7 +84,8 @@ type UserPublicSerializer struct {
 }
 
 func (u *UserPublicSerializer) Valid() bool {
-	validators.Email_validator(u.Email, &u.ValidatorErrs)
+	validators.EmailValidator(u.Email, &u.ValidatorErrs)
+	validators.RoleValidator(string(u.Role), &u.ValidatorErrs)
 
 	return len(u.ValidatorErrs) == 0
 }
@@ -111,7 +114,7 @@ type UserUpdateSerializer struct {
 
 func (u *UserUpdateSerializer) Valid() bool {
 	if u.Email != "" {
-		validators.Email_validator(u.Email, &u.ValidatorErrs)
+		validators.EmailValidator(u.Email, &u.ValidatorErrs)
 	}
 
 	return len(u.ValidatorErrs) == 0
@@ -130,4 +133,34 @@ func (u UserUpdateSerializer) ToModel() *models.User {
 	u.copy_data(user)
 
 	return user
+}
+
+type UserMaintenanceSerializer struct {
+	ID uint
+	FirstName string
+	LastName string
+	Email string
+	Role models.Role
+	ValidatorErrs []validators.ValidatorErr
+}
+
+func (u *UserMaintenanceSerializer) Valid() bool {
+	validators.EmailValidator(u.Email, &u.ValidatorErrs)
+	validators.RoleValidator(string(u.Role), &u.ValidatorErrs)
+
+	return len(u.ValidatorErrs) == 0
+}
+
+func (u *UserMaintenanceSerializer) FromModel(user_model *models.User) (err error) {
+	u.ID = user_model.ID
+	u.FirstName = user_model.FirstName
+	u.LastName = user_model.LastName
+	u.Email = user_model.Email
+	u.Role = user_model.Role
+
+	if ok := u.Valid(); !ok {
+		return fmt.Errorf("email %s is not a valid email", u.Email)
+	}
+	
+	return nil
 }

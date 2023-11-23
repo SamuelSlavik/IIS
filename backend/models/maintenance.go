@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Status string
@@ -15,20 +13,28 @@ const (
 )
 
 type MalfunctionReport struct {
-	gorm.Model
+	ID uint `gorm:"primaryKey;autoIncrement;not null"`
+	Title string `gorm:"not null;size:100"`
 	Description string `gorm:"not null"`
-	Status Status `gorm:"not null;default:pending"`
 	CreatedByRef uint `gorm:"not null"`
-	CreatedBy User `gorm:"foreignKey:CreatedBy"`
-	VehicleRef uint `gorm:"not null"`
-	Vehicle Vehicle `gorm:"foreignKey:Vehicle"`
+	CreatedBy User `gorm:"foreignKey:CreatedByRef"`
+	VehicleRef string `gorm:"not null"`
+	Vehicle Vehicle `gorm:"foreignKey:VehicleRef"`
+	CreatedAt time.Time `gorm:"autoCreateTime"`
+	MaintenReq *MaintenanceRequest `gorm:"foreignkey:MalfuncRepRef;constraint:OnDelete:CASCADE"`
 }
 
 type MaintenanceRequest struct {
-	gorm.Model
-	Description string `gorm:"not null"`
+	ID uint `gorm:"primaryKey;autoIncrement;not null"`
 	Status Status `gorm:"not null;default:pending"`
 	Deadline time.Time
+	CreatedAt time.Time `gorm:"autoCreateTime"`
+	MalfuncRepRef *uint `gorm:"not null;unique"`
+	MalfuncRep *MalfunctionReport `gorm:"foreignkey:MalfuncRepRef"`
+	CreatedByRef *uint `gorm:"not null"`
+	CreatedBy *User `gorm:"foreignKey:CreatedByRef"`
+	ResolvedByRef *uint 
+	ResolvedBy *User `gorm:"foreignKey:ResolvedByRef"`
 }
 
 type MaintenanceReport struct {

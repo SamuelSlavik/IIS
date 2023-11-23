@@ -7,9 +7,8 @@ type Vehicle struct {
 	ImageData       []byte
 	VehicleTypeName string
 	VehicleType     VehicleType `gorm:"foreignKey:VehicleTypeName;references:Type"`
-	LineName        *string
 	Connections     []Connection
-	Malfunctions     []MalfunctionReport `gorm:"foreignKey:Vehicle"`
+	Malfunctions     []MalfunctionReport `gorm:"foreignKey:VehicleRef"`
 }
 
 type VehicleType struct {
