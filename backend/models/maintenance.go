@@ -16,19 +16,23 @@ const (
 
 type MalfunctionReport struct {
 	gorm.Model
-	description string `gorm:"not null"`
-	status Status `gorm:"not null;default:pending"`
+	Description string `gorm:"not null"`
+	Status Status `gorm:"not null;default:pending"`
+	CreatedByRef uint `gorm:"not null"`
+	CreatedBy User `gorm:"foreignKey:CreatedBy"`
+	VehicleRef uint `gorm:"not null"`
+	Vehicle Vehicle `gorm:"foreignKey:Vehicle"`
 }
 
 type MaintenanceRequest struct {
 	gorm.Model
-	description string `gorm:"not null"`
-	status Status `gorm:"not null;default:pending"`
-	deadline time.Time
+	Description string `gorm:"not null"`
+	Status Status `gorm:"not null;default:pending"`
+	Deadline time.Time
 }
 
 type MaintenanceReport struct {
-	description string `gorm:"not null"`
-	cost uint `gorm:"default:0"`
+	Description string `gorm:"not null"`
+	Cost uint `gorm:"default:0"`
 }
 

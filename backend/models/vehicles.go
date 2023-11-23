@@ -10,6 +10,7 @@ type Vehicle struct {
 	VehicleType     VehicleType `gorm:"foreignKey:VehicleTypeName;references:Type"`
 	LineName        *string
 	Connections     []Connection
+	Malfunctions     []MalfunctionReport `gorm:"foreignKey:Vehicle"`
 }
 
 type VehicleType struct {

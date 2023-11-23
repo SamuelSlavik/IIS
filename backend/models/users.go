@@ -26,6 +26,7 @@ type User struct {
 	BirthDate time.Time `gorm:"not null"`
 	Password  string    `gorm:"not null"`
 	Role      Role      `gorm:"not null"`
+	MalfuncReports []MalfunctionReport `gorm:"foreignKey:CreatedBy"`
 }
 
 func uniqueEmailCheck(tx *gorm.DB, email string) (err error) {
