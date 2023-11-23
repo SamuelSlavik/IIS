@@ -44,14 +44,18 @@ const logOut = async () => {
         </p>
         <br/>
         <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/lines">Manage lines</router-link></p>
+        <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/lines/new">Create new line</router-link></p>
         <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/connections">Manage connections</router-link></p>
+        <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/connections/new">Create new connection</router-link></p>
         <br/>
         <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/vehicles">Manage vehicles</router-link></p>
-        <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/requests/new">Create maintenance request</router-link></p>
+        <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/vehicles/new">Create new vehicle</router-link></p>
         <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/requests">Manage maintenance requests</router-link></p>
+        <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/requests/new">Create maintenance request</router-link></p>
+
         <br/>
         <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/stops">Manage stops</router-link></p>
-        <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/stops/new">Create stop</router-link></p>
+        <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/stops/new">Create new stop</router-link></p>
         <br/>
         <p v-if="user.role === 'admin' || user.role === 'technician'"><router-link to="/profile/technician/requests">My maintenance requests</router-link></p>
         <br/>
