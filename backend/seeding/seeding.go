@@ -6,6 +6,7 @@ import (
 
 	api "github.com/AdamPekny/IIS/backend"
 	"github.com/AdamPekny/IIS/backend/models"
+	"github.com/AdamPekny/IIS/backend/serializers"
 	"github.com/AdamPekny/IIS/backend/utils"
 	"github.com/brianvoe/gofakeit/v6"
 )
@@ -19,7 +20,24 @@ func init() {
 func main() {
 	gofakeit.Seed(69420)
 	api.Migrate_all()
-	//users need to be seeded manually
+	/*
+		seed users
+		mail: root@<role>.com
+		password: root
+	*/
+	roles := []string{"admin", "superuser", "technician", "dispatcher", "driver"}
+	for _, role := range roles {
+		user := serializers.UserSignupSerializer{
+			FirstName:   gofakeit.FirstName(),
+			LastName:    gofakeit.LastName(),
+			Email:       fmt.Sprintf("root@%v.com", role),
+			BirthDate:   utils.CustomDate{Time: gofakeit.Date()},
+			Password:    "root",
+			PasswordRpt: "root",
+			Role:        models.Role(role),
+		}
+		utils.DB.Create(user.ToModel())
+	}
 	//seed vehicle types
 	vehicleTypes := []models.VehicleType{{Type: "bus"}, {Type: "tram"}, {Type: "obrnena_dodavka"}}
 	for _, v := range vehicleTypes {
@@ -60,34 +78,37 @@ func main() {
 	vehicles := []models.Vehicle{}
 	utils.DB.Find(&vehicles)
 	// seed segments
-	/*for i := 0; i < len(lines); i++ {
+	for i := 0; i < len(lines); i++ {
 		initial_segment := models.Segment{
 			StopName1: lines[i].InitialStop,
 			StopName2: stops[gofakeit.Number(0, len(stops)-1)].Name,
 			Time:      uint(rand.Intn(3) + 1),
+			LineName:  lines[i].Name,
 		}
 		utils.DB.Create(&initial_segment)
-		lines[i].Segments = append(lines[i].Segments, &initial_segment)
+		lines[i].Segments = append(lines[i].Segments, initial_segment)
 		utils.DB.Save(&lines[i])
 		for j := 0; j < 3; j++ {
 			next_segment := models.Segment{
 				StopName1: lines[i].Segments[len(lines[i].Segments)-1].StopName2,
 				StopName2: stops[gofakeit.Number(0, len(stops)-1)].Name,
 				Time:      uint(rand.Intn(3) + 1),
+				LineName:  lines[i].Name,
 			}
 			utils.DB.Create(&next_segment)
-			lines[i].Segments = append(lines[i].Segments, &next_segment)
+			lines[i].Segments = append(lines[i].Segments, next_segment)
 			utils.DB.Save(&lines[i])
 		}
 		final_segment := models.Segment{
 			StopName1: lines[i].Segments[len(lines[i].Segments)-1].StopName2,
 			StopName2: lines[i].FinalStop,
 			Time:      uint(rand.Intn(3) + 1),
+			LineName:  lines[i].Name,
 		}
 		utils.DB.Create(&final_segment)
-		lines[i].Segments = append(lines[i].Segments, &final_segment)
+		lines[i].Segments = append(lines[i].Segments, final_segment)
 		utils.DB.Save(&lines[i])
-	}*/
+	}
 	for i := 0; i < 8; i++ {
 		connection := models.Connection{
 			DepartureTime: gofakeit.Date(),

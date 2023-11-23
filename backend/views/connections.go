@@ -43,7 +43,7 @@ func ListConnections(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, connections)
 }
 
-func GetConnection(ctx *gin.Context) {
+func GetConnectionById(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var connection_model models.Connection
 	var err error
@@ -70,51 +70,59 @@ func GetConnection(ctx *gin.Context) {
 	}
 	ctx.IndentedJSON(http.StatusOK, connection)
 }
-func getStops(id uint) (*[]serializers.StopInConnection, error) {
+
+func getStops(lineID uint) (*[]serializers.StopInConnection, error) {
 	var connection models.Connection
 	stops := []serializers.StopInConnection{}
-	if result := utils.DB.First(&connection, id); result.Error != nil {
-		return nil, result.Error
-	} else {
-		var line models.Line
-		utils.DB.Model(&line).Preload("Segments").First(&line, "Name = ?", connection.LineName) //todo error handling
-		stop1 := line.InitialStop
-		dep_time := connection.DepartureTime
-		for {
-			var segment models.Segment
-			err := utils.DB.Preload("Stop1").Preload("Stop2").Joins("inner join line_segments on stop_name1=segment_stop_name1 AND stop_name2=segment_stop_name2").
-				First(&segment, "stop_name1=? AND line_segments.line_name=?", stop1, line.Name).Error
-			if err != nil {
-				return nil, err
-			}
-			if segment.StopName2 == line.FinalStop {
-				stops = append(stops, serializers.StopInConnection{
-					StopName:      segment.StopName1,
-					DepartureTime: dep_time.Format("15:04"),
-				})
-				dep_time = dep_time.Add(time.Minute * time.Duration(segment.Time))
-				stops = append(stops, serializers.StopInConnection{
-					StopName:      segment.StopName2,
-					DepartureTime: dep_time.Format("15:04"),
-				})
-				break
-			}
+	if err := utils.DB.First(&connection, lineID).Error; err != nil {
+		return nil, err
+	}
+	var line models.Line
+	if err := utils.DB.Model(&line).Preload("Segments").First(&line, "Name = ?", connection.LineName).Error; err != nil {
+		return nil, err
+	}
+	//stop1 := line.InitialStop
+	dep_time := connection.DepartureTime
+	//todo zvalidovat funkcnost
+	for i := 0; i < len(line.Segments); i++ {
+		/*var segment models.Segment
+		err := utils.DB.First(&segment, "stop_name1=? AND line_name=?", stop1, line.Name).Error
+		if err != nil {
+			return nil, err
+		}*/
+		if line.Segments[i].StopName2 == line.FinalStop {
 			stops = append(stops, serializers.StopInConnection{
-				StopName:      segment.StopName1,
+				StopName:      line.Segments[i].StopName1,
 				DepartureTime: dep_time.Format("15:04"),
 			})
-			dep_time = dep_time.Add(time.Minute * time.Duration(segment.Time))
-			stop1 = segment.StopName2
+			dep_time = dep_time.Add(time.Minute * time.Duration(line.Segments[i].Time))
+			stops = append(stops, serializers.StopInConnection{
+				StopName:      line.Segments[i].StopName2,
+				DepartureTime: dep_time.Format("15:04"),
+			})
+			break
 		}
+		stops = append(stops, serializers.StopInConnection{
+			StopName:      line.Segments[i].StopName1,
+			DepartureTime: dep_time.Format("15:04"),
+		})
+		dep_time = dep_time.Add(time.Minute * time.Duration(line.Segments[i].Time))
+		//stop1 = segment.StopName2
 
 	}
 	return &stops, nil
 }
 
-func GetConnectionByLine(ctx *gin.Context) {
+func ListConnectionsByLine(ctx *gin.Context) {
 	line := ctx.Param("line")
 	var connection_models []models.Connection
 	var err error
+	line_model := models.Line{}
+	err = utils.DB.First(&line_model, "name=?", line).Error
+	if err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
 	err = utils.DB.Find(&connection_models, "line_name=?", line).Error
 	if err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
@@ -128,17 +136,25 @@ func GetConnectionByLine(ctx *gin.Context) {
 			ArrivalTime:   model.ArrivalTime.Format("2006-01-02 15:04"),
 			DepartureTime: model.DepartureTime.Format("2006-01-02 15:04"),
 			Dirrection:    model.Dirrection,
+			InitialStop:   line_model.InitialStop,
+			FinalStop:     line_model.FinalStop,
 		}
 		connections = append(connections, connection)
 	}
 	ctx.IndentedJSON(http.StatusOK, connections)
 }
 
-func GetConnectionByLineAndDate(ctx *gin.Context) {
+func ListConnectionsByLineAndDate(ctx *gin.Context) {
 	line := ctx.Param("line")
 	date := ctx.Param("date")
 	var connection_models []models.Connection
 	var err error
+	line_model := models.Line{}
+	err = utils.DB.First(&line_model, "name=?", line).Error
+	if err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
 	err = utils.DB.Find(&connection_models, "line_name=? AND departure_time BETWEEN ? AND ? ", line, date, date+" 23:59:59").Error
 	fmt.Print(len(connection_models))
 	if err != nil {
@@ -153,6 +169,8 @@ func GetConnectionByLineAndDate(ctx *gin.Context) {
 			ArrivalTime:   model.ArrivalTime.Format("2006-01-02 15:04"),
 			DepartureTime: model.DepartureTime.Format("2006-01-02 15:04"),
 			Dirrection:    model.Dirrection,
+			InitialStop:   line_model.InitialStop,
+			FinalStop:     line_model.FinalStop,
 		}
 		connections = append(connections, connection)
 	}
