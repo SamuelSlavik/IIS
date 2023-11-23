@@ -113,6 +113,7 @@ func getStops(lineID uint) (*[]serializers.StopInConnection, error) {
 	return &stops, nil
 }
 
+
 func ListConnectionsByLine(ctx *gin.Context) {
 	line := ctx.Param("line")
 	var connection_models []models.Connection
@@ -143,6 +144,7 @@ func ListConnectionsByLine(ctx *gin.Context) {
 	}
 	ctx.IndentedJSON(http.StatusOK, connections)
 }
+
 
 func ListConnectionsByLineAndDate(ctx *gin.Context) {
 	line := ctx.Param("line")

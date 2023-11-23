@@ -8,10 +8,13 @@ import Pencil from "vue-material-design-icons/Pencil.vue";
 import Delete from "vue-material-design-icons/Delete.vue";
 import Tank from "vue-material-design-icons/Tank.vue";
 import {useNotificationStore} from "@/stores/notification-store";
+import Magnify from "vue-material-design-icons/Magnify.vue";
 
 
 const loading = ref<boolean>(false)
 const notifications = useNotificationStore()
+
+const query = ref<string>("")
 
 const users = ref<User[]>([])
 
@@ -40,11 +43,11 @@ const deleteUser = async(id: string) => {
   try {
     const response = await axios.delete(Endpoints.deleteUser(id), {withCredentials: true})
     if (response.status === 200) {
-      notifications.value.push("User deleted")
+      notifications.addNotification("User deleted", "success")
       loadUsers()
     }
   } catch (error) {
-    notifications.value.push("Failed to delete user: " + error)
+    notifications.addNotification("Failed to delete user: " + error, "error")
   } finally {
   }
 }
@@ -59,6 +62,20 @@ onMounted(() => {
   <div>
     <div class="header">
       <h2>Manage users</h2>
+    </div>
+
+    <div class="toolbar">
+      <form @submit.prevent="loadUsers" class="search-form">
+        <input
+            type="text"
+            name="query"
+            placeholder="Search users"
+            v-model="query"
+        />
+        <button type="submit" class="small-button">
+          <Magnify size="24px"/>
+        </button>
+      </form>
     </div>
 
     <Loader v-if="loading" />

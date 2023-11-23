@@ -60,3 +60,19 @@ export enum VehicleTypeEnum {
     ObrnenaDodavka = "obrnena_dodavka",
 }
 
+
+export interface Stop {
+    ID: string
+    Name: string
+    Active: string
+}
+
+export interface NewStop {
+    Name: string
+}
+
+export interface LineInList {
+    Name: string
+    InitialStop: string
+    FinalStop: string
+}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -36,7 +37,9 @@ func Signup(ctx *gin.Context) {
 	// Create User
 	result := utils.DB.Create(user_model)
 	if result.Error != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": result.Error.Error(),
+		})
 		return
 	}
 
@@ -44,16 +47,16 @@ func Signup(ctx *gin.Context) {
 }
 
 func DeleteUser(ctx *gin.Context) {
-	userID := ctx.Param("id")
+	user_id := ctx.Param("id")
 
-	if userID == "" {
+	if user_id == "" {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "User ID is required"})
 		return
 	}
 
 	// Fetch user from the database
 	var user models.User
-	result := utils.DB.First(&user, "id = ?", userID)
+	result := utils.DB.First(&user, "id = ?", user_id)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		ctx.IndentedJSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
@@ -63,8 +66,8 @@ func DeleteUser(ctx *gin.Context) {
 	}
 
 	// Delete user from the database
-	deleteResult := utils.DB.Delete(&user)
-	if deleteResult.Error != nil {
+	delete_result := utils.DB.Delete(&user)
+	if delete_result.Error != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
@@ -206,4 +209,78 @@ func RetrieveCurrentUser(ctx *gin.Context) {
 	user_serializer.FromModel(user_model)
 
 	ctx.IndentedJSON(http.StatusOK, user_serializer)
+}
+
+func UpdateUser(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Param("id"))
+
+	if err != nil || id < 0 {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid ID provided",
+		})
+	}
+
+	uid := uint(id)
+
+	logged_user_ctx, exists := ctx.Get("user")
+
+	if !exists {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"Error": "User not logged in",
+		})
+		return
+	}
+
+	logged_user_model, ok := logged_user_ctx.(models.User)
+
+	if !ok {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"Error": "Not a valid user logged in",
+		})
+		return
+	}
+
+	if (logged_user_model.ID != uid && logged_user_model.Role != models.AdminRole) {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"Error": "Permission denied",
+		})
+		return
+	}
+
+	var user_model models.User
+
+	result := utils.DB.First(&user_model, uid)
+
+	if result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"Error": result.Error.Error(),
+		})
+		return
+	}
+
+	var user_update_serializer serializers.UserUpdateSerializer
+
+	// Validate and bind User to serializer
+	if err := ctx.BindJSON(&user_update_serializer); err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, err)
+		return
+	}
+
+
+	new_user := user_update_serializer.ToModel()
+
+	// Update User
+	result = utils.DB.Model(&user_model).Updates(new_user)
+	if result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": result.Error.Error(),
+		})
+		return
+	}
+
+	var user_public serializers.UserPublicSerializer
+
+	user_public.FromModel(user_model)
+
+	ctx.IndentedJSON(http.StatusOK, user_public)
 }
