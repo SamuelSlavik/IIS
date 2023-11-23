@@ -55,7 +55,7 @@ func RequireAuth(permitted_roles ...string) gin.HandlerFunc {
 			}
 
 			// Check role
-			if len(permitted_roles) > 0 {
+			if len(permitted_roles) > 0 && user.Role != models.AdminRole {
 				role_ok := false
 				for _, value := range permitted_roles {
 					if value == string(user.Role) {
