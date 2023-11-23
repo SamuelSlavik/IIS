@@ -26,6 +26,7 @@ type User struct {
 	Password    string       `gorm:"not null"`
 	Role        Role         `gorm:"not null"`
 	Connections []Connection `gorm:"foreignKey:DriverID"`
+	MalfuncReports []MalfunctionReport `gorm:"foreignKey:CreatedBy"`
 }
 
 func uniqueEmailCheck(tx *gorm.DB, email string) (err error) {

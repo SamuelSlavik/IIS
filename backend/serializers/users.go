@@ -87,7 +87,7 @@ func (u *UserPublicSerializer) Valid() bool {
 	return len(u.ValidatorErrs) == 0
 }
 
-func (u *UserPublicSerializer) FromModel(user models.User) {
+func (u *UserPublicSerializer) FromModel(user models.User) (err error) {
 	u.ID = user.ID
 	u.FirstName = user.FirstName
 	u.LastName = user.LastName
@@ -95,6 +95,8 @@ func (u *UserPublicSerializer) FromModel(user models.User) {
 	u.BirthDate = user.BirthDate
 	u.Role = user.Role
 	u.CreatedAt = user.CreatedAt
+
+	return nil
 }
 
 // User update serializer

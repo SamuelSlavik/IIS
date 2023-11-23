@@ -2,7 +2,6 @@ package views
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -95,7 +94,7 @@ func Login(ctx *gin.Context) {
 	result := utils.DB.First(&user_model, "email = ?", user_serializer.Email)
 
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"UserNotFoundErr": "User not found!"})
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "User not found!"})
 		return
 	}
 
@@ -103,7 +102,7 @@ func Login(ctx *gin.Context) {
 	err := bcrypt.CompareHashAndPassword([]byte(user_model.Password), []byte(user_serializer.Password))
 
 	if err != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"UserAuthErr": "Password does not match!"})
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Password does not match!"})
 		return
 	}
 
@@ -116,15 +115,17 @@ func Login(ctx *gin.Context) {
 	token_string, err := token.SignedString([]byte(os.Getenv("SECRET")))
 
 	if err != nil {
-		fmt.Print(err.Error())
-		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"UserAuthInternalErr": "Could not create token!"})
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	ctx.SetSameSite(http.SameSiteLaxMode)
 	ctx.SetCookie("Authorization", token_string, 3600, "", "", false, true)
 
-	user_public.FromModel(user_model)
+	if err := user_public.FromModel(user_model); err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	ctx.IndentedJSON(http.StatusOK, user_public)
 }
@@ -143,14 +144,17 @@ func ListUsers(ctx *gin.Context) {
 
 	if res.Error != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"Error": "Could not retrieve users!",
+			"error": res.Error.Error(),
 		})
 		return
 	}
 
 	for _, user := range user_models {
 		user_serialized := serializers.UserPublicSerializer{}
-		user_serialized.FromModel(user)
+		if err := user_serialized.FromModel(user); err != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 		user_serializers = append(user_serializers, user_serialized)
 	}
 
@@ -174,13 +178,16 @@ func RetrieveUser(ctx *gin.Context) {
 
 	if res.Error != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
-			"Error": "No user with enterd UID!",
+			"Error": res.Error.Error(),
 		})
 		return
 	}
 
 	user_serializer = serializers.UserPublicSerializer{}
-	user_serializer.FromModel(user_model)
+	if err := user_serializer.FromModel(user_model); err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	ctx.IndentedJSON(http.StatusOK, user_serializer)
 }
@@ -206,7 +213,10 @@ func RetrieveCurrentUser(ctx *gin.Context) {
 		return
 	}
 
-	user_serializer.FromModel(user_model)
+	if err := user_serializer.FromModel(user_model); err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	ctx.IndentedJSON(http.StatusOK, user_serializer)
 }
@@ -280,7 +290,10 @@ func UpdateUser(ctx *gin.Context) {
 
 	var user_public serializers.UserPublicSerializer
 
-	user_public.FromModel(user_model)
+	if err := user_public.FromModel(user_model); err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	ctx.IndentedJSON(http.StatusOK, user_public)
 }
