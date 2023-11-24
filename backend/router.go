@@ -41,6 +41,7 @@ func Router() *gin.Engine {
 	router.GET("/api/connections/list/:line", views.ListConnectionsByLine)
 	router.GET("/api/connections/list/:line/:date", views.ListConnectionsByLineAndDate)
 	router.POST("/api/connections/create", views.CreateConnection)
+	router.PATCH("/api/connections/assign/:id", views.AssignToConnection)
 
 	router.GET("/api/stops", views.ListStops)
 	router.GET("/api/stops/get/:id", views.GetStop)

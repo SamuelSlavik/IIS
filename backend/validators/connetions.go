@@ -53,7 +53,7 @@ func Driver_id_validator(id *uint, validator_errs *[]ValidatorErr) {
 	}
 }
 
-func Vehicle_availability(registration *string, departure_time string, NumberOfDays int, validator_errs *[]ValidatorErr) {
+func Vehicle_availability(registration *string, departure_time string, arrival_time time.Time, NumberOfDays int, validator_errs *[]ValidatorErr) {
 	if registration == nil {
 		return
 	}
@@ -75,9 +75,14 @@ func Vehicle_availability(registration *string, departure_time string, NumberOfD
 	}
 	for i := 0; i < int(NumberOfDays); i++ {
 		timeObject = timeObject.AddDate(0, 0, i)
+		arrival_time = arrival_time.AddDate(0, 0, i)
 		for _, connection := range vehicle.Connections {
 			if (connection.DepartureTime.Before(timeObject) || connection.DepartureTime.Equal(timeObject)) && (connection.ArrivalTime.After(timeObject) || connection.ArrivalTime.Equal(timeObject)) {
 				*validator_errs = append(*validator_errs, ValidatorErr{"VehicleAvailability", "Vehicle is not available at given time"})
+				return
+			}
+			if (connection.DepartureTime.Before(arrival_time) || connection.DepartureTime.Equal(arrival_time)) && (connection.ArrivalTime.After(arrival_time) || connection.ArrivalTime.Equal(arrival_time)) {
+				*validator_errs = append(*validator_errs, ValidatorErr{"DriverAvailability", "Driver is not available at given time"})
 				return
 			}
 		}
@@ -86,7 +91,7 @@ func Vehicle_availability(registration *string, departure_time string, NumberOfD
 }
 
 // todo optimalizovat 2x pristup do db
-func Driver_availability(driverID *uint, departure_time string, NumberOfDays int, validator_errs *[]ValidatorErr) {
+func Driver_availability(driverID *uint, departure_time string, arrival_time time.Time, NumberOfDays int, validator_errs *[]ValidatorErr) {
 	if driverID == nil {
 		return
 	}
@@ -108,8 +113,13 @@ func Driver_availability(driverID *uint, departure_time string, NumberOfDays int
 	}
 	for i := 0; i < int(NumberOfDays); i++ {
 		timeObject = timeObject.AddDate(0, 0, i)
+		arrival_time = arrival_time.AddDate(0, 0, i)
 		for _, connection := range user.Connections {
 			if (connection.DepartureTime.Before(timeObject) || connection.DepartureTime.Equal(timeObject)) && (connection.ArrivalTime.After(timeObject) || connection.ArrivalTime.Equal(timeObject)) {
+				*validator_errs = append(*validator_errs, ValidatorErr{"DriverAvailability", "Driver is not available at given time"})
+				return
+			}
+			if (connection.DepartureTime.Before(arrival_time) || connection.DepartureTime.Equal(arrival_time)) && (connection.ArrivalTime.After(arrival_time) || connection.ArrivalTime.Equal(arrival_time)) {
 				*validator_errs = append(*validator_errs, ValidatorErr{"DriverAvailability", "Driver is not available at given time"})
 				return
 			}

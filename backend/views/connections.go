@@ -199,3 +199,32 @@ func CreateConnection(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusOK, result)
 	}
 }
+
+func AssignToConnection(ctx *gin.Context) {
+	id := ctx.Param("id")
+	connection_model := models.Connection{}
+	res := utils.DB.First(&connection_model, "id=?", id)
+	if res.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
+		return
+	}
+	connection := serializers.ConnectionAssignSerializer{}
+	connection.DepartureTime = connection_model.DepartureTime.Format("2006-01-02 15:04:05")
+	connection.ArrivalTime = connection_model.ArrivalTime
+	if err := ctx.BindJSON(&connection); err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	if !connection.Valid() {
+		ctx.IndentedJSON(http.StatusBadRequest, connection.ValidatorErrs)
+		return
+	}
+	connection_model.VehicleRegistration = connection.VehicleReg
+	connection_model.DriverID = connection.DriverID
+	if result := utils.DB.Save(&connection_model); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
+		return
+	} else {
+		ctx.IndentedJSON(http.StatusOK, result)
+	}
+}
