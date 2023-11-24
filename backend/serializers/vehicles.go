@@ -43,7 +43,7 @@ func (v *VehicleMaintenanceSerializer) Valid() bool {
 	return true
 }
 
-func (v *VehicleMaintenanceSerializer) FromModel(vehicle_model models.Vehicle) (err error) {
+func (v *VehicleMaintenanceSerializer) FromModel(vehicle_model *models.Vehicle) (err error) {
 	v.Registration = vehicle_model.Registration
 	v.Brand = vehicle_model.Brand
 	v.VehicleTypeName = vehicle_model.VehicleTypeName

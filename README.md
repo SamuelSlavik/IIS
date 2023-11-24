@@ -60,14 +60,14 @@ https://github.com/cosmtrek/air/blob/master/README.md
     /api/vehicles/update/:regnum      - update vehicle
     STOPS:
     /api/stops/update/:id       - update stop
+    MAINTENANCE REQUEST:
+    /api/maintenreq/update/status/:id    - update status of maintenance request
 ### PATCH
     USER:
     /api/users/update/:id   - update user information (not role) *
     CONNECTIONS:
     /api/conncections/update/:id - update connection (without driver and vehicle)
     /api/conncections/assign/:id - assign driver + vehicle 
-    MAINTENANCE REQUEST:
-    /api/maintenreq/update/status/:id    - update status of maintenance request
 ### DELETE
     USER:
     /api/users/delete/:id   - delete user (if admin and only one admin exists do not delete)
