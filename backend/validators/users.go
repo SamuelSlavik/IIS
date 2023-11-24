@@ -4,6 +4,7 @@ import (
 	"regexp"
 
 	"github.com/AdamPekny/IIS/backend/models"
+	"github.com/AdamPekny/IIS/backend/utils"
 )
 
 type ValidatorErr struct {
@@ -48,5 +49,27 @@ func RoleValidator(role string, validator_errs *[]ValidatorErr) {
 	*validator_errs = append(*validator_errs, ValidatorErr{
 		Name: "RoleErr",
 		Desc: "Invalid role!",
+	})
+}
+
+func HasRoleValidator(user_id uint, validator_errs *[]ValidatorErr, permitted_roles ...models.Role) {
+	var user models.User
+
+	if result := utils.DB.First(&user, user_id); result.Error != nil {
+		*validator_errs = append(*validator_errs, ValidatorErr{
+			Name: "InvalidUserID",
+			Desc: "User not found under ID",
+		})
+	}
+
+	for _, permitted_role := range permitted_roles {
+		if permitted_role == user.Role {
+			return
+		}
+	}
+
+	*validator_errs = append(*validator_errs, ValidatorErr{
+		Name: "RoleErr",
+		Desc: "Not a permitted role!",
 	})
 }
