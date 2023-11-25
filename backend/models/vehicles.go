@@ -8,7 +8,7 @@ type Vehicle struct {
 	VehicleTypeName string
 	VehicleType     VehicleType `gorm:"foreignKey:VehicleTypeName;references:Type"`
 	Connections     []Connection
-	Malfunctions     []MalfunctionReport `gorm:"foreignKey:VehicleRef"`
+	Malfunctions    []MalfunctionReport `gorm:"foreignKey:VehicleRef;constraint:OnDelete:CASCADE"`
 }
 
 type VehicleType struct {

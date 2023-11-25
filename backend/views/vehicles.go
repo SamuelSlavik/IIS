@@ -1,6 +1,7 @@
 package views
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/AdamPekny/IIS/backend/models"
@@ -47,13 +48,13 @@ func GetVehicle(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, res.Error)
 		return
 	}
-	res = utils.DB.Model(&models.MalfunctionReport{}).Where("vehicle_ref = ?", vehicle_id).
-		Joins("JOIN maintenance_requests ON maintenance_requests.malfunc_rep_ref = malfunction_reports.id").
+	res = utils.DB.Joins("JOIN malfunction_reports ON maintenance_requests.malfunc_rep_ref = malfunction_reports.id").Where("vehicle_ref = ?", vehicle_id).
 		Order("created_at DESC").Find(&mainteneces)
 	if res.Error != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, res.Error)
 		return
 	}
+	fmt.Print(mainteneces[0].Status, "\n")
 	if mainteneces[0].Status == "done" {
 		vehicle_serializer := serializers.VehicleGetSerializer{
 			Registration: vehicle.Registration,
@@ -62,7 +63,7 @@ func GetVehicle(ctx *gin.Context) {
 			Type:         vehicle.VehicleType.Type,
 			LastMaintenance: serializers.LastMaintenance{
 				Status: string(mainteneces[0].Status),
-				Date:   mainteneces[0].MaintenRep.CreatedAt.Format("2006-01-02"),
+				Date:   mainteneces[0].MaintenRep.CreatedAt.Format("2006-01-02 15:04:05"),
 			},
 		}
 		ctx.IndentedJSON(http.StatusOK, vehicle_serializer)
@@ -75,10 +76,56 @@ func GetVehicle(ctx *gin.Context) {
 			Type:         vehicle.VehicleType.Type,
 			LastMaintenance: serializers.LastMaintenance{
 				Status: string(mainteneces[0].Status),
-				Date:   mainteneces[0].CreatedAt.Format("2006-01-02"),
+				Date:   mainteneces[0].CreatedAt.Format("2006-01-02 "),
 			},
 		}
 		ctx.IndentedJSON(http.StatusOK, vehicle_serializer)
 		return
+	}
+}
+
+func UpdateVehicle(ctx *gin.Context) {
+	vehicle_id := ctx.Param("id")
+	vehicle := models.Vehicle{}
+	res := utils.DB.First(&vehicle, "registration = ?", vehicle_id)
+	if res.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, res.Error)
+		return
+	}
+	vehicle_serializer := serializers.VehicleUpdateSerializer{}
+	if err := ctx.BindJSON(&vehicle_serializer); err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	if !vehicle_serializer.Valid() {
+		ctx.IndentedJSON(http.StatusBadRequest, vehicle_serializer.ValidatorErrs)
+		return
+	}
+	vehicle.Capacity = vehicle_serializer.Capacity
+	if vehicle_serializer.Brand != "" {
+		vehicle.Brand = vehicle_serializer.Brand
+	}
+	vehicle.VehicleTypeName = vehicle_serializer.Type
+	if result := utils.DB.Save(&vehicle); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
+		return
+	} else {
+		ctx.IndentedJSON(http.StatusOK, result)
+	}
+}
+
+func DeleteVehicle(ctx *gin.Context) {
+	vehicle_id := ctx.Param("id")
+	vehicle := models.Vehicle{}
+	res := utils.DB.First(&vehicle, "registration = ?", vehicle_id)
+	if res.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, res.Error)
+		return
+	}
+	if result := utils.DB.Delete(&vehicle); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
+		return
+	} else {
+		ctx.IndentedJSON(http.StatusOK, result)
 	}
 }
