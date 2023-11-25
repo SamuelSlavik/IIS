@@ -339,11 +339,11 @@ func CreateMaintenRequest(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, mainten_req_pub_serializer)
 }
 
-func ListMaintenRequests(ctx *gin.Context) {
+func ListUnassignedMaintenRequests(ctx *gin.Context) {
 	var mainten_req_models []models.MaintenanceRequest
 	var mainten_req_model_serializers []serializers.MaintenReqPublicSerializer
 
-	if result := utils.DB.Preload("MalfuncRep").Preload("CreatedBy").Preload("ResolvedBy").Find(&mainten_req_models); result.Error != nil {
+	if result := utils.DB.Where("resolved_by_ref IS NULL").Preload("MalfuncRep").Preload("CreatedBy").Preload("ResolvedBy").Find(&mainten_req_models); result.Error != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": result.Error.Error(),
 		})
@@ -368,9 +368,26 @@ func ListStatusMaintenRequests(ctx *gin.Context) {
 	var mainten_req_models []models.MaintenanceRequest
 	var mainten_req_model_serializers []serializers.MaintenReqPublicSerializer
 
-	status := ctx.Param("status")
+	db_query := utils.DB
 
-	if result := utils.DB.Where("status = ?", status).Preload("MalfuncRep").Preload("CreatedBy").Preload("ResolvedBy").Find(&mainten_req_models); result.Error != nil {
+	logged_user, err := models.GetUserFromCtx(ctx)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if logged_user.Role == models.TechnicianRole {
+		db_query = db_query.Where("resolved_by_ref = ?", logged_user.ID)
+	}
+	
+	status := ctx.Query("status")
+	if status == string(models.PendingStatus) || status == string(models.InProgressStatus) || status == string(models.DoneStatus) {
+		db_query = db_query.Where("status = ?", status)
+	}
+
+	if result := db_query.Preload("MalfuncRep").Preload("CreatedBy").Preload("ResolvedBy").Find(&mainten_req_models); result.Error != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": result.Error.Error(),
 		})
