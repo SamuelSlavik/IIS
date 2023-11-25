@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -140,11 +141,17 @@ func ListUsers(ctx *gin.Context) {
 	var user_models []models.User
 	var user_serializers []serializers.UserPublicSerializer
 
-	res := utils.DB.Find(&user_models)
+	query := ctx.Query("query")
 
-	if res.Error != nil {
+	db_query := utils.DB.Order("full_name ASC")
+
+	if query != "" {
+		db_query = db_query.Where("LOWER(full_name) LIKE ?", "%" + strings.ToLower(query) + "%")
+	}
+
+	if result := db_query.Find(&user_models); result.Error != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": res.Error.Error(),
+			"error": result.Error.Error(),
 		})
 		return
 	}
