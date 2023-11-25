@@ -12,7 +12,6 @@ type VehicleSerializer struct {
 	Brand         string
 	ImageData     []byte
 	Type          string `binding:"required"`
-	LineName      *string
 	ValidatorErrs []validators.ValidatorErr
 }
 
@@ -23,7 +22,6 @@ func (vehicle VehicleSerializer) Create_model() (vehicle_model *models.Vehicle) 
 		Brand:           vehicle.Brand,
 		ImageData:       vehicle.ImageData,
 		VehicleTypeName: vehicle.Type,
-		LineName:        vehicle.LineName,
 	}
 	return
 }
@@ -31,4 +29,24 @@ func (vehicle VehicleSerializer) Create_model() (vehicle_model *models.Vehicle) 
 func (vehicle *VehicleSerializer) Valid() bool {
 	validators.Registration_validator(vehicle.Registration, &vehicle.ValidatorErrs)
 	return len(vehicle.ValidatorErrs) == 0
+}
+
+
+type VehicleMaintenanceSerializer struct {
+	Registration string
+	Brand string
+	VehicleTypeName string
+	ValidatorErrs []validators.ValidatorErr
+}
+
+func (v *VehicleMaintenanceSerializer) Valid() bool {
+	return true
+}
+
+func (v *VehicleMaintenanceSerializer) FromModel(vehicle_model *models.Vehicle) (err error) {
+	v.Registration = vehicle_model.Registration
+	v.Brand = vehicle_model.Brand
+	v.VehicleTypeName = vehicle_model.VehicleTypeName
+	
+	return nil
 }

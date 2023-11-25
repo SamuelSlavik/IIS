@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
-
 
 type Role string
 
@@ -20,25 +20,28 @@ const (
 
 type User struct {
 	gorm.Model
-	FirstName string    `gorm:"not null"`
-	LastName  string    `gorm:"not null"`
-	Email     string    `gorm:"not null"` // Unique among non deleted users
-	BirthDate time.Time `gorm:"not null"`
-	Password  string    `gorm:"not null"`
-	Role      Role      `gorm:"not null"`
+	FirstName   string       `gorm:"not null"`
+	LastName    string       `gorm:"not null"`
+	Email       string       `gorm:"not null"` // Unique among non deleted users
+	BirthDate   time.Time    `gorm:"not null"`
+	Password    string       `gorm:"not null"`
+	Role        Role         `gorm:"not null"`
+	Connections []Connection `gorm:"foreignKey:DriverID"`
+	MalfuncReports []MalfunctionReport `gorm:"foreignKey:CreatedByRef"`
 }
 
 func uniqueEmailCheck(tx *gorm.DB, email string) (err error) {
 	var existing_user User
-	result := tx.Where("email = ?", email).First(&existing_user)
+	result := tx.Where("email = ?", email).Find(&existing_user)
 
-    if result.Error == nil {
-        // User with the same email already exists, return an error
-        return fmt.Errorf("User with email %s already exists", email)
-    } else if result.Error != gorm.ErrRecordNotFound {
-        // Some other error occurred, return the error
-        return result.Error
-    }
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected > 0 {
+		// User with the same email already exists, return an error
+		return fmt.Errorf("User with email %s already exists", email)
+	}
 
 	return nil
 }
@@ -52,10 +55,10 @@ func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {
 
 	result := tx.Where("id = ?", u.ID).First(&existing_user)
 
-    if result.Error != nil {
-        // User with the same email already exists, return an error
-        return fmt.Errorf("User not found")
-    }
+	if result.Error != nil {
+		// User with the same email already exists, return an error
+		return fmt.Errorf("User not found")
+	}
 
 	// Check if the email field is being updated
 	if tx.Statement.Changed("Email") {
@@ -65,4 +68,18 @@ func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {
 	}
 
 	return nil
+}
+
+func GetUserFromCtx(ctx *gin.Context) (*User, error) {
+	if user_ctx, ok := ctx.Get("user"); ok {
+		user, ok := user_ctx.(User)
+	
+		if !ok {
+			return nil, fmt.Errorf("not a valid user")
+		}
+	
+		return &user, nil
+	} else {
+		return nil, fmt.Errorf("user not in context")
+	}
 }

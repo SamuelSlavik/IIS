@@ -28,9 +28,9 @@ https://github.com/cosmtrek/air/blob/master/README.md
     STOPS:
     /api/stops/list       - get all stops
     MALFUNC REPORTS:
-    /api/malfunc/list     - list all malfunction reports
-    /api/malfunc/list/:status     - list all malfunction reports with status
-    /api/malfunc/get/:id     - get specific malfunction request
+    /api/maintenance/malfunc/list     - list all malfunction reports
+    /api/maintenance/malfunc/list/:status     - list all malfunction reports with status
+    /api/maintenance/malfunc/get/:id     - get specific malfunction request
     MAINTENANCE REQUEST:
     /api/maintenreq/list    - list MAINTENANCE REQUESTs
     /api/maintenreq/list/:status     - list MAINTENANCE REQUEST with status
@@ -50,7 +50,7 @@ https://github.com/cosmtrek/air/blob/master/README.md
     STOPS:
     /api/stops/create       - create stop
     MALFUNC REPORTS:
-    /api/malfunc/create     - create malfunction report
+    /api/maintenance/malfunc/create    - create malfunction report
     MAINTENANCE REQUEST:
     /api/maintenreq/create     - create MAINTENANCE REQUEST
 ### PUT
@@ -60,14 +60,14 @@ https://github.com/cosmtrek/air/blob/master/README.md
     /api/vehicles/update/:regnum      - update vehicle
     STOPS:
     /api/stops/update/:id       - update stop
+    MAINTENANCE REQUEST:
+    /api/maintenreq/update/status/:id    - update status of maintenance request
 ### PATCH
     USER:
     /api/users/update/:id   - update user information (not role) *
     CONNECTIONS:
     /api/conncections/update/:id - update connection (without driver and vehicle)
     /api/conncections/assign/:id - assign driver + vehicle 
-    MAINTENANCE REQUEST:
-    /api/maintenreq/update/status/:id    - update status of maintenance request
 ### DELETE
     USER:
     /api/users/delete/:id   - delete user (if admin and only one admin exists do not delete)
