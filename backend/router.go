@@ -32,6 +32,7 @@ func Router() *gin.Engine {
 
 	// Vehicles
 	router.GET("/api/vehicles/list", views.List_vehicles)
+	router.GET("/api/vehicles/get/:id", views.GetVehicle)
 
 	router.POST("/api/vehicles/create", views.Create_vehicle)
 
