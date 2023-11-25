@@ -723,3 +723,27 @@ func CreateMaintenReport(ctx *gin.Context) {
 
 	ctx.IndentedJSON(http.StatusOK, report_public_serializer)
 }
+
+func ListMaintenReports(ctx *gin.Context) {
+	var mainten_rep_models []models.MaintenanceReport
+	var mainten_rep_pub_serializers []serializers.MaintenRepPublicSerializer
+
+	if result := utils.DB.Find(&mainten_rep_models); result.Error != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": result.Error.Error(),
+		})
+		return
+	}
+
+	for _, report := range mainten_rep_models {
+		mainten_rep_pub_serializers = append(mainten_rep_pub_serializers, serializers.MaintenRepPublicSerializer{})
+		if err := mainten_rep_pub_serializers[len(mainten_rep_pub_serializers)-1].FromModel(&report); err != nil {
+			ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+	}
+
+	ctx.IndentedJSON(http.StatusOK, mainten_rep_pub_serializers)
+}

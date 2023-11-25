@@ -15,6 +15,19 @@ type VehicleSerializer struct {
 	ValidatorErrs []validators.ValidatorErr
 }
 
+type VehicleGetSerializer struct {
+	Registration string
+	Capacity     uint
+	Brand        string
+	//image lol
+	Type            string
+	LastMaintenance LastMaintenance
+}
+type LastMaintenance struct {
+	Status string
+	Date   string
+}
+
 func (vehicle VehicleSerializer) Create_model() (vehicle_model *models.Vehicle) {
 	vehicle_model = &models.Vehicle{
 		Capacity:        vehicle.Capacity,
@@ -31,12 +44,11 @@ func (vehicle *VehicleSerializer) Valid() bool {
 	return len(vehicle.ValidatorErrs) == 0
 }
 
-
 type VehicleMaintenanceSerializer struct {
-	Registration string
-	Brand string
+	Registration    string
+	Brand           string
 	VehicleTypeName string
-	ValidatorErrs []validators.ValidatorErr
+	ValidatorErrs   []validators.ValidatorErr
 }
 
 func (v *VehicleMaintenanceSerializer) Valid() bool {
@@ -47,6 +59,6 @@ func (v *VehicleMaintenanceSerializer) FromModel(vehicle_model *models.Vehicle) 
 	v.Registration = vehicle_model.Registration
 	v.Brand = vehicle_model.Brand
 	v.VehicleTypeName = vehicle_model.VehicleTypeName
-	
+
 	return nil
 }
