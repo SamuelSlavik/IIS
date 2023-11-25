@@ -13,7 +13,7 @@ func Migrate_all() {
 	utils.DB.AutoMigrate(&models.VehicleType{}, &models.Vehicle{})
 
 	// Migrate Maintenance models
-	utils.DB.AutoMigrate(&models.MalfunctionReport{}, &models.MaintenanceRequest{})
+	utils.DB.AutoMigrate(&models.MalfunctionReport{}, &models.MaintenanceRequest{}, &models.MaintenanceReport{})
 
 	utils.DB.AutoMigrate(&models.Stop{}, &models.Line{}, &models.Segment{}, &models.Connection{})
 }

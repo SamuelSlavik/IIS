@@ -27,7 +27,7 @@ type MalfunctionReport struct {
 type MaintenanceRequest struct {
 	ID uint `gorm:"primaryKey;autoIncrement;not null"`
 	Status Status `gorm:"not null;default:pending"`
-	Deadline time.Time
+	Deadline *time.Time
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 	MalfuncRepRef *uint `gorm:"not null"`
 	MalfuncRep *MalfunctionReport `gorm:"foreignkey:MalfuncRepRef"`
@@ -42,7 +42,7 @@ type MaintenanceReport struct {
 	ID uint `gorm:"primaryKey;autoIncrement;not null"`
 	Title string `gorm:"not null;size:100"`
 	Description string `gorm:"not null"`
-	Cost uint `gorm:"default:0"`
+	Cost float64 `gorm:"default:0.0;type:decimal(11,2);not null"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 	MaintenReqRef *uint `gorm:"not null;unique"`
 	MaintenReq *MaintenanceRequest `gorm:"foreignKey:MaintenReqRef"`

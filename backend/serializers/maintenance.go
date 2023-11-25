@@ -1,7 +1,6 @@
 package serializers
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/AdamPekny/IIS/backend/models"
@@ -105,6 +104,9 @@ type MaintenReqCreateSerializer struct {
 
 func (m *MaintenReqCreateSerializer) Valid() bool {
 	validators.StatusValidator(string(m.Status), &m.ValidatorErrs)
+	if m.Deadline.Time != nil {
+		validators.DeadlineValidator(*m.Deadline.Time, &m.ValidatorErrs)
+	}
 	if m.ResolvedByRef != nil {
 		validators.HasRoleValidator(*m.ResolvedByRef, &m.ValidatorErrs, models.TechnicianRole)
 	}
@@ -133,7 +135,7 @@ func (m *MaintenReqCreateSerializer) ToModel(ctx *gin.Context) (*models.Maintena
 type MaintenReqPublicSerializer struct {
 	ID uint `binding:"required"`
 	Status models.Status `binding:"required"`
-	Deadline time.Time `binding:"required"`
+	Deadline *time.Time `binding:"required"`
 	CreatedAt time.Time `binding:"required"`
 	MalfuncRep *MalfuncRepShortPublicSerialzier `binding:"required"`
 	CreatedBy *UserMaintenanceSerializer `binding:"required"`
@@ -153,7 +155,6 @@ func (m *MaintenReqPublicSerializer) FromModel(mainten_req_model *models.Mainten
 	m.Deadline = mainten_req_model.Deadline
 	m.CreatedAt = mainten_req_model.CreatedAt
 	
-	fmt.Printf("MalfuncRep ID: %d\n", mainten_req_model.MalfuncRep.ID)
 	malfunc_rep_serializer := &MalfuncRepShortPublicSerialzier{}
 
 	if err := malfunc_rep_serializer.FromModel(mainten_req_model.MalfuncRep); err != nil {
@@ -184,9 +185,77 @@ func (m *MaintenReqPublicSerializer) FromModel(mainten_req_model *models.Mainten
 	return nil
 }
 
+type MaintenReqShortPublicSerializer struct {
+	ID uint `binding:"required"`
+	CreatedAt time.Time `binding:"required"`
+	MalfuncRep *MalfuncRepShortPublicSerialzier `binding:"required"`
+	CreatedBy *UserMaintenanceSerializer `binding:"required"`
+	ResolvedBy *UserMaintenanceSerializer
+	ValidatorErrs []validators.ValidatorErr
+}
+
+func (m *MaintenReqShortPublicSerializer) Valid() bool {
+	return true
+}
+
+func (m *MaintenReqShortPublicSerializer) FromModel(mainten_req_model *models.MaintenanceRequest) (err error) {
+	m.ID = mainten_req_model.ID
+	m.CreatedAt = mainten_req_model.CreatedAt
+
+	if mainten_req_model.MalfuncRep == nil {
+		mainten_req_model.MalfuncRep = &models.MalfunctionReport{} 
+		if result := utils.DB.First(mainten_req_model.MalfuncRep, mainten_req_model.MalfuncRepRef); result.Error != nil {
+			return result.Error
+		}
+	}
+	
+	malfunc_rep_serializer := &MalfuncRepShortPublicSerialzier{}
+
+	if err := malfunc_rep_serializer.FromModel(mainten_req_model.MalfuncRep); err != nil {
+		return err
+	}
+
+	m.MalfuncRep = malfunc_rep_serializer
+
+	if mainten_req_model.CreatedBy == nil {
+		mainten_req_model.CreatedBy = &models.User{}
+		if result := utils.DB.First(mainten_req_model.CreatedBy, mainten_req_model.CreatedByRef); result.Error != nil {
+			return result.Error
+		}
+	}
+
+	created_by_serializer := &UserMaintenanceSerializer{}
+
+	if err := created_by_serializer.FromModel(mainten_req_model.CreatedBy); err != nil {
+		return err
+	}
+
+	m.CreatedBy = created_by_serializer
+
+	if mainten_req_model.ResolvedByRef != nil {
+		if mainten_req_model.ResolvedBy == nil {
+			mainten_req_model.ResolvedBy = &models.User{}
+			if result := utils.DB.First(mainten_req_model.ResolvedBy, mainten_req_model.ResolvedByRef); result.Error != nil {
+				return result.Error
+			}
+		}
+
+		resolved_by_serializer := &UserMaintenanceSerializer{}
+
+		if err := resolved_by_serializer.FromModel(mainten_req_model.ResolvedBy); err != nil {
+			return err
+		}
+
+		m.ResolvedBy = resolved_by_serializer
+	}
+	
+
+	return nil
+}
+
 type MaintenReqUpdateSerializer struct {
 	Status models.Status `binding:"required"`
-	Deadline utils.CustomDate `binding:"required"`
+	Deadline utils.CustomDate
 	MalfuncRepRef *uint `binding:"required"`
 	CreatedByRef *uint
 	ResolvedByRef *uint
@@ -195,6 +264,9 @@ type MaintenReqUpdateSerializer struct {
 
 func (m *MaintenReqUpdateSerializer) Valid() bool {
 	validators.StatusValidator(string(m.Status), &m.ValidatorErrs)
+	if m.Deadline.Time != nil {
+		validators.DeadlineValidator(*m.Deadline.Time, &m.ValidatorErrs)
+	}
 	if m.ResolvedByRef != nil {
 		validators.HasRoleValidator(*m.ResolvedByRef, &m.ValidatorErrs, models.TechnicianRole)
 	}
@@ -219,4 +291,64 @@ func (m *MaintenReqUpdateSerializer) ToModel(ctx *gin.Context) (*models.Maintena
 	model.ResolvedByRef = m.ResolvedByRef
 
 	return model, nil
+}
+
+type MaintenRepCreateSerializer struct {
+	Title string `binding:"required"`
+	Description string `binding:"required"`
+	Cost float64
+	MaintenReqRef *uint `binding:"required"`
+	ValidatorErrs []validators.ValidatorErr
+}
+
+func (m *MaintenRepCreateSerializer) Valid() bool {
+	validators.CostValidator(m.Cost, &m.ValidatorErrs)
+	validators.HasResolverValidator(m.MaintenReqRef, &m.ValidatorErrs)
+
+	return len(m.ValidatorErrs) == 0
+}
+
+func (m *MaintenRepCreateSerializer) ToModel() (*models.MaintenanceReport, error) {
+	model := &models.MaintenanceReport{
+		Title: m.Title,
+		Description: m.Description,
+		Cost: m.Cost,
+		MaintenReqRef: m.MaintenReqRef,
+	}
+
+	return model, nil
+}
+
+type MaintenRepPublicSerializer struct {
+	ID uint `binding:"required"`
+	Title string `binding:"required"`
+	Description string `binding:"required"`
+	Cost float64 `binding:"required"`
+	CreatedAt time.Time `binding:"required"`
+	MaintenReq *MaintenReqShortPublicSerializer `binding:"required"`
+}
+
+func (m *MaintenRepPublicSerializer) FromModel(mainten_rep_model *models.MaintenanceReport) (err error) {
+	m.ID = mainten_rep_model.ID
+	m.Title = mainten_rep_model.Title
+	m.Description = mainten_rep_model.Description
+	m.Cost = mainten_rep_model.Cost
+	m.CreatedAt = mainten_rep_model.CreatedAt
+	
+	mainten_req_serializer := &MaintenReqShortPublicSerializer{}
+
+	if mainten_rep_model.MaintenReq == nil {
+		mainten_rep_model.MaintenReq = &models.MaintenanceRequest{}
+		if result := utils.DB.First(mainten_rep_model.MaintenReq, mainten_rep_model.MaintenReqRef); result.Error != nil {
+			return result.Error
+		}
+	}
+
+	if err := mainten_req_serializer.FromModel(mainten_rep_model.MaintenReq); err != nil {
+		return err
+	}
+
+	m.MaintenReq = mainten_req_serializer	
+
+	return nil
 }

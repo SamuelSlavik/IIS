@@ -658,3 +658,68 @@ func DeleteMaintenRequest(ctx *gin.Context) {
 		"message": "maintenance request deleted successfully",
 	})
 }
+
+func CreateMaintenReport(ctx *gin.Context) {
+	report_create_serializer := &serializers.MaintenRepCreateSerializer{}
+	if err := ctx.BindJSON(report_create_serializer); err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if !report_create_serializer.Valid() {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"errors": report_create_serializer.ValidatorErrs,
+		})
+		return
+	}
+
+	request_model := &models.MaintenanceRequest{}
+	if result := utils.DB.First(request_model, report_create_serializer.MaintenReqRef); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": result.Error.Error(),
+		})
+		return
+	}
+
+	logged_user, err := models.GetUserFromCtx(ctx)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if logged_user.ID != *request_model.ResolvedByRef && logged_user.Role != models.AdminRole {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "permission denied",
+		})
+		return
+	}
+
+	report_model, err := report_create_serializer.ToModel()
+	if err != nil {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if result := utils.DB.Create(report_model); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": result.Error.Error(),
+		})
+		return
+	}
+
+	report_public_serializer := &serializers.MaintenRepPublicSerializer{}
+	if err := report_public_serializer.FromModel(report_model); err != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.IndentedJSON(http.StatusOK, report_public_serializer)
+}
