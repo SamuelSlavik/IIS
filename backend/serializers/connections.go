@@ -10,15 +10,12 @@ import (
 )
 
 type ConnectionSerializer struct {
-	ID        uint
-	LineName  string
-	Type      string
-	ListStops *[]StopInConnection
-}
-
-type StopInConnection struct {
+	ID            uint
+	LineName      string
 	DepartureTime string
-	StopName      string
+	VehicleReg    *string
+	DriverID      *uint
+	Dirrection    bool
 }
 
 type ConnectionLineSerializer struct {
@@ -37,9 +34,9 @@ type ConnectionCreateSerializer struct {
 	VehicleReg    *string
 	Dirrection    bool `binding:"required"`
 	DriverID      *uint
-	ValidatorErrs []validators.ValidatorErr
 	NumberOfDays  int       `binding:"required"`
 	ArrivalTime   time.Time //neplnit z fe
+	ValidatorErrs []validators.ValidatorErr
 }
 
 type ConnectionAssignSerializer struct {
@@ -50,6 +47,40 @@ type ConnectionAssignSerializer struct {
 	ValidatorErrs []validators.ValidatorErr
 }
 
+type ConnectionUpdateSerializer struct {
+	LineName      string
+	DepartureTime string
+	Dirrection    bool
+	ArrivalTime   time.Time //neplnit z fe
+	DriverID      *uint
+	VehicleReg    *string
+	ValidatorErrs []validators.ValidatorErr
+}
+
+type ConnectionDetailsSerializer struct {
+	ID        uint
+	LineName  string
+	Type      string
+	ListStops *[]StopInConnection
+}
+
+type StopInConnection struct {
+	DepartureTime string
+	StopName      string
+}
+
+func Get_arrival_time(dep_time time.Time, line_name string) (arrival_time time.Time) {
+	line := models.Line{}
+	utils.DB.Preload("Segments").First(&line, "name=?", line_name)
+	var duration time.Duration
+	for _, segment := range line.Segments {
+		fmt.Print(segment.Time)
+		duration += time.Minute * time.Duration(segment.Time)
+	}
+	arrival_time = dep_time.Add(duration)
+	return
+}
+
 func (conn *ConnectionCreateSerializer) Valid() bool {
 	validators.Line_name_validator(conn.LineName, &conn.ValidatorErrs)
 	validators.Vehicle_registration_validator(conn.VehicleReg, &conn.ValidatorErrs)
@@ -58,29 +89,21 @@ func (conn *ConnectionCreateSerializer) Valid() bool {
 		return false
 	}
 
-	line := models.Line{}
-	utils.DB.Preload("Segments").First(&line, "name=?", conn.LineName)
-	var duration time.Duration
-	for _, segment := range line.Segments {
-		fmt.Print(segment.Time)
-		duration += time.Minute * time.Duration(segment.Time)
-	}
-
 	dep_time, _ := time.Parse("2006-01-02 15:04:05", conn.DepartureTime)
-	conn.ArrivalTime = dep_time.Add(duration)
-	validators.Vehicle_availability(conn.VehicleReg, conn.DepartureTime, conn.ArrivalTime, conn.NumberOfDays, &conn.ValidatorErrs)
-	validators.Driver_availability(conn.DriverID, conn.DepartureTime, conn.ArrivalTime, conn.NumberOfDays, &conn.ValidatorErrs)
+	conn.ArrivalTime = Get_arrival_time(dep_time, conn.LineName)
+	validators.Vehicle_availability(-1, conn.VehicleReg, conn.DepartureTime, conn.ArrivalTime, conn.NumberOfDays, &conn.ValidatorErrs)
+	validators.Driver_availability(-1, conn.DriverID, conn.DepartureTime, conn.ArrivalTime, conn.NumberOfDays, &conn.ValidatorErrs)
 	return len(conn.ValidatorErrs) == 0
 
 }
-func (conn *ConnectionAssignSerializer) Valid() bool {
+func (conn *ConnectionAssignSerializer) Valid(id int) bool {
 	validators.Vehicle_registration_validator(conn.VehicleReg, &conn.ValidatorErrs)
 	validators.Driver_id_validator(conn.DriverID, &conn.ValidatorErrs)
 	if len(conn.ValidatorErrs) != 0 {
 		return false
 	}
-	validators.Vehicle_availability(conn.VehicleReg, conn.DepartureTime, conn.ArrivalTime, 1, &conn.ValidatorErrs)
-	validators.Driver_availability(conn.DriverID, conn.DepartureTime, conn.ArrivalTime, 1, &conn.ValidatorErrs)
+	validators.Vehicle_availability(id, conn.VehicleReg, conn.DepartureTime, conn.ArrivalTime, 1, &conn.ValidatorErrs)
+	validators.Driver_availability(id, conn.DriverID, conn.DepartureTime, conn.ArrivalTime, 1, &conn.ValidatorErrs)
 	return len(conn.ValidatorErrs) == 0
 }
 
