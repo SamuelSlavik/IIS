@@ -68,51 +68,34 @@ func CreateMalfuncReport(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, malfunc_report_pub_serializer)
 }
 
-func ListMalfuncReports(ctx *gin.Context) {
-	var malfunc_reports []models.MalfunctionReport
-	var malfunc_report_serializers []serializers.MalfuncRepPublicSerialzier
-
-	if result := utils.DB.Preload("CreatedBy").Preload("Vehicle").Find(&malfunc_reports); result.Error != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": result.Error.Error(),
-		})
-		return
-	}
-
-	for _, report := range malfunc_reports {
-		malfunc_report_serializers = append(malfunc_report_serializers, serializers.MalfuncRepPublicSerialzier{})
-		if err := malfunc_report_serializers[len(malfunc_report_serializers)-1].FromModel(&report); err != nil {
-			ctx.IndentedJSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-	}
-
-	ctx.IndentedJSON(http.StatusOK, malfunc_report_serializers)
-}
-
 func ListStatusMalfuncReports(ctx *gin.Context) {
 	var malfunc_reports []models.MalfunctionReport
 	var malfunc_report_serializers []serializers.MalfuncRepPublicSerialzier
 
-	status := ctx.Param("status")
-	if status != "ack" && status != "unack" {
-		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "status is different from ack or unack",
+	logged_user, err := models.GetUserFromCtx(ctx)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": err.Error(),
 		})
-		return
 	}
 
-	if result := utils.DB.Preload("MaintenReqs").Preload("CreatedBy").Preload("Vehicle").Find(&malfunc_reports); result.Error != nil {
+	db_query := utils.DB
+
+	if logged_user.Role == models.DriverRole {
+		db_query = db_query.Where("created_by_ref = ?", logged_user.ID)
+	}
+
+	if result := db_query.Preload("MaintenReqs").Preload("CreatedBy").Preload("Vehicle").Find(&malfunc_reports); result.Error != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": result.Error.Error(),
 		})
 		return
 	}
 
+	status := ctx.Query("status")
+
 	for _, report := range malfunc_reports {
-		if (status == "ack" && len(report.MaintenReqs) > 0) || (status == "unack" && len(report.MaintenReqs) == 0) {
+		if (status == "ack" && len(report.MaintenReqs) > 0) || (status == "unack" && len(report.MaintenReqs) == 0) || (status != "ack" && status != "unack") {
 			malfunc_report_serializers = append(malfunc_report_serializers, serializers.MalfuncRepPublicSerialzier{})
 			if err := malfunc_report_serializers[len(malfunc_report_serializers)-1].FromModel(&report); err != nil {
 				ctx.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -727,8 +710,22 @@ func CreateMaintenReport(ctx *gin.Context) {
 func ListMaintenReports(ctx *gin.Context) {
 	var mainten_rep_models []models.MaintenanceReport
 	var mainten_rep_pub_serializers []serializers.MaintenRepPublicSerializer
+	
+	logged_user, err := models.GetUserFromCtx(ctx)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 
-	if result := utils.DB.Find(&mainten_rep_models); result.Error != nil {
+	db_query := utils.DB
+
+	if logged_user.Role == models.TechnicianRole {
+		db_query = db_query.Joins("JOIN maintenance_requests ON maintenance_reports.mainten_req_ref = maintenance_requests.id").Where("maintenance_requests.resolved_by_ref = ?", logged_user.ID)
+	}
+
+	if result := db_query.Order("CreatedAt DESC").Find(&mainten_rep_models); result.Error != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": result.Error.Error(),
 		})
