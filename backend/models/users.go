@@ -26,8 +26,26 @@ type User struct {
 	BirthDate   time.Time    `gorm:"not null"`
 	Password    string       `gorm:"not null"`
 	Role        Role         `gorm:"not null"`
+	FullName string
 	Connections []Connection `gorm:"foreignKey:DriverID"`
 	MalfuncReports []MalfunctionReport `gorm:"foreignKey:CreatedByRef"`
+}
+
+func (u *User) AfterCreate(tx *gorm.DB) (err error) {
+	u.FullName = u.FirstName + " " + u.LastName
+	result := tx.Model(&User{}).Where("id = ?", u.ID).Update("full_name", u.FullName)
+	
+	return result.Error
+}
+
+func (u *User) AfterUpdate(tx *gorm.DB) (err error) {
+	if tx.Statement.Changed("first_name") || tx.Statement.Changed("last_name") {
+		u.FullName = u.FirstName + " " + u.LastName
+		result := tx.Model(&User{}).Where("id = ?", u.ID).Update("full_name", u.FullName)
+		return result.Error
+	}
+	
+	return nil
 }
 
 func uniqueEmailCheck(tx *gorm.DB, email string) (err error) {
@@ -51,15 +69,6 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {
-	var existing_user User
-
-	result := tx.Where("id = ?", u.ID).First(&existing_user)
-
-	if result.Error != nil {
-		// User with the same email already exists, return an error
-		return fmt.Errorf("User not found")
-	}
-
 	// Check if the email field is being updated
 	if tx.Statement.Changed("Email") {
 		new_values := tx.Statement.Dest.(*User)
