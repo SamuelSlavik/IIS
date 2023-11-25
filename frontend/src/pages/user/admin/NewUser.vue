@@ -48,36 +48,37 @@ const registerNewUser = async () => {
           name="last-name"
           placeholder="Last name"
           v-model="newUser.lastName"
-
+          required
       />
       <input
           type="date"
           name="birth-date"
           placeholder="Date of birth"
           v-model="newUser.birthDate"
-
+          required
       />
       <input
           type="email"
           name="email"
           placeholder="Email"
           v-model="newUser.email"
-
+          required
       />
       <input
           type="password"
           name="password"
           placeholder="Password"
           v-model="newUser.password"
-
+          required
       />
       <input
           type="password"
           name="password-rpt"
           placeholder="Repeat password"
           v-model="newUser.passwordRpt"
+          required
       />
-      <select v-model="newUser.role">
+      <select v-model="newUser.role" required>
         <option value="superuser">Superuser</option>
         <option value="technician">Technician</option>
         <option value="dispatcher">Dispatcher</option>
