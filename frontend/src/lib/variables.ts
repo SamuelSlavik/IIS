@@ -36,7 +36,10 @@ export class Endpoints {
         return `${Endpoints.baseUrl}/users/get/${id}`;
     }
 
-    static get listUsers(): string {
+    static listUsers(query?: string): string {
+        if (query) {
+            return `${Endpoints.baseUrl}/users/list?query=${query}`;
+        }
         return `${Endpoints.baseUrl}/users/list`;
     }
 

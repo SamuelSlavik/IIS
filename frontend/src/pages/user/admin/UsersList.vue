@@ -26,7 +26,7 @@ const getUsersByRole = (role: string) => {
 const loadUsers = async () => {
   loading.value = true
   try {
-     const response = await axios.get<User[]>(Endpoints.listUsers, {withCredentials: true})
+     const response = await axios.get<User[]>(Endpoints.listUsers(query.value), {withCredentials: true})
      users.value = response.data
   } catch (error) {
     notifications.addNotification("Failed to get users: " + error)
