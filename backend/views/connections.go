@@ -8,6 +8,7 @@ import (
 	"github.com/AdamPekny/IIS/backend/models"
 	"github.com/AdamPekny/IIS/backend/serializers"
 	"github.com/AdamPekny/IIS/backend/utils"
+	"github.com/AdamPekny/IIS/backend/validators"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,47 +16,44 @@ func ListConnections(ctx *gin.Context) {
 	var connections []serializers.ConnectionSerializer
 	var connection_models []models.Connection
 	var err error
-	err = utils.DB.Find(&connection_models).Error
+	err = utils.DB.Where("driver_id IS NOT NULL AND vehicle_registration IS NOT NULL").Find(&connection_models).Error
 	if err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 	for _, model := range connection_models {
 		connection := serializers.ConnectionSerializer{
-			ID:       model.ID,
-			LineName: model.LineName,
-		}
-		var vehicle models.Vehicle
-		err = utils.DB.First(&vehicle, "id=?", model.VehicleRegistration).Error
-		if err != nil {
-			ctx.IndentedJSON(http.StatusBadRequest, err.Error())
-			return
-		}
-		connection.Type = vehicle.VehicleTypeName
-		connection.ListStops, err = getStops(connection.ID)
-		if err != nil {
-			ctx.IndentedJSON(http.StatusBadRequest, err.Error())
-			return
+			ID:            model.ID,
+			LineName:      model.LineName,
+			DepartureTime: model.DepartureTime.Format("2006-01-02 15:04"),
+			DriverID:      model.DriverID,
+			VehicleReg:    model.VehicleRegistration,
+			Dirrection:    model.Dirrection,
 		}
 		connections = append(connections, connection)
-
 	}
 	ctx.IndentedJSON(http.StatusOK, connections)
 }
 
-func GetConnectionById(ctx *gin.Context) {
+func GetDetailOfConnection(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var connection_model models.Connection
 	var err error
-	err = utils.DB.First(&connection_model, "id=?", id).Error
+	err = utils.DB.Where("driver_id IS NOT NULL AND vehicle_registration IS NOT NULL").First(&connection_model, "id=?", id).Error
 	if err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	connection := serializers.ConnectionSerializer{
+	connection := serializers.ConnectionDetailsSerializer{
 		ID:       connection_model.ID,
 		LineName: connection_model.LineName,
 	}
+	connection.ListStops, err = getStops(connection.ID)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
 	var vehicle models.Vehicle
 	err = utils.DB.First(&vehicle, "id=?", connection_model.VehicleRegistration).Error
 	if err != nil {
@@ -63,11 +61,6 @@ func GetConnectionById(ctx *gin.Context) {
 		return
 	}
 	connection.Type = vehicle.VehicleTypeName
-	connection.ListStops, err = getStops(connection.ID)
-	if err != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
-		return
-	}
 	ctx.IndentedJSON(http.StatusOK, connection)
 }
 
@@ -111,6 +104,26 @@ func getStops(lineID uint) (*[]serializers.StopInConnection, error) {
 
 	}
 	return &stops, nil
+}
+
+func GetConnectionById(ctx *gin.Context) {
+	id := ctx.Param("id")
+	var connection_model models.Connection
+	var err error
+	err = utils.DB.First(&connection_model, "id=?", id).Error
+	if err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	connection := serializers.ConnectionSerializer{
+		ID:            connection_model.ID,
+		LineName:      connection_model.LineName,
+		DepartureTime: connection_model.DepartureTime.Format("2006-01-02 15:04"),
+		DriverID:      connection_model.DriverID,
+		VehicleReg:    connection_model.VehicleRegistration,
+		Dirrection:    connection_model.Dirrection,
+	}
+	ctx.IndentedJSON(http.StatusOK, connection)
 }
 
 func ListConnectionsByLine(ctx *gin.Context) {
@@ -209,19 +222,85 @@ func AssignToConnection(ctx *gin.Context) {
 		return
 	}
 	connection := serializers.ConnectionAssignSerializer{}
-	connection.DepartureTime = connection_model.DepartureTime.Format("2006-01-02 15:04:05")
-	connection.ArrivalTime = connection_model.ArrivalTime
 	if err := ctx.BindJSON(&connection); err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	if !connection.Valid() {
+	connection.DepartureTime = connection_model.DepartureTime.Format("2006-01-02 15:04:05")
+	connection.ArrivalTime = connection_model.ArrivalTime
+	if !connection.Valid(int(connection_model.ID)) {
 		ctx.IndentedJSON(http.StatusBadRequest, connection.ValidatorErrs)
 		return
 	}
 	connection_model.VehicleRegistration = connection.VehicleReg
 	connection_model.DriverID = connection.DriverID
 	if result := utils.DB.Save(&connection_model); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
+		return
+	} else {
+		ctx.IndentedJSON(http.StatusOK, result)
+	}
+}
+
+func UpdateConnection(ctx *gin.Context) {
+	id := ctx.Param("id")
+	connection_model := models.Connection{}
+	res := utils.DB.First(&connection_model, "id=?", id)
+	if res.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
+		return
+	}
+	connection := serializers.ConnectionUpdateSerializer{}
+	if err := ctx.BindJSON(&connection); err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	connection.ArrivalTime = connection_model.ArrivalTime
+	if connection.LineName != connection_model.LineName {
+		validators.Line_name_validator(connection.LineName, &connection.ValidatorErrs)
+		connection_model.LineName = connection.LineName
+	}
+	if connection.VehicleReg != connection_model.VehicleRegistration {
+		validators.Vehicle_registration_validator(connection.VehicleReg, &connection.ValidatorErrs)
+		connection_model.VehicleRegistration = connection.VehicleReg
+	}
+	if connection.DriverID != connection_model.DriverID {
+		validators.Driver_id_validator(connection.DriverID, &connection.ValidatorErrs)
+		connection_model.DriverID = connection.DriverID
+	}
+	if len(connection.ValidatorErrs) != 0 {
+		ctx.IndentedJSON(http.StatusBadRequest, connection.ValidatorErrs)
+		return
+	}
+	dep_time, _ := time.Parse("2006-01-02 15:04:05", connection.DepartureTime)
+	if !connection_model.DepartureTime.Equal(dep_time) {
+		arr_time := serializers.Get_arrival_time(dep_time, connection_model.LineName)
+		validators.Driver_availability(int(connection_model.ID), connection_model.DriverID, connection.DepartureTime, arr_time, 1, &connection.ValidatorErrs)
+		validators.Vehicle_availability(int(connection_model.ID), connection_model.VehicleRegistration, connection.DepartureTime, arr_time, 1, &connection.ValidatorErrs)
+		connection_model.DepartureTime = dep_time
+		connection_model.ArrivalTime = arr_time
+	}
+	if len(connection.ValidatorErrs) != 0 {
+		ctx.IndentedJSON(http.StatusBadRequest, connection.ValidatorErrs)
+		return
+	}
+	if result := utils.DB.Save(&connection_model); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
+		return
+	} else {
+		ctx.IndentedJSON(http.StatusOK, result)
+	}
+}
+
+func DeleteConnection(ctx *gin.Context) {
+	id := ctx.Param("id")
+	connection_model := models.Connection{}
+	res := utils.DB.First(&connection_model, "id=?", id)
+	if res.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
+		return
+	}
+	if result := utils.DB.Delete(&connection_model); result.Error != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
 		return
 	} else {
