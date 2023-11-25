@@ -149,7 +149,7 @@ const router = createRouter({
           component: MyPlan
         },
         {
-          path: 'driver/report/new',
+          path: 'driver/reports/new',
           component: NewMalfunction
         },
 

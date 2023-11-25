@@ -10,18 +10,21 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
   },
   "dependencies": {
-    "axios": "^1.6.0",
+    "axios": "^1.6.2",
     "pinia": "^2.1.7",
-    "vue": "^3.3.4",
+    "vue": "^3.3.9",
     "vue-axios": "^3.5.2",
     "vue-cookie": "^1.1.4",
     "vue-cookies": "^1.8.3",
     "vue-material-design-icons": "^5.2.0",
-    "vue-router": "^4.2.5"
+    "vue-multiselect": "^2.1.8",
+    "vue-router": "^4.2.5",
+    "vue-select": "^4.0.0-beta.6"
   },
   "devDependencies": {
     "@tsconfig/node18": "^18.2.2",
     "@types/node": "^18.18.5",
+    "@types/vue-select": "^3.16.8",
     "@vitejs/plugin-vue": "^4.4.0",
     "@vitejs/plugin-vue-jsx": "^3.0.2",
     "@vue/tsconfig": "^0.4.0",

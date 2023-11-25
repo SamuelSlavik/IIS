@@ -24,6 +24,10 @@ export class Endpoints {
         return `${Endpoints.baseUrl}/users/delete/${id}`;
     }
 
+    static updateUser(id: string): string {
+        return `${Endpoints.baseUrl}/users/update/${id}`;
+    }
+
     static get retrieveCurrentUser(): string {
         return `${Endpoints.baseUrl}/users/get`;
     }
@@ -65,5 +69,11 @@ export class Endpoints {
 
     static get listLines(): string {
         return `${Endpoints.baseUrl}/lines`;
+    }
+
+
+
+    static get reportMalfunction(): string {
+        return `${Endpoints.baseUrl}/maintenance/malfunc/create`;
     }
 }

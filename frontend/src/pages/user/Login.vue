@@ -80,17 +80,17 @@ const login = async () => {
     gap: 2rem;
   }
 
-  input, select {
+  input, select, textarea, .vs__selected-options {
     width: 100%;
     padding: 1rem;
     outline: none;
     border-radius: 4px;
     border: 1px solid rgba(60, 60, 67, .12);
   }
-  input:invalid, select:invalid {
+  input:invalid, select:invalid, textarea:invalid {
     border: 1px solid #ff453a;
   }
-  input:hover, input:focus, select:hover, select:focus {
+  input:hover, input:focus, select:hover, select:focus, textarea:focus, textarea:hover {
     border: 1px solid #00bd7e;
   }
 

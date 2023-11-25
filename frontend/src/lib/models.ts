@@ -76,3 +76,10 @@ export interface LineInList {
     InitialStop: string
     FinalStop: string
 }
+
+
+export interface MalfunctionReport {
+    Title: string
+    Description: string
+    VehicleRef: string
+}
