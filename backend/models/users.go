@@ -31,19 +31,9 @@ type User struct {
 	MalfuncReports []MalfunctionReport `gorm:"foreignKey:CreatedByRef"`
 }
 
-func (u *User) AfterCreate(tx *gorm.DB) (err error) {
-	u.FullName = u.FirstName + " " + u.LastName
-	result := tx.Model(&User{}).Where("id = ?", u.ID).Update("full_name", u.FullName)
-	
-	return result.Error
-}
-
-func (u *User) AfterUpdate(tx *gorm.DB) (err error) {
-	if tx.Statement.Changed("first_name") || tx.Statement.Changed("last_name") {
-		u.FullName = u.FirstName + " " + u.LastName
-		result := tx.Model(&User{}).Where("id = ?", u.ID).Update("full_name", u.FullName)
-		return result.Error
-	}
+func (u *User) BeforeSave(tx *gorm.DB) (err error) {
+	new_values := tx.Statement.Dest.(*User)
+	new_values.FullName = new_values.FirstName + " " + new_values.LastName
 	
 	return nil
 }
