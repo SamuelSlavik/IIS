@@ -8,7 +8,7 @@ type Status string
 
 const (
 	PendingStatus Status = "pending"
-	InProgressStatus Status = "in progress"
+	InProgressStatus Status = "progress"
 	DoneStatus Status = "done"
 )
 
