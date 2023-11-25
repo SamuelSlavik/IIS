@@ -33,7 +33,7 @@ func Conn() {
 }
 
 type CustomDate struct {
-	time.Time
+	*time.Time
 }
 
 func (d *CustomDate) UnmarshalJSON(b []byte) error {
@@ -47,7 +47,7 @@ func (d *CustomDate) UnmarshalJSON(b []byte) error {
 		return err
 	}
 
-	d.Time = parsedDate
+	d.Time = &parsedDate
 	return nil
 }
 

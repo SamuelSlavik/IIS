@@ -35,7 +35,7 @@ func (u UserSignupSerializer) copy_data(user *models.User) {
 	user.FirstName = u.FirstName
 	user.LastName = u.LastName
 	user.Email = u.Email
-	user.BirthDate = u.BirthDate.Time
+	user.BirthDate = *u.BirthDate.Time
 	user.Role = u.Role
 	user.Password = u.Password
 }
@@ -124,7 +124,7 @@ func (u UserUpdateSerializer) copy_data(user *models.User) {
 	user.FirstName = u.FirstName
 	user.LastName = u.LastName
 	user.Email = u.Email
-	user.BirthDate = u.BirthDate.Time
+	user.BirthDate = *u.BirthDate.Time
 }
 
 func (u UserUpdateSerializer) ToModel() *models.User {

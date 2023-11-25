@@ -27,11 +27,12 @@ func main() {
 	*/
 	roles := []string{"admin", "superuser", "technician", "dispatcher", "driver"}
 	for _, role := range roles {
+		date := gofakeit.Date()
 		user := serializers.UserSignupSerializer{
 			FirstName:   gofakeit.FirstName(),
 			LastName:    gofakeit.LastName(),
 			Email:       fmt.Sprintf("root@%v.com", role),
-			BirthDate:   utils.CustomDate{Time: gofakeit.Date()},
+			BirthDate:   utils.CustomDate{Time: &date},
 			Password:    "root",
 			PasswordRpt: "root",
 			Role:        models.Role(role),

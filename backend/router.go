@@ -58,6 +58,7 @@ func Router() *gin.Engine {
 	// Maintenance
 	router.POST("/api/maintenance/malfunc/create", middleware.RequireAuth(string(models.DriverRole)), views.CreateMalfuncReport)
 	router.POST("/api/maintenance/maintenreq/create", middleware.RequireAuth(string(models.SuperuserRole)), views.CreateMaintenRequest)
+	router.POST("/api/maintenance/maintenrep/create", middleware.RequireAuth(string(models.TechnicianRole)), views.CreateMaintenReport)
 	router.PUT("/api/maintenance/malfunc/update/:id", middleware.RequireAuth(string(models.DriverRole)), views.UpdateMalfuncReport)
 	router.PUT("/api/maintenance/maintenreq/update/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.UpdateMaintenRequest)
 	router.DELETE("/api/maintenance/malfunc/delete/:id", middleware.RequireAuth(string(models.DriverRole)), views.DeleteMalfuncReport)
