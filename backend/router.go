@@ -37,7 +37,7 @@ func Router() *gin.Engine {
 	router.POST("/api/vehicles/create", views.Create_vehicle)
 	router.PUT("/api/vehicles/update/:id", views.UpdateVehicle)
 	router.DELETE("/api/vehicles/delete/:id", views.DeleteVehicle)
-	//router.GET("/api/vehicles/list/ok", views.ListNotBrokenVehicles))
+	router.GET("/api/vehicles/list/ok", views.ListNotBrokenVehicles)
 
 	// Connections
 	router.GET("/api/connections/list", views.ListConnections)
@@ -60,8 +60,8 @@ func Router() *gin.Engine {
 	router.GET("/api/lines/list", views.ListLines)
 	router.GET("/api/lines/get/:line", views.GetLine)
 	router.POST("/api/lines/create", views.CreateLine)
-	//router.PUT("/api/lines/edit/:id", views.EditLine)
-	//router.DELETE("/api/lines/delete/:id", views.DeleteLine)
+	router.PATCH("/api/lines/update/:line", views.UpdateLine)
+	router.DELETE("/api/lines/delete/:line", views.DeleteLine)
 
 	// Maintenance
 	router.POST("/api/maintenance/malfunc/create", middleware.RequireAuth(string(models.DriverRole)), views.CreateMalfuncReport)

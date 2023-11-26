@@ -5,20 +5,21 @@ import (
 )
 
 type Line struct {
-	Name        string `gorm:"primaryKey;unique;not null"`
-	InitialStop string `gorm:"not null"`
-	FinalStop   string `gorm:"not null"`
-	Connections []Connection
-	Segments    []Segment
+	Name        string       `gorm:"primaryKey;unique;not null"`
+	InitialStop string       `gorm:"not null"`
+	FinalStop   string       `gorm:"not null"`
+	Connections []Connection `gorm:"constraint:OnDelete:CASCADE"`
+	Segments    []Segment    `gorm:"constraint:OnDelete:CASCADE"`
 }
 
 // todo id pk
 type Segment struct {
-	StopName1 string `gorm:"primaryKey;autoIncrement:false"`
-	StopName2 string `gorm:"primaryKey;autoIncrement:false"`
-	Stop1     Stop   `gorm:"foreignKey:StopName1;references:Name"`
-	Stop2     Stop   `gorm:"foreignKey:StopName2;references:Name"`
-	Time      uint   `gorm:"not null"`
+	ID        uint `gorm:"primaryKey;autoIncrement;not null"`
+	StopName1 string
+	StopName2 string
+	Stop1     Stop `gorm:"foreignKey:StopName1;references:Name"`
+	Stop2     Stop `gorm:"foreignKey:StopName2;references:Name"`
+	Time      uint `gorm:"not null"`
 	LineName  string
 }
 

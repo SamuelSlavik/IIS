@@ -6,8 +6,8 @@ type Vehicle struct {
 	Brand           string
 	ImageData       []byte
 	VehicleTypeName string
-	VehicleType     VehicleType `gorm:"foreignKey:VehicleTypeName;references:Type"`
-	Connections     []Connection
+	VehicleType     VehicleType         `gorm:"foreignKey:VehicleTypeName;references:Type"`
+	Connections     []Connection        `gorm:"constraint:OnDelete:SET NULL"`
 	Malfunctions    []MalfunctionReport `gorm:"foreignKey:VehicleRef;constraint:OnDelete:CASCADE"`
 }
 

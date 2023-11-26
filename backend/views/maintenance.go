@@ -85,6 +85,11 @@ func ListStatusMalfuncReports(ctx *gin.Context) {
 		db_query = db_query.Where("created_by_ref = ?", logged_user.ID)
 	}
 
+	vehicle := ctx.Query("vehicle")
+	if vehicle != "" {
+		db_query = db_query.Where("vehicle_ref = ?", vehicle)
+	}
+
 	if result := db_query.Preload("MaintenReqs").Preload("CreatedBy").Preload("Vehicle").Find(&malfunc_reports); result.Error != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": result.Error.Error(),
