@@ -12,6 +12,7 @@ type Line struct {
 	Segments    []Segment
 }
 
+// todo id pk
 type Segment struct {
 	StopName1 string `gorm:"primaryKey;autoIncrement:false"`
 	StopName2 string `gorm:"primaryKey;autoIncrement:false"`
