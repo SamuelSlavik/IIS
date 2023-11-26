@@ -29,7 +29,7 @@ func RequireAuth(permitted_roles ...string) gin.HandlerFunc {
 		token, err := jwt.Parse(token_string, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				ctx.AbortWithStatus(http.StatusUnauthorized)
-				return nil, errors.New("Unexpected signing method")
+				return nil, errors.New("unexpected signing method")
 			}
 
 			// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
@@ -71,6 +71,10 @@ func RequireAuth(permitted_roles ...string) gin.HandlerFunc {
 
 			// Attach user to request
 			ctx.Set("user", user)
+
+			// Reset cookie lifetime to 1h
+			ctx.SetSameSite(http.SameSiteNoneMode)
+			ctx.SetCookie("Authorization", token_string, 3600, "", "", true, true)
 
 			ctx.Next()
 		} else {
