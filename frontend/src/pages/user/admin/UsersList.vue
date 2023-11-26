@@ -20,16 +20,21 @@ const users = ref<User[]>([])
 
 const uniqueRoles = ref(['admin', 'superuser', 'technician', 'dispatcher', 'driver'])
 const getUsersByRole = (role: string) => {
-  return users.value.filter((user) => user.Role == role);
+  if (users.value) {
+    return users.value.filter((user) => user.Role == role);
+  }
+  return []
+
 };
 
 const loadUsers = async () => {
-  loading.value = true
   try {
-     const response = await axios.get<User[]>(Endpoints.listUsers, {withCredentials: true})
-     users.value = response.data
+    loading.value = true
+    const response = await axios.get<User[]>(Endpoints.listUsers(query.value), {withCredentials: true})
+    users.value = response.data
+    console.log(users.value)
   } catch (error) {
-    notifications.addNotification("Failed to get users: " + error)
+    notifications.addNotification("Failed to get users: " + error, "error")
   } finally {
     loading.value = false
   }
@@ -44,7 +49,7 @@ const deleteUser = async(id: string) => {
     const response = await axios.delete(Endpoints.deleteUser(id), {withCredentials: true})
     if (response.status === 200) {
       notifications.addNotification("User deleted", "success")
-      loadUsers()
+      await loadUsers()
     }
   } catch (error) {
     notifications.addNotification("Failed to delete user: " + error, "error")

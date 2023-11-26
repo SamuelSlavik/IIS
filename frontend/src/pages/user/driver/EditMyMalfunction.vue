@@ -1,17 +1,22 @@
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
 import Loader from "@/components/Loader.vue";
-import type {MalfunctionReport, User, Vehicle} from "@/lib/models";
+import type {User} from "@/lib/models";
 import {Endpoints} from "@/lib/variables";
 import axios from "axios";
 import {useNotificationStore} from "@/stores/notification-store";
+import type {Malfunction, MalfunctionReport, Vehicle} from "@/lib/models";
 import router from "@/router";
-
+import {useUserStore} from "@/stores/user-store";
 
 const loading = ref<boolean>(false)
 const notifications = useNotificationStore()
 
+const user = useUserStore()
+
 const vehicles = ref<Vehicle[]>([])
+
+const reportId = router.currentRoute.value.params.id.toString() || ""
 
 const newReport = ref<MalfunctionReport>({
   Title: "",
@@ -19,6 +24,19 @@ const newReport = ref<MalfunctionReport>({
   VehicleRef: "",
 })
 
+const loadMalfunction = async () => {
+  loading.value = true
+  try {
+    const response = await axios.get<Malfunction>(Endpoints.retrieveMalfunction(reportId), {withCredentials: true})
+    newReport.value.Title = response.data.Title
+    newReport.value.Description = response.data.Description
+    newReport.value.VehicleRef = response.data.Vehicle.Registration
+  } catch (error) {
+    notifications.addNotification("Failed to load malfunction: " + error, 'error')
+  } finally {
+    loading.value = false
+  }
+}
 const loadVehicles = async () => {
   loading.value = true
   try {
@@ -34,19 +52,20 @@ const loadVehicles = async () => {
 const submitReport = async () => {
   loading.value = true
   try {
-    const response = await axios.post(Endpoints.reportMalfunction, newReport.value, {withCredentials: true})
+    const response = await axios.put(Endpoints.editMalfunction(reportId), newReport.value, {withCredentials: true})
     if (response.status === 200) {
-      notifications.addNotification("Malfunction reported", 'success')
-      await router.push('/profile/driver/reports');
+      notifications.addNotification("Malfunction updated", 'success')
+      user.role === "driver" ? await router.push('/profile/driver/reports') : await router.push('/profile/superuser/malfunctions');
     }
   } catch (error) {
-    notifications.addNotification("Failed to report malfunction: " + error, 'error')
+    notifications.addNotification("Failed to update malfunction: " + error, 'error')
   } finally {
     loading.value = false
   }
 }
 
 onMounted(() => {
+  loadMalfunction()
   loadVehicles()
 })
 
@@ -55,7 +74,7 @@ onMounted(() => {
 <template>
   <div>
     <div class="header">
-      <h2>Report a malfunction on a vehicle</h2>
+      <h2>Edit malfunction report</h2>
     </div>
 
     <Loader v-if="loading"/>

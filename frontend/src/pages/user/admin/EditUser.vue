@@ -84,12 +84,6 @@ onMounted(() => {
             placeholder="Date of birth"
             v-model="newUser.BirthDate"
         />
-        <select v-model="newUser.Role" required>
-          <option value="superuser">Superuser</option>
-          <option value="technician">Technician</option>
-          <option value="dispatcher">Dispatcher</option>
-          <option value="driver">Driver</option>
-        </select>
         <button
             type="submit"
         >Update user</button>

@@ -5,7 +5,7 @@ import {Endpoints} from "@/lib/variables";
 import axios from "axios";
 import {useNotificationStore} from "@/stores/notification-store";
 import {onMounted, ref} from "vue";
-import type {Vehicle} from "@/lib/models";
+import type {Vehicle, VehicleInList} from "@/lib/models";
 import Bus from "vue-material-design-icons/Bus.vue";
 import Tram from "vue-material-design-icons/Tram.vue";
 import Tank from "vue-material-design-icons/Tank.vue";
@@ -13,6 +13,7 @@ import Pencil from "vue-material-design-icons/Pencil.vue";
 import Delete from "vue-material-design-icons/Delete.vue";
 import Check from "vue-material-design-icons/Check.vue";
 import Close from 'vue-material-design-icons/Close.vue';
+import {formatDate} from "../../../lib/utils";
 
 
 const user = useUserStore()
@@ -20,13 +21,13 @@ const router = useRouter();
 let notifications = useNotificationStore();
 const loading = ref<boolean>(false)
 
-const vehicles = ref<Vehicle[]>([])
+const vehicles = ref<VehicleInList[]>([])
 
 const uniqueVehicles = ref(['tram', 'bus', 'obrnena_dodavka'])
 const getVehiclesByType = (type: string) => {
   console.log(type)
   console.log(vehicles)
-  return vehicles.value.filter((vehicle) => vehicle.VehicleTypeName === type);
+  return vehicles.value.filter((vehicle) => vehicle.Type === type);
 };
 
 
@@ -62,20 +63,23 @@ onMounted(() => {
     <div v-else>
       <div v-for="type in uniqueVehicles" :key="type">
         <div v-if="getVehiclesByType(type).length > 0" class="table">
-          <div v-for="(vehicle, index) in getVehiclesByType(type)" :key="vehicle.ID">
+          <div v-for="(vehicle, index) in getVehiclesByType(type)" :key="vehicle.Registration">
             <div class="list-item">
-              <router-link :to="'/profile/superuser/vehicles/detail/' + vehicle.ID" class="list-item__name">
-                <Bus v-if="vehicle.VehicleTypeName === 'bus'" class="connection-icon"/>
-                <Tram v-if="vehicle.VehicleTypeName === 'tram'" class="connection-icon"/>
-                <Tank v-if="vehicle.VehicleTypeName === 'obrnena_dodavka'" class="connection-icon"/>
+              <router-link :to="'/profile/superuser/vehicles/detail/' + vehicle.Registration" class="list-item__name">
+                <Bus v-if="vehicle.Type === 'bus'" class="connection-icon"/>
+                <Tram v-if="vehicle.Type === 'tram'" class="connection-icon"/>
+                <Tank v-if="vehicle.Type === 'obrnena_dodavka'" class="connection-icon"/>
                 {{vehicle.Registration}}
               </router-link>
-              <p class="list-item__role"><Check fill-color="#2ecc71"/></p>
-              <p class="list-item__role"><Close fill-color="#e74c3c"/></p>
-              <p class="list-item__role">{{ vehicle.Capacity }}</p>
+              <p v-if="vehicle.LastMaintenance.Date != '-'" class="list-item__role" :class="{ 'yellow': vehicle.LastMaintenance.Status === 'pending' || vehicle.LastMaintenance.Status === 'progress' }">
+                Maintenance: {{ formatDate(vehicle.LastMaintenance.Date)  }}
+              </p>
+              <p class="list-item__role" :class="{ 'yellow': vehicle.LastMaintenance.Status === 'pending' || vehicle.LastMaintenance.Status === 'progress' }">
+                Maintenance: {{ vehicle.LastMaintenance.Date  }}
+              </p>
               <div class="list-item__tools">
-                <router-link to="/profile/superuser/vehicles/edit"><Pencil :size="24" /></router-link>
-                <a @click="deleteVehicle(vehicle.ID)"><Delete :size="24" /></a>
+                <router-link :to="'/profile/superuser/vehicles/edit/' + vehicle.Registration"><Pencil :size="24" /></router-link>
+                <a @click="deleteVehicle(vehicle.Registration)"><Delete :size="24" /></a>
               </div>
             </div>
             <div v-if="index < getVehiclesByType(type).length - 1" class="table-hr"></div>

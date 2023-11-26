@@ -17,12 +17,11 @@ const query = ref<string>("")
 const stops = ref<Stop[]>([])
 
 const loadStops = async () => {
+  loading.value = true
   try {
-    loading.value = true
     const response = await axios.get(Endpoints.listStops(query.value), {withCredentials: true})
     stops.value = response.data
     console.log(stops.value)
-
   } catch (error) {
     notifications.addNotification("Failed to load stops: " + error, "error")
   } finally {
