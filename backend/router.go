@@ -19,6 +19,7 @@ func Router() *gin.Engine {
 
 	// Users
 	router.GET("/api/users/list", middleware.RequireAuth(), views.ListUsers)
+	router.GET("/api/users/list/:role", middleware.RequireAuth(), views.ListRoleUsers)
 	router.GET("/api/users/get/:id", middleware.RequireAuth(), views.RetrieveUser)
 	router.GET("/api/users/get", middleware.RequireAuth(), views.RetrieveCurrentUser)
 	router.GET("/api/users/logout", middleware.RequireAuth(), views.Logout)
@@ -68,6 +69,7 @@ func Router() *gin.Engine {
 	router.POST("/api/maintenance/maintenrep/create", middleware.RequireAuth(string(models.TechnicianRole)), views.CreateMaintenReport)
 	router.PUT("/api/maintenance/malfunc/update/:id", middleware.RequireAuth(string(models.DriverRole)), views.UpdateMalfuncReport)
 	router.PUT("/api/maintenance/maintenreq/update/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.UpdateMaintenRequest)
+	router.PATCH("/api/maintenance/maintenreq/assigntech/:id", middleware.RequireAuth(string(models.TechnicianRole), string(models.SuperuserRole)), views.AssignTechMaintenRequest)
 	router.PUT("/api/maintenance/maintenrep/update/:id", middleware.RequireAuth(string(models.TechnicianRole)), views.UpdateMaintenReport)
 	router.DELETE("/api/maintenance/malfunc/delete/:id", middleware.RequireAuth(string(models.DriverRole)), views.DeleteMalfuncReport)
 	router.DELETE("/api/maintenance/maintenreq/delete/:id", middleware.RequireAuth(string(models.DriverRole)), views.DeleteMaintenRequest)

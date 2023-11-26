@@ -16,6 +16,7 @@ import (
 	"github.com/AdamPekny/IIS/backend/models"
 	"github.com/AdamPekny/IIS/backend/serializers"
 	utils "github.com/AdamPekny/IIS/backend/utils"
+	"github.com/AdamPekny/IIS/backend/validators"
 )
 
 func Signup(ctx *gin.Context) {
@@ -150,6 +151,47 @@ func ListUsers(ctx *gin.Context) {
 	}
 
 	if result := db_query.Find(&user_models); result.Error != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": result.Error.Error(),
+		})
+		return
+	}
+
+	for _, user := range user_models {
+		user_serialized := serializers.UserPublicSerializer{}
+		if err := user_serialized.FromModel(user); err != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		user_serializers = append(user_serializers, user_serialized)
+	}
+
+	ctx.IndentedJSON(http.StatusOK, user_serializers)
+}
+
+func ListRoleUsers(ctx *gin.Context) {
+	var user_models []models.User
+	var user_serializers []serializers.UserPublicSerializer
+
+	query := ctx.Query("query")
+
+	db_query := utils.DB.Order("full_name ASC")
+
+	if query != "" {
+		db_query = db_query.Where("LOWER(full_name) LIKE ?", "%" + strings.ToLower(query) + "%")
+	}
+
+	role := ctx.Param("role")
+	var valid_errs []validators.ValidatorErr
+	validators.RoleValidator(role, &valid_errs)
+	if len(valid_errs) > 0 {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"errors": valid_errs,
+		})
+		return
+	}
+
+	if result := db_query.Where("role = ?", role).Find(&user_models); result.Error != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": result.Error.Error(),
 		})
