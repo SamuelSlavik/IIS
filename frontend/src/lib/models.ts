@@ -38,16 +38,23 @@ export enum Roles {
 }
 
 export interface Vehicle {
-    ID: string
     Registration: string
     Capacity: number
     Brand: string
-    ImageData: string
-    VehicleType: VehicleType
-    VehicleTypeName: string
+    Type: string
+    LastMaintenance: LastMaintenance
+}
+export interface NewVehicle {
+    Registration: string
+    Capacity: number | null
+    Brand: string
+    Type: string
+}
+export interface UpdateVehicle {
+    Capacity: number | null
+    Brand: string
+    Type: string
     LineName: string
-    Connections: Connection[]
-    Malfunctions: Malfunction[] | null
 }
 
 export interface VehicleInList {

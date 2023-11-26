@@ -1,19 +1,92 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
-import Loader from "@/components/Loader.vue";
-import type {User} from "@/lib/models";
+import {useUserStore} from "@/stores/user-store";
+import {useRouter} from "vue-router";
 import {Endpoints} from "@/lib/variables";
 import axios from "axios";
 import {useNotificationStore} from "@/stores/notification-store";
+import {onMounted, ref} from "vue";
+import type {NewVehicle} from "@/lib/models";
 
-const loading = ref<boolean>(false)
-const notifications = useNotificationStore()
+const user = useUserStore()
+const router = useRouter();
+let notifications = useNotificationStore();
+
+const newVehicle = ref<NewVehicle>({
+  Registration: "",
+  Capacity: null,
+  Type: "",
+  Brand: "",
+})
+
+const loadVehicle = async () => {
+  try {
+    const response = await axios.get(Endpoints.retrieveVehicle(router.currentRoute.value.params.id.toString()), {withCredentials: true})
+    newVehicle.value.Registration = response.data.Registration
+    newVehicle.value.Capacity = response.data.Capacity
+    newVehicle.value.Type = response.data.Type
+    newVehicle.value.Brand = response.data.Brand
+  } catch (error: any) {
+    notifications.addNotification("Failed to load vehicle: " + error, "error")
+  }
+}
+
+const submitVehicle = async () => {
+  try {
+    const response = await axios.put(Endpoints.updateVehicle(newVehicle.value.Registration), newVehicle.value, {withCredentials: true})
+    if (response.status === 200) {
+      notifications.addNotification("Vehicle created", 'success')
+      await router.push('/profile/superuser/vehicles');
+    }
+  } catch (error: any) {
+    notifications.addNotification("Failed to create vehicle: " + error, "error")
+  }
+}
+
+onMounted(() => {
+  loadVehicle()
+})
 
 </script>
 
 <template>
   <div>
-    Working..
+    <div class="header">
+      <h2>Create new vehicle</h2>
+    </div>
+
+    <div>
+      <form @submit.prevent="submitVehicle" class="form">
+        <input
+            type="text"
+            name="registration"
+            placeholder="Vehicle registration: XXX0000"
+            v-model="newVehicle.Registration"
+            required
+        />
+        <input
+            type="number"
+            name="capacity"
+            placeholder="Capacity"
+            v-model="newVehicle.Capacity"
+            required
+        />
+        <input
+            type="text"
+            name="brand"
+            placeholder="Brand"
+            v-model="newVehicle.Brand"
+        />
+        <select v-model="newVehicle.Type" required>
+          <option value="" disabled>Vehicle type</option>
+          <option value="bus">Bus</option>
+          <option value="tram">Tram</option>
+          <option value="obrnena_dodavka">Obrnena dodavka</option>
+        </select>
+        <button
+            type="submit"
+        >Update vehicle</button>
+      </form>
+    </div>
   </div>
 </template>
 

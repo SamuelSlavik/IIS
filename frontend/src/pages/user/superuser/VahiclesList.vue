@@ -72,13 +72,13 @@ onMounted(() => {
                 {{vehicle.Registration}}
               </router-link>
               <p v-if="vehicle.LastMaintenance.Date != '-'" class="list-item__role" :class="{ 'yellow': vehicle.LastMaintenance.Status === 'pending' || vehicle.LastMaintenance.Status === 'progress' }">
-                {{ formatDate(vehicle.LastMaintenance.Date)  }}
+                Maintenance: {{ formatDate(vehicle.LastMaintenance.Date)  }}
               </p>
               <p class="list-item__role" :class="{ 'yellow': vehicle.LastMaintenance.Status === 'pending' || vehicle.LastMaintenance.Status === 'progress' }">
-                {{ vehicle.LastMaintenance.Date  }}
+                Maintenance: {{ vehicle.LastMaintenance.Date  }}
               </p>
               <div class="list-item__tools">
-                <router-link to="/profile/superuser/vehicles/edit"><Pencil :size="24" /></router-link>
+                <router-link :to="'/profile/superuser/vehicles/edit/' + vehicle.Registration"><Pencil :size="24" /></router-link>
                 <a @click="deleteVehicle(vehicle.Registration)"><Delete :size="24" /></a>
               </div>
             </div>
