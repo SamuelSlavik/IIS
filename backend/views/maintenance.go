@@ -618,6 +618,78 @@ func UpdateMaintenRequest(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, mainten_req_pub_serializer)
 }
 
+func AssignTechMaintenRequest(ctx *gin.Context) {
+	var mainten_req_serializer serializers.MaintenReqAssignTechSerializer
+
+	if err := ctx.BindJSON(&mainten_req_serializer); err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if !mainten_req_serializer.Valid() {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"errors": mainten_req_serializer.ValidatorErrs,
+		})
+		return
+	}
+
+	mainten_req_model, err := mainten_req_serializer.ToModel(ctx)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"errors": err.Error(),
+		})
+		return
+	}
+
+	logged_user, err := models.GetUserFromCtx(ctx)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if logged_user.Role == models.TechnicianRole && logged_user.ID != *mainten_req_model.ResolvedByRef {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "permission denied",
+		})
+		return
+	} else if logged_user.Role == models.SuperuserRole && logged_user.ID != *mainten_req_model.CreatedByRef {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "permission denied",
+		})
+		return
+	}
+
+	if result := utils.DB.Model(mainten_req_model).Update("resolved_by_ref", mainten_req_model.ResolvedByRef); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": result.Error.Error(),
+		})
+		return
+	}
+
+	// Fill with new data
+	if result := utils.DB.Preload("MalfuncRep").Preload("CreatedBy").Preload("ResolvedBy").First(&mainten_req_model, mainten_req_model.ID); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": result.Error.Error(),
+		})
+		return
+	}
+
+	var mainten_req_pub_serializer serializers.MaintenReqPublicSerializer
+
+	if err := mainten_req_pub_serializer.FromModel(mainten_req_model); err != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.IndentedJSON(http.StatusOK, mainten_req_pub_serializer)
+}
+
 func DeleteMaintenRequest(ctx *gin.Context) {
 	id, err := utils.GetIDFromURL(ctx)
 

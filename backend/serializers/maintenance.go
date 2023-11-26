@@ -301,6 +301,33 @@ func (m *MaintenReqUpdateSerializer) ToModel(ctx *gin.Context) (*models.Maintena
 	return model, nil
 }
 
+type MaintenReqAssignTechSerializer struct {
+	ResolvedByRef *uint `binding:"required"`
+	ValidatorErrs []validators.ValidatorErr
+}
+
+func (m *MaintenReqAssignTechSerializer) Valid() bool {
+	validators.HasRoleValidator(*m.ResolvedByRef, &m.ValidatorErrs, models.TechnicianRole)
+
+	return len(m.ValidatorErrs) == 0
+}
+
+func (m *MaintenReqAssignTechSerializer) ToModel(ctx *gin.Context) (*models.MaintenanceRequest, error) {
+	id, err := utils.GetIDFromURL(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	model := &models.MaintenanceRequest{}
+	if result := utils.DB.Select("id").First(model, id); result.Error != nil {
+		return nil, result.Error
+	}
+
+	model.ResolvedByRef = m.ResolvedByRef
+
+	return model, nil
+}
+
 type MaintenRepCreateSerializer struct {
 	Title string `binding:"required"`
 	Description string `binding:"required"`
