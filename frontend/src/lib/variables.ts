@@ -65,9 +65,6 @@ export class Endpoints {
         }
         return `${Endpoints.baseUrl}/stops`;
     }
-    static listStopsByQuery(query:string): string {
-        return `${Endpoints.baseUrl}/stops/${query}`;
-    }
     static stopDetail(id: string): string {
         return `${Endpoints.baseUrl}/stops/get/${id}`;
     }
@@ -84,9 +81,11 @@ export class Endpoints {
 
 
     static get listLines(): string {
-        return `${Endpoints.baseUrl}/lines`;
+        return `${Endpoints.baseUrl}/lines/list`;
     }
-
+    static get createLine(): string {
+        return `${Endpoints.baseUrl}/lines/create`;
+    }
 
 
     static get reportMalfunction(): string {

@@ -92,6 +92,14 @@ export interface LineInList {
     InitialStop: string
     FinalStop: string
 }
+export interface NewLine {
+    Name: string
+    StopsSequence: SeqStop[]
+}
+export interface SeqStop {
+    StopName: string
+    Duration: number | null
+}
 
 
 export interface MalfunctionReport {
