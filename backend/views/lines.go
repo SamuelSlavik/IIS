@@ -51,6 +51,10 @@ func CreateLine(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
+	if len(lineSerializer.StopsSequence) < 2 {
+		ctx.IndentedJSON(http.StatusBadRequest, "Line must have at least 2 stops")
+		return
+	}
 	segments := []models.Segment{}
 	for i := 0; i < len(lineSerializer.StopsSequence)-1; i++ {
 		segment := models.Segment{
