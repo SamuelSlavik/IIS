@@ -34,6 +34,7 @@ type MalfuncRepPublicSerialzier struct {
 	ID uint `binding:"required"`
 	Title string `binding:"required"`
 	Description string `binding:"required"`
+	Acknowledged bool 
 	CreatedBy *UserMaintenanceSerializer `binding:"required"`
 	Vehicle *VehicleMaintenanceSerializer `binding:"required"`
 	CreatedAt time.Time
@@ -44,6 +45,13 @@ func (m *MalfuncRepPublicSerialzier) FromModel(malfunc_report *models.Malfunctio
 	m.Title = malfunc_report.Title
 	m.Description = malfunc_report.Description
 	m.CreatedAt = malfunc_report.CreatedAt
+
+	var mainten_req_models []models.MaintenanceRequest
+	if result := utils.DB.Where("malfunc_rep_ref = ?", m.ID).Find(&mainten_req_models); result.Error != nil {
+		return result.Error
+	}
+
+	m.Acknowledged = len(mainten_req_models) > 0
 
 	created_by_serializer := &UserMaintenanceSerializer{}
 

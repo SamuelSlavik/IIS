@@ -2,6 +2,9 @@ package validators
 
 import (
 	"regexp"
+
+	"github.com/AdamPekny/IIS/backend/models"
+	"github.com/AdamPekny/IIS/backend/utils"
 )
 
 func Registration_validator(registration string, validator_errs *[]ValidatorErr) {
@@ -18,6 +21,23 @@ func Registration_validator(registration string, validator_errs *[]ValidatorErr)
 		*validator_errs = append(*validator_errs, ValidatorErr{
 			Name: "RegistrationFmtErr",
 			Desc: "Wrong registration number format!",
+		})
+	}
+}
+
+func Vehicle_type_validator(vehicle_type string, validator_errs *[]ValidatorErr) {
+	res := utils.DB.Where("type = ?", vehicle_type).Find(&models.VehicleType{})
+	if res.Error != nil {
+		*validator_errs = append(*validator_errs, ValidatorErr{
+			Name: "DatabaseErr",
+			Desc: res.Error.Error(),
+		})
+		return
+	}
+	if res.RowsAffected == 0 {
+		*validator_errs = append(*validator_errs, ValidatorErr{
+			Name: "VehicleTypeErr",
+			Desc: "Vehicle type does not exist!",
 		})
 	}
 }

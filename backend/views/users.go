@@ -120,7 +120,7 @@ func Login(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SetSameSite(http.SameSiteLaxMode)
+	ctx.SetSameSite(http.SameSiteNoneMode)
 	ctx.SetCookie("Authorization", token_string, 3600, "", "", false, true)
 
 	if err := user_public.FromModel(user_model); err != nil {
@@ -132,7 +132,7 @@ func Login(ctx *gin.Context) {
 }
 
 func Logout(ctx *gin.Context) {
-	ctx.SetSameSite(http.SameSiteLaxMode)
+	ctx.SetSameSite(http.SameSiteNoneMode)
 	ctx.SetCookie("Authorization", "", -1, "", "", false, true)
 	ctx.JSON(http.StatusOK, gin.H{"message": "Logout successful"})
 }

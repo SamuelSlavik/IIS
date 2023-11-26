@@ -28,6 +28,14 @@ type LastMaintenance struct {
 	Date   string
 }
 
+type VehicleUpdateSerializer struct {
+	Capacity uint `binding:"required"`
+	Brand    string
+	//image lol
+	Type          string `binding:"required"`
+	ValidatorErrs []validators.ValidatorErr
+}
+
 func (vehicle VehicleSerializer) Create_model() (vehicle_model *models.Vehicle) {
 	vehicle_model = &models.Vehicle{
 		Capacity:        vehicle.Capacity,
@@ -39,8 +47,14 @@ func (vehicle VehicleSerializer) Create_model() (vehicle_model *models.Vehicle) 
 	return
 }
 
+func (vehicle *VehicleUpdateSerializer) Valid() bool {
+	validators.Vehicle_type_validator(vehicle.Type, &vehicle.ValidatorErrs)
+	return len(vehicle.ValidatorErrs) == 0
+}
+
 func (vehicle *VehicleSerializer) Valid() bool {
 	validators.Registration_validator(vehicle.Registration, &vehicle.ValidatorErrs)
+	validators.Vehicle_type_validator(vehicle.Type, &vehicle.ValidatorErrs)
 	return len(vehicle.ValidatorErrs) == 0
 }
 
