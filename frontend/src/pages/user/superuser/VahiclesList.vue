@@ -71,8 +71,6 @@ onMounted(() => {
                 <Tank v-if="vehicle.Type === 'obrnena_dodavka'" class="connection-icon"/>
                 {{vehicle.Registration}}
               </router-link>
-              <p class="list-item__role" v-if="vehicle.Registration"><Close fill-color="#e74c3c"/></p>
-              <p class="list-item__role" v-else><Check fill-color="#2ecc71"/></p>
               <p v-if="vehicle.LastMaintenance.Date != '-'" class="list-item__role" :class="{ 'yellow': vehicle.LastMaintenance.Status === 'pending' || vehicle.LastMaintenance.Status === 'progress' }">
                 {{ formatDate(vehicle.LastMaintenance.Date)  }}
               </p>
