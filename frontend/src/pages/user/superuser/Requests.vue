@@ -20,12 +20,35 @@ const router = useRouter();
 let notifications = useNotificationStore();
 const loading = ref<boolean>(false)
 
+const requests = ref()
+
+const loadRequests = async () => {
+  loading.value = true
+  try {
+    const response = await axios.get(Endpoints.listRequests, {withCredentials: true})
+    requests.value = response.data
+  } catch (error) {
+    notifications.addNotification("Failed to load maintenance requests: " + error, 'error')
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  loadRequests()
+})
+
 </script>
 
 <template>
 <div>
   <div class="header">
     <h2>Manage maintenance requests</h2>
+  </div>
+
+  <Loader v-if="loading"/>
+  <div v-else>
+
   </div>
 </div>
 </template>

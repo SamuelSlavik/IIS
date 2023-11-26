@@ -12,6 +12,7 @@ import Check from "vue-material-design-icons/Check.vue";
 import Bus from "vue-material-design-icons/Bus.vue";
 import Tram from "vue-material-design-icons/Tram.vue";
 import Tank from "vue-material-design-icons/Tank.vue";
+import Hammer from "vue-material-design-icons/HammerSickle.vue";
 import router from "@/router";
 
 const loading = ref<boolean>(false)
@@ -82,6 +83,7 @@ onMounted(() => {
               {{report.Vehicle.Registration}}
             </p>
             <div class="list-item__tools">
+              <router-link :to="'/profile/superuser/requests/create/' + report.ID"><Hammer :size="24" /></router-link>
               <router-link :to="'/profile/malfunctions/edit/' + report.ID"><Pencil :size="24" /></router-link>
               <a @click="deleteMalfunction(report.ID)"><Delete :size="24" /></a>
             </div>
@@ -105,6 +107,7 @@ onMounted(() => {
               {{report.Vehicle.Registration}}
             </p>
             <div class="list-item__tools">
+              <router-link :to="'/profile/superuser/requests/create/' + report.ID"><Hammer :size="24" /></router-link>
               <a @click="deleteMalfunction(report.ID)"><Delete :size="24" /></a>
             </div>
           </div>

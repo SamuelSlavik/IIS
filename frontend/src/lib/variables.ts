@@ -107,4 +107,24 @@ export class Endpoints {
         }
         return `${Endpoints.baseUrl}/maintenance/malfunc/list`;
     }
+
+
+    static get listRequests(): string {
+        return `${Endpoints.baseUrl}/maintenance/maintenreq/list`;
+    }
+    static get createRequest(): string {
+        return `${Endpoints.baseUrl}/maintenance/maintenreq/create`;
+    }
+    static retrieveRequest(id: string): string {
+        return `${Endpoints.baseUrl}/maintenance/maintenreq/get/${id}`;
+    }
+    static editRequest(id: string): string {
+        return `${Endpoints.baseUrl}/maintenance/maintenreq/update/${id}`;
+    }
+    static deleteRequest(id: string): string {
+        return `${Endpoints.baseUrl}/maintenance/maintenreq/delete/${id}`;
+    }
+
+
+
 }

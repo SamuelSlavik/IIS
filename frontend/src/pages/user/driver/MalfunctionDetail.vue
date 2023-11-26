@@ -13,6 +13,7 @@ import Bus from "vue-material-design-icons/Bus.vue";
 import Tram from "vue-material-design-icons/Tram.vue";
 import Tank from "vue-material-design-icons/Tank.vue";
 import {useUserStore} from "@/stores/user-store";
+import Hammer from "vue-material-design-icons/HammerSickle.vue";
 
 const loading = ref<boolean>(false)
 const notifications = useNotificationStore()
@@ -98,6 +99,7 @@ onMounted(() => {
 
       <div class="hr"></div>
       <div class="tools">
+        <router-link v-if="user.Role != 'driver'" :to="'/profile/superuser/requests/create/' + report.ID"><Hammer :size="24" /></router-link>
         <router-link v-if="!report.Acknowledged" :to='"/profile/malfunctions/edit/" + report.ID'><Pencil :size="24" /></router-link>
         <a @click="deleteReport(report.ID)"><Delete :size="24" /></a>
       </div>

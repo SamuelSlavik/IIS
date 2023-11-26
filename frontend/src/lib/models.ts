@@ -123,3 +123,12 @@ export interface LastMaintenance {
     Status: string
     Date: string
 }
+
+
+export interface NewRequest {
+    Status: string
+    Deadline: string
+    MalfuncRepRef: string
+    CreatedByRef: string
+    ResolvedByRef: string
+}
