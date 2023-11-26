@@ -83,7 +83,7 @@ onMounted(() => {
             </p>
             <div class="list-item__tools">
               <router-link :to="'/profile/superuser/stops/edit/' + stop.ID"><Pencil :size="24" /></router-link>
-              <a @click="deleteStop(stop.ID)"><Delete :size="24" /></a>
+              <a v-if="!stop.Active" @click="deleteStop(stop.ID)"><Delete :size="24" /></a>
             </div>
           </div>
           <div v-if="index < stops.length - 1" class="table-hr"></div>

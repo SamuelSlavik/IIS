@@ -25,8 +25,19 @@ const loadLines = async () => {
   }
 }
 
-const deleteLine = (name: string) => {
-
+const deleteLine = async (name: string) => {
+  if (!window.confirm("Are you sure you want to delete this line?")) {
+    return;
+  }
+  try {
+    const response = await axios.delete(Endpoints.deleteLine(name), {withCredentials: true})
+    if (response.status === 200) {
+      notifications.addNotification("Line deleted", "success")
+      loadLines()
+    }
+  } catch (error: any) {
+    notifications.addNotification("Failed to delete line: " + error, "error")
+  }
 }
 
 onMounted(() => {

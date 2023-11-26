@@ -125,7 +125,7 @@ const router = createRouter({
           component: Lines
         },
         {
-          path: 'superuser/lines/detail/:id',
+          path: 'superuser/lines/detail/:name',
           component: LineDetail
         },
         {
@@ -133,7 +133,7 @@ const router = createRouter({
           component: NewLine
         },
         {
-          path: 'superuser/lines/edit/:id',
+          path: 'superuser/lines/edit/:name',
           component: EditLine
         },
         {
