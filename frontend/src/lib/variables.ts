@@ -86,6 +86,15 @@ export class Endpoints {
     static get createLine(): string {
         return `${Endpoints.baseUrl}/lines/create`;
     }
+    static deleteLine(id: string): string {
+        return `${Endpoints.baseUrl}/lines/delete/${id}`;
+    }
+    static retrieveLine(id: string): string {
+        return `${Endpoints.baseUrl}/lines/get/${id}`;
+    }
+    static editLine(id: string): string {
+        return `${Endpoints.baseUrl}/lines/update/${id}`;
+    }
 
 
     static get reportMalfunction(): string {
