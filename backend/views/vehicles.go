@@ -1,7 +1,6 @@
 package views
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/AdamPekny/IIS/backend/models"
@@ -12,8 +11,61 @@ import (
 
 func List_vehicles(ctx *gin.Context) {
 	var vehicles []models.Vehicle
-	utils.DB.Preload("VehicleType").Find(&vehicles)
-	ctx.IndentedJSON(http.StatusOK, vehicles)
+	res := utils.DB.Preload("VehicleType").Find(&vehicles)
+	if res.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, res.Error)
+		return
+	}
+	var vehicle_serializers []serializers.VehicleGetSerializer
+	for _, vehicle := range vehicles {
+		mainteneces := []models.MaintenanceRequest{}
+		res := utils.DB.Joins("JOIN malfunction_reports ON maintenance_requests.malfunc_rep_ref = malfunction_reports.id").Where("vehicle_ref = ?", vehicle.Registration).
+			Order("created_at DESC").Find(&mainteneces)
+		if res.Error != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, res.Error)
+			return
+		}
+		if len(mainteneces) == 0 {
+			vehicle_serializer := serializers.VehicleGetSerializer{
+				Registration: vehicle.Registration,
+				Capacity:     vehicle.Capacity,
+				Brand:        vehicle.Brand,
+				Type:         vehicle.VehicleType.Type,
+				LastMaintenance: serializers.LastMaintenance{
+					Status: "-",
+					Date:   "-",
+				},
+			}
+			vehicle_serializers = append(vehicle_serializers, vehicle_serializer)
+			continue
+		}
+		if mainteneces[0].Status == "done" {
+			vehicle_serializer := serializers.VehicleGetSerializer{
+				Registration: vehicle.Registration,
+				Capacity:     vehicle.Capacity,
+				Brand:        vehicle.Brand,
+				Type:         vehicle.VehicleType.Type,
+				LastMaintenance: serializers.LastMaintenance{
+					Status: string(mainteneces[0].Status),
+					Date:   mainteneces[0].MaintenRep.CreatedAt.Format("2006-01-02 15:04:05"),
+				},
+			}
+			vehicle_serializers = append(vehicle_serializers, vehicle_serializer)
+		} else {
+			vehicle_serializer := serializers.VehicleGetSerializer{
+				Registration: vehicle.Registration,
+				Capacity:     vehicle.Capacity,
+				Brand:        vehicle.Brand,
+				Type:         vehicle.VehicleType.Type,
+				LastMaintenance: serializers.LastMaintenance{
+					Status: string(mainteneces[0].Status),
+					Date:   mainteneces[0].CreatedAt.Format("2006-01-02 "),
+				},
+			}
+			vehicle_serializers = append(vehicle_serializers, vehicle_serializer)
+		}
+	}
+	ctx.IndentedJSON(http.StatusOK, vehicle_serializers)
 }
 
 func Create_vehicle(ctx *gin.Context) {
@@ -54,7 +106,20 @@ func GetVehicle(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, res.Error)
 		return
 	}
-	fmt.Print(mainteneces[0].Status, "\n")
+	if len(mainteneces) == 0 {
+		vehicle_serializer := serializers.VehicleGetSerializer{
+			Registration: vehicle.Registration,
+			Capacity:     vehicle.Capacity,
+			Brand:        vehicle.Brand,
+			Type:         vehicle.VehicleType.Type,
+			LastMaintenance: serializers.LastMaintenance{
+				Status: "-",
+				Date:   "-",
+			},
+		}
+		ctx.IndentedJSON(http.StatusOK, vehicle_serializer)
+		return
+	}
 	if mainteneces[0].Status == "done" {
 		vehicle_serializer := serializers.VehicleGetSerializer{
 			Registration: vehicle.Registration,
