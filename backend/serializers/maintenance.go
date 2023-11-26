@@ -301,10 +301,37 @@ func (m *MaintenReqUpdateSerializer) ToModel(ctx *gin.Context) (*models.Maintena
 	return model, nil
 }
 
+type MaintenReqAssignTechSerializer struct {
+	ResolvedByRef *uint `binding:"required"`
+	ValidatorErrs []validators.ValidatorErr
+}
+
+func (m *MaintenReqAssignTechSerializer) Valid() bool {
+	validators.HasRoleValidator(*m.ResolvedByRef, &m.ValidatorErrs, models.TechnicianRole)
+
+	return len(m.ValidatorErrs) == 0
+}
+
+func (m *MaintenReqAssignTechSerializer) ToModel(ctx *gin.Context) (*models.MaintenanceRequest, error) {
+	id, err := utils.GetIDFromURL(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	model := &models.MaintenanceRequest{}
+	if result := utils.DB.Select("id").First(model, id); result.Error != nil {
+		return nil, result.Error
+	}
+
+	model.ResolvedByRef = m.ResolvedByRef
+
+	return model, nil
+}
+
 type MaintenRepCreateSerializer struct {
 	Title string `binding:"required"`
 	Description string `binding:"required"`
-	Cost float64
+	Cost float64 
 	MaintenReqRef *uint `binding:"required"`
 	ValidatorErrs []validators.ValidatorErr
 }
@@ -359,4 +386,39 @@ func (m *MaintenRepPublicSerializer) FromModel(mainten_rep_model *models.Mainten
 	m.MaintenReq = mainten_req_serializer	
 
 	return nil
+}
+
+type MaintenRepUpdateSerializer struct {
+	Title string `binding:"required"`
+	Description string `binding:"required"`
+	Cost float64 
+	MaintenReqRef *uint `binding:"required"`
+	ValidatorErrs []validators.ValidatorErr
+}
+
+func (m *MaintenRepUpdateSerializer) Valid() bool {
+	validators.CostValidator(m.Cost, &m.ValidatorErrs)
+	validators.HasResolverValidator(m.MaintenReqRef, &m.ValidatorErrs)
+
+	return len(m.ValidatorErrs) == 0
+}
+
+func (m *MaintenRepUpdateSerializer) ToModel(ctx *gin.Context) (*models.MaintenanceReport, error) {
+	model := &models.MaintenanceReport{}
+
+	id, err := utils.GetIDFromURL(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if result := utils.DB.First(&model, id); result.Error != nil {
+		return nil, result.Error
+	}
+
+	model.Title = m.Title
+	model.Description = m.Description
+	model.Cost = m.Cost
+	model.MaintenReqRef = m.MaintenReqRef
+
+	return model, nil
 }

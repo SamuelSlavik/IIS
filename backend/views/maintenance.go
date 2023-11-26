@@ -387,6 +387,11 @@ func ListStatusMaintenRequests(ctx *gin.Context) {
 		db_query = db_query.Where("status = ?", status)
 	}
 
+	vehicle := ctx.Query("vehicle")
+	if vehicle != "" {
+		db_query = db_query.Joins("JOIN malfunction_reports ON malfunction_reports.id = maintenance_requests.malfunc_rep_ref").Where("malfunction_reports.vehicle_ref = ?", vehicle)
+	}
+
 	if result := db_query.Preload("MalfuncRep").Preload("CreatedBy").Preload("ResolvedBy").Find(&mainten_req_models); result.Error != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": result.Error.Error(),
@@ -613,6 +618,78 @@ func UpdateMaintenRequest(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, mainten_req_pub_serializer)
 }
 
+func AssignTechMaintenRequest(ctx *gin.Context) {
+	var mainten_req_serializer serializers.MaintenReqAssignTechSerializer
+
+	if err := ctx.BindJSON(&mainten_req_serializer); err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if !mainten_req_serializer.Valid() {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"errors": mainten_req_serializer.ValidatorErrs,
+		})
+		return
+	}
+
+	mainten_req_model, err := mainten_req_serializer.ToModel(ctx)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"errors": err.Error(),
+		})
+		return
+	}
+
+	logged_user, err := models.GetUserFromCtx(ctx)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if logged_user.Role == models.TechnicianRole && logged_user.ID != *mainten_req_model.ResolvedByRef {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "permission denied",
+		})
+		return
+	} else if logged_user.Role == models.SuperuserRole && logged_user.ID != *mainten_req_model.CreatedByRef {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "permission denied",
+		})
+		return
+	}
+
+	if result := utils.DB.Model(mainten_req_model).Update("resolved_by_ref", mainten_req_model.ResolvedByRef); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": result.Error.Error(),
+		})
+		return
+	}
+
+	// Fill with new data
+	if result := utils.DB.Preload("MalfuncRep").Preload("CreatedBy").Preload("ResolvedBy").First(&mainten_req_model, mainten_req_model.ID); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": result.Error.Error(),
+		})
+		return
+	}
+
+	var mainten_req_pub_serializer serializers.MaintenReqPublicSerializer
+
+	if err := mainten_req_pub_serializer.FromModel(mainten_req_model); err != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.IndentedJSON(http.StatusOK, mainten_req_pub_serializer)
+}
+
 func DeleteMaintenRequest(ctx *gin.Context) {
 	id, err := utils.GetIDFromURL(ctx)
 
@@ -742,7 +819,7 @@ func ListMaintenReports(ctx *gin.Context) {
 		db_query = db_query.Joins("JOIN maintenance_requests ON maintenance_reports.mainten_req_ref = maintenance_requests.id").Where("maintenance_requests.resolved_by_ref = ?", logged_user.ID)
 	}
 
-	if result := db_query.Order("CreatedAt DESC").Find(&mainten_rep_models); result.Error != nil {
+	if result := db_query.Order("created_at DESC").Find(&mainten_rep_models); result.Error != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": result.Error.Error(),
 		})
@@ -760,4 +837,152 @@ func ListMaintenReports(ctx *gin.Context) {
 	}
 
 	ctx.IndentedJSON(http.StatusOK, mainten_rep_pub_serializers)
+}
+
+func GetMaintenReport(ctx *gin.Context) {
+	var mainten_rep_model models.MaintenanceReport
+	var mainten_rep_pub_serializer serializers.MaintenRepPublicSerializer
+
+	id, err := utils.GetIDFromURL(ctx)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if result := utils.DB.First(&mainten_rep_model, id); result.Error != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": result.Error.Error(),
+		})
+		return
+	}
+
+	if err := mainten_rep_pub_serializer.FromModel(&mainten_rep_model); err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.IndentedJSON(http.StatusOK, mainten_rep_pub_serializer)
+}
+
+func UpdateMaintenReport(ctx *gin.Context) {
+	report_update_serializer := &serializers.MaintenRepUpdateSerializer{}
+	if err := ctx.BindJSON(report_update_serializer); err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if !report_update_serializer.Valid() {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"errors": report_update_serializer.ValidatorErrs,
+		})
+		return
+	}
+
+	request_model := &models.MaintenanceRequest{}
+	if result := utils.DB.First(request_model, report_update_serializer.MaintenReqRef); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": result.Error.Error(),
+		})
+		return
+	}
+
+	logged_user, err := models.GetUserFromCtx(ctx)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if logged_user.ID != *request_model.ResolvedByRef && logged_user.Role != models.AdminRole {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "permission denied",
+		})
+		return
+	}
+
+	report_model, err := report_update_serializer.ToModel(ctx)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if result := utils.DB.Save(report_model); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": result.Error.Error(),
+		})
+		return
+	}
+
+	report_public_serializer := &serializers.MaintenRepPublicSerializer{}
+	if err := report_public_serializer.FromModel(report_model); err != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.IndentedJSON(http.StatusOK, report_public_serializer)
+}
+
+func DeleteMaintenReport(ctx *gin.Context) {
+	id, err := utils.GetIDFromURL(ctx)
+
+	if err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	var report_model models.MaintenanceReport
+
+	if result := utils.DB.First(&report_model, id); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": result.Error.Error(),
+		})
+		return
+	}
+
+	request_model := &models.MaintenanceRequest{}
+	if result := utils.DB.First(request_model, report_model.MaintenReqRef); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": result.Error.Error(),
+		})
+		return
+	}
+
+	logged_user, err := models.GetUserFromCtx(ctx)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if logged_user.ID != *request_model.ResolvedByRef && logged_user.Role != models.AdminRole {
+		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "permission denied",
+		})
+		return
+	}
+
+	if result := utils.DB.Delete(report_model); result.Error != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": result.Error.Error(),
+		})
+		return
+	}
+
+	ctx.IndentedJSON(http.StatusOK, gin.H{
+		"message": "maintenance report deleted successfully",
+	})
 }

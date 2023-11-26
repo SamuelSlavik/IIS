@@ -23,6 +23,7 @@ type VehicleGetSerializer struct {
 	Type            string
 	LastMaintenance LastMaintenance
 }
+
 type LastMaintenance struct {
 	Status string
 	Date   string
