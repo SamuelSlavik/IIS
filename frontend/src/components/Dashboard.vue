@@ -64,6 +64,7 @@ const logOut = async () => {
         <p v-if="user.role === 'admin' || user.role === 'driver'"><router-link to="/profile/driver/plans">My Plan</router-link></p>
         <br/>
         <p v-if="user.role === 'admin' || user.role === 'driver'"><router-link to="/profile/driver/reports/new">Report vehicle problem</router-link></p>
+        <p v-if="user.role === 'admin' || user.role === 'driver'"><router-link to="/profile/driver/reports">Reported malfunctions</router-link></p>
       </div>
       <div class="hr"></div>
       <div>

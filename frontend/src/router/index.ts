@@ -28,6 +28,9 @@ import MyRequestDetail from "@/pages/user/technician/MyRequestDetail.vue";
 import MyRequestComplete from "@/pages/user/technician/MyRequestComplete.vue";
 import MyPlan from "@/pages/user/driver/MyPlan.vue";
 import NewMalfunction from "@/pages/user/driver/NewMalfunction.vue";
+import EditMyMalfunction from "@/pages/user/driver/EditMyMalfunction.vue";
+import MyMalfunctions from "@/pages/user/driver/MyMalfunctions.vue";
+import MalfunctionDetail from "@/pages/user/driver/MalfunctionDetail.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -133,6 +136,14 @@ const router = createRouter({
           component: EditLine
         },
         {
+          path: 'malfunction/detail/:id',
+          component: MalfunctionDetail
+        },
+
+
+
+
+        {
           path: 'technician/requests',
           component: MyRequests
         },
@@ -152,8 +163,14 @@ const router = createRouter({
           path: 'driver/reports/new',
           component: NewMalfunction
         },
-
-
+        {
+          path: 'driver/reports',
+          component: MyMalfunctions
+        },
+        {
+          path: 'driver/reports/edit/:id',
+          component: EditMyMalfunction
+        },
       ]
     }
   ]

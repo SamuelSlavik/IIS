@@ -79,4 +79,19 @@ export class Endpoints {
     static get reportMalfunction(): string {
         return `${Endpoints.baseUrl}/maintenance/malfunc/create`;
     }
+    static retrieveMalfunction(id: string): string {
+        return `${Endpoints.baseUrl}/maintenance/malfunc/get/${id}`;
+    }
+    static editMalfunction(id: string): string {
+        return `${Endpoints.baseUrl}/maintenance/malfunc/update/${id}`;
+    }
+    static deleteMalfunction(id: string): string {
+        return `${Endpoints.baseUrl}/maintenance/malfunc/delete/${id}`;
+    }
+    static listMalfunctions(query?: string): string {
+        if (query) {
+            return `${Endpoints.baseUrl}/maintenance/malfunc/list?query=${query}`;
+        }
+        return `${Endpoints.baseUrl}/maintenance/malfunc/list`;
+    }
 }

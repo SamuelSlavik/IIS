@@ -47,6 +47,9 @@ onMounted(() => {
 .router-link-active {
   color: #00bd7e;
 }
+.red {
+  color: #e74c3c;
+}
 @media (min-width: 1024px) {
 
 }

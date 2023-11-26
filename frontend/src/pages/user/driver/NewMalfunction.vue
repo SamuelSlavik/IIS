@@ -5,9 +5,6 @@ import type {MalfunctionReport, User, Vehicle} from "@/lib/models";
 import {Endpoints} from "@/lib/variables";
 import axios from "axios";
 import {useNotificationStore} from "@/stores/notification-store";
-import Bus from "vue-material-design-icons/Bus.vue";
-import Tram from "vue-material-design-icons/Tram.vue";
-import Tank from "vue-material-design-icons/Tank.vue";
 import router from "@/router";
 
 

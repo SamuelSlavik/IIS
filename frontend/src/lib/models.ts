@@ -83,3 +83,22 @@ export interface MalfunctionReport {
     Description: string
     VehicleRef: string
 }
+export interface Malfunction {
+    ID: string
+    Title: string
+    Description: string
+    Vehicle: VehicleRef
+    CreatedAt: string
+    CreatedBy: CreatedByRef
+}
+export interface VehicleRef {
+    Registration: string
+    Brand: string
+    VehicleTypeName: string
+}
+export interface CreatedByRef {
+    FirstName: string
+    LastName: string
+    Email: string
+    Role: string
+}
