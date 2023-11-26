@@ -38,22 +38,6 @@ func (u *User) BeforeSave(tx *gorm.DB) (err error) {
 	return nil
 }
 
-func uniqueEmailCheck(tx *gorm.DB, email string) (err error) {
-	var existing_user User
-	result := tx.Where("email = ?", email).Find(&existing_user)
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	if result.RowsAffected > 0 {
-		// User with the same email already exists, return an error
-		return fmt.Errorf("User with email %s already exists", email)
-	}
-
-	return nil
-}
-
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	return uniqueEmailCheck(tx, u.Email)
 }
@@ -64,6 +48,14 @@ func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {
 		new_values := tx.Statement.Dest.(*User)
 
 		return uniqueEmailCheck(tx, new_values.Email)
+	}
+
+	return nil
+}
+
+func (u *User) AfterDelete(tx *gorm.DB) (err error) {
+	if result := tx.Model(&Connection{}).Where("driver_id = ?", u.ID).Update("driver_id", nil); result.Error != nil {
+		return result.Error
 	}
 
 	return nil
@@ -81,4 +73,20 @@ func GetUserFromCtx(ctx *gin.Context) (*User, error) {
 	} else {
 		return nil, fmt.Errorf("user not in context")
 	}
+}
+
+func uniqueEmailCheck(tx *gorm.DB, email string) (err error) {
+	var existing_user User
+	result := tx.Where("email = ?", email).Find(&existing_user)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected > 0 {
+		// User with the same email already exists, return an error
+		return fmt.Errorf("User with email %s already exists", email)
+	}
+
+	return nil
 }
