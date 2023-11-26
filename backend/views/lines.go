@@ -71,3 +71,13 @@ func CreateLine(ctx *gin.Context) {
 
 	ctx.IndentedJSON(http.StatusOK, lineSerializer)
 }
+
+func DeleteLine(ctx *gin.Context) {
+	lineName := ctx.Param("line")
+	res := utils.DB.Delete(&models.Line{Name: lineName})
+	if res.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
+		return
+	}
+	ctx.IndentedJSON(http.StatusOK, "ok")
+}

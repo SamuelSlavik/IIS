@@ -5,11 +5,11 @@ import (
 )
 
 type Line struct {
-	Name        string `gorm:"primaryKey;unique;not null"`
-	InitialStop string `gorm:"not null"`
-	FinalStop   string `gorm:"not null"`
-	Connections []Connection
-	Segments    []Segment
+	Name        string       `gorm:"primaryKey;unique;not null"`
+	InitialStop string       `gorm:"not null"`
+	FinalStop   string       `gorm:"not null"`
+	Connections []Connection `gorm:"constraint:OnDelete:CASCADE"`
+	Segments    []Segment    `gorm:"constraint:OnDelete:CASCADE"`
 }
 
 // todo id pk
