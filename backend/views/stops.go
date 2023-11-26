@@ -1,12 +1,13 @@
 package views
 
 import (
+	"net/http"
+	"strings"
+
 	"github.com/AdamPekny/IIS/backend/models"
 	"github.com/AdamPekny/IIS/backend/serializers"
 	"github.com/AdamPekny/IIS/backend/utils"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"strings"
 )
 
 func ListStops(ctx *gin.Context) {
@@ -140,4 +141,43 @@ func CreateStop(ctx *gin.Context) {
 	}
 
 	ctx.IndentedJSON(http.StatusOK, stopSerializer)
+}
+
+func DeleteStop(ctx *gin.Context) {
+	stopID := ctx.Param("id")
+
+	var existingStop models.Stop
+	result := utils.DB.First(&existingStop, stopID)
+	if result.Error != nil {
+		ctx.IndentedJSON(http.StatusNotFound, gin.H{
+			"error": "Stop not found",
+		})
+	}
+
+	segments := []models.Segment{}
+	result = utils.DB.Where("stop_name1 = ? OR stop_name2 = ?", existingStop.Name, existingStop.Name).Find(&segments)
+	if result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Could not delete stop",
+		})
+		return
+	}
+	if len(segments) > 0 {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Stop is used in a segment",
+		})
+		return
+	} else {
+		result = utils.DB.Delete(&existingStop)
+		if result.Error != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+				"error": "Could not delete stop",
+			})
+			return
+		}
+	}
+	ctx.IndentedJSON(http.StatusOK, gin.H{
+		"message": "Stop deleted successfully",
+	})
+
 }

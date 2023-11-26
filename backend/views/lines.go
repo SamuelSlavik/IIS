@@ -145,5 +145,5 @@ func DeleteLine(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
 		return
 	}
-	ctx.IndentedJSON(http.StatusOK, "ok")
+	ctx.IndentedJSON(http.StatusOK, gin.H{"message": "Line deleted successfully"})
 }
