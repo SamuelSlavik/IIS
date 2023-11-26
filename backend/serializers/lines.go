@@ -25,6 +25,10 @@ type CreateSeqStops struct {
 	Duration uint   `binding:"required"`
 }
 
+type LineUpdateSerializer struct {
+	StopsSequence []CreateSeqStops
+}
+
 func (line_s *LineSerializer) GetStops(line_name string) error {
 	var line models.Line
 	if err := utils.DB.Model(&line).Preload("Segments").First(&line, "Name = ?", line_name).Error; err != nil {

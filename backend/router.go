@@ -60,7 +60,7 @@ func Router() *gin.Engine {
 	router.GET("/api/lines/list", views.ListLines)
 	router.GET("/api/lines/get/:line", views.GetLine)
 	router.POST("/api/lines/create", views.CreateLine)
-	//router.PUT("/api/lines/edit/:id", views.UpdateLine)
+	router.PATCH("/api/lines/update/:line", views.UpdateLine)
 	router.DELETE("/api/lines/delete/:line", views.DeleteLine)
 
 	// Maintenance
