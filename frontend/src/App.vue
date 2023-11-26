@@ -50,6 +50,9 @@ onMounted(() => {
 .red {
   color: #e74c3c;
 }
+.yellow {
+  color: #c19c0b;
+}
 @media (min-width: 1024px) {
 
 }

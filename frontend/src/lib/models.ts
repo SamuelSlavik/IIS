@@ -50,6 +50,14 @@ export interface Vehicle {
     Malfunctions: Malfunction[] | null
 }
 
+export interface VehicleInList {
+    Registration: string
+    Capacity: number
+    Brand: string
+    Type: string
+    LastMaintenance: LastMaintenance
+}
+
 export interface VehicleType {
     ID: string
     Type: VehicleTypeEnum
@@ -103,4 +111,8 @@ export interface CreatedByRef {
     LastName: string
     Email: string
     Role: string
+}
+export interface LastMaintenance {
+    Status: string
+    Date: string
 }
