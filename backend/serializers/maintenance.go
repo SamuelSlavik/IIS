@@ -55,6 +55,17 @@ func (m *MalfuncRepPublicSerialzier) FromModel(malfunc_report *models.Malfunctio
 
 	created_by_serializer := &UserMaintenanceSerializer{}
 
+	if malfunc_report.CreatedBy == nil {
+		malfunc_report.CreatedBy = &models.User{}
+		result := utils.DB.Find(malfunc_report.CreatedBy, malfunc_report.CreatedByRef)
+		if result.RowsAffected == 0 {
+			result = utils.DB.Unscoped().First(malfunc_report.CreatedBy, malfunc_report.CreatedByRef)
+			if result.Error != nil {
+				return result.Error
+			}
+		}
+	}
+
 	if err := created_by_serializer.FromModel(malfunc_report.CreatedBy); err != nil {
 		return err
 	}
@@ -173,6 +184,17 @@ func (m *MaintenReqPublicSerializer) FromModel(mainten_req_model *models.Mainten
 
 	created_by_serializer := &UserMaintenanceSerializer{}
 
+	if mainten_req_model.CreatedBy == nil {
+		mainten_req_model.CreatedBy = &models.User{}
+		result := utils.DB.Find(mainten_req_model.CreatedBy, mainten_req_model.CreatedByRef)
+		if result.RowsAffected == 0 {
+			result = utils.DB.Unscoped().First(mainten_req_model.CreatedBy, mainten_req_model.CreatedByRef)
+			if result.Error != nil {
+				return result.Error
+			}
+		}
+	}
+
 	if err := created_by_serializer.FromModel(mainten_req_model.CreatedBy); err != nil {
 		return err
 	}
@@ -181,6 +203,17 @@ func (m *MaintenReqPublicSerializer) FromModel(mainten_req_model *models.Mainten
 
 	if mainten_req_model.ResolvedByRef != nil {
 		resolved_by_serializer := &UserMaintenanceSerializer{}
+
+		if mainten_req_model.ResolvedBy == nil {
+			mainten_req_model.ResolvedBy = &models.User{}
+			result := utils.DB.Find(mainten_req_model.ResolvedBy, mainten_req_model.ResolvedByRef)
+			if result.RowsAffected == 0 {
+				result = utils.DB.Unscoped().First(mainten_req_model.ResolvedBy, mainten_req_model.ResolvedByRef)
+				if result.Error != nil {
+					return result.Error
+				}
+			}
+		}
 
 		if err := resolved_by_serializer.FromModel(mainten_req_model.ResolvedBy); err != nil {
 			return err
@@ -225,14 +258,18 @@ func (m *MaintenReqShortPublicSerializer) FromModel(mainten_req_model *models.Ma
 
 	m.MalfuncRep = malfunc_rep_serializer
 
+	created_by_serializer := &UserMaintenanceSerializer{}
+
 	if mainten_req_model.CreatedBy == nil {
 		mainten_req_model.CreatedBy = &models.User{}
-		if result := utils.DB.First(mainten_req_model.CreatedBy, mainten_req_model.CreatedByRef); result.Error != nil {
-			return result.Error
+		result := utils.DB.Find(mainten_req_model.CreatedBy, mainten_req_model.CreatedByRef)
+		if result.RowsAffected == 0 {
+			result = utils.DB.Unscoped().First(mainten_req_model.CreatedBy, mainten_req_model.CreatedByRef)
+			if result.Error != nil {
+				return result.Error
+			}
 		}
 	}
-
-	created_by_serializer := &UserMaintenanceSerializer{}
 
 	if err := created_by_serializer.FromModel(mainten_req_model.CreatedBy); err != nil {
 		return err
@@ -241,14 +278,18 @@ func (m *MaintenReqShortPublicSerializer) FromModel(mainten_req_model *models.Ma
 	m.CreatedBy = created_by_serializer
 
 	if mainten_req_model.ResolvedByRef != nil {
+		resolved_by_serializer := &UserMaintenanceSerializer{}
+
 		if mainten_req_model.ResolvedBy == nil {
 			mainten_req_model.ResolvedBy = &models.User{}
-			if result := utils.DB.First(mainten_req_model.ResolvedBy, mainten_req_model.ResolvedByRef); result.Error != nil {
-				return result.Error
+			result := utils.DB.Find(mainten_req_model.ResolvedBy, mainten_req_model.ResolvedByRef)
+			if result.RowsAffected == 0 {
+				result = utils.DB.Unscoped().First(mainten_req_model.ResolvedBy, mainten_req_model.ResolvedByRef)
+				if result.Error != nil {
+					return result.Error
+				}
 			}
 		}
-
-		resolved_by_serializer := &UserMaintenanceSerializer{}
 
 		if err := resolved_by_serializer.FromModel(mainten_req_model.ResolvedBy); err != nil {
 			return err
