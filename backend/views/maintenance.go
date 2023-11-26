@@ -387,6 +387,11 @@ func ListStatusMaintenRequests(ctx *gin.Context) {
 		db_query = db_query.Where("status = ?", status)
 	}
 
+	vehicle := ctx.Query("vehicle")
+	if vehicle != "" {
+		db_query = db_query.Joins("JOIN malfunction_reports ON malfunction_reports.id = maintenance_requests.malfunc_rep_ref").Where("malfunction_reports.vehicle_ref = ?", vehicle)
+	}
+
 	if result := db_query.Preload("MalfuncRep").Preload("CreatedBy").Preload("ResolvedBy").Find(&mainten_req_models); result.Error != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": result.Error.Error(),
