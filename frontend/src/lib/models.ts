@@ -47,6 +47,7 @@ export interface Vehicle {
     VehicleTypeName: string
     LineName: string
     Connections: Connection[]
+    Malfunctions: Malfunction[] | null
 }
 
 export interface VehicleType {
@@ -90,6 +91,7 @@ export interface Malfunction {
     Vehicle: VehicleRef
     CreatedAt: string
     CreatedBy: CreatedByRef
+    Acknowledged: boolean
 }
 export interface VehicleRef {
     Registration: string

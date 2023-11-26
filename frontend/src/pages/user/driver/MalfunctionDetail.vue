@@ -12,9 +12,12 @@ import {formatDate} from "@/lib/utils";
 import Bus from "vue-material-design-icons/Bus.vue";
 import Tram from "vue-material-design-icons/Tram.vue";
 import Tank from "vue-material-design-icons/Tank.vue";
+import {useUserStore} from "@/stores/user-store";
 
 const loading = ref<boolean>(false)
 const notifications = useNotificationStore()
+
+const user = useUserStore()
 
 const reportId = router.currentRoute.value.params.id.toString() || ""
 
@@ -33,6 +36,20 @@ const loadMalfunction = async () => {
 }
 
 const deleteReport = async (id: string) => {
+  if (!window.confirm("Are you sure you want to delete this malfunction?")) {
+    return;
+  }
+
+  try {
+    const response = await axios.delete(Endpoints.deleteMalfunction(id), {withCredentials: true})
+    if (response.status === 200) {
+      notifications.addNotification("Malfunction deleted", "success")
+      user.role === "driver" ? await router.push('/profile/driver/reports') : await router.push('/profile/superuser/malfunctions');
+    }
+  } catch (error) {
+    notifications.addNotification("Failed to delete malfunction: " + error, "error")
+  } finally {
+  }
 }
 
 onMounted(() => {
@@ -49,6 +66,13 @@ onMounted(() => {
         <h2>{{report.Title}}</h2>
       </div>
 
+      <div class="details-item">
+        <p>Status:</p>
+        <p v-if="report.Acknowledged" class="green">Acknowledged</p>
+        <p v-else class="red">Unacknowledged</p>
+      </div>
+
+      <br/>
       <div class="details-item">
         <p>Created by:</p>
         <p>{{ report.CreatedBy.FirstName + " " + report.CreatedBy.LastName}} <br/> {{report.CreatedBy.Email}}</p>
@@ -74,7 +98,7 @@ onMounted(() => {
 
       <div class="hr"></div>
       <div class="tools">
-        <router-link :to='"/profile/malfunction/edit/" + report.ID'><Pencil :size="24" /></router-link>
+        <router-link v-if="!report.Acknowledged" :to='"/profile/malfunctions/edit/" + report.ID'><Pencil :size="24" /></router-link>
         <a @click="deleteReport(report.ID)"><Delete :size="24" /></a>
       </div>
     </div>

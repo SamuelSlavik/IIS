@@ -70,8 +70,8 @@ onMounted(() => {
                 <Tank v-if="vehicle.VehicleTypeName === 'obrnena_dodavka'" class="connection-icon"/>
                 {{vehicle.Registration}}
               </router-link>
-              <p class="list-item__role"><Check fill-color="#2ecc71"/></p>
-              <p class="list-item__role"><Close fill-color="#e74c3c"/></p>
+              <p class="list-item__role" v-if="vehicle.Malfunctions"><Close fill-color="#e74c3c"/></p>
+              <p class="list-item__role" v-else><Check fill-color="#2ecc71"/></p>
               <p class="list-item__role">{{ vehicle.Capacity }}</p>
               <div class="list-item__tools">
                 <router-link to="/profile/superuser/vehicles/edit"><Pencil :size="24" /></router-link>

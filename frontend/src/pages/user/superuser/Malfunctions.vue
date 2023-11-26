@@ -63,7 +63,7 @@ onMounted(() => {
 <template>
   <div>
     <div class="header">
-      <h2>My reported malfunctions</h2>
+      <h2>Reported malfunctions</h2>
     </div>
 
     <Loader v-if="loading"/>
@@ -88,7 +88,7 @@ onMounted(() => {
           </div>
           <!-- Display table-hr only if it's not the last user for the current role -->
           <div v-if="index < unAckMalfunctions.length - 1" class="table-hr"></div>
-      </div>
+        </div>
       </div>
 
       <div v-if="ackMalfunctions" class="table">

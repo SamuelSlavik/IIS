@@ -88,9 +88,9 @@ export class Endpoints {
     static deleteMalfunction(id: string): string {
         return `${Endpoints.baseUrl}/maintenance/malfunc/delete/${id}`;
     }
-    static listMalfunctions(query?: string): string {
-        if (query) {
-            return `${Endpoints.baseUrl}/maintenance/malfunc/list?query=${query}`;
+    static listMalfunctions(status?: string): string {
+        if (status) {
+            return `${Endpoints.baseUrl}/maintenance/malfunc/list?status=${status}`;
         }
         return `${Endpoints.baseUrl}/maintenance/malfunc/list`;
     }

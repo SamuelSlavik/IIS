@@ -37,7 +37,7 @@ const submitReport = async () => {
     const response = await axios.post(Endpoints.reportMalfunction, newReport.value, {withCredentials: true})
     if (response.status === 200) {
       notifications.addNotification("Malfunction reported", 'success')
-      await router.push('/profile');
+      await router.push('/profile/driver/reports');
     }
   } catch (error) {
     notifications.addNotification("Failed to report malfunction: " + error, 'error')

@@ -14,7 +14,7 @@ import Pencil from "vue-material-design-icons/Pencil.vue";
 
 const user = useUserStore()
 const router = useRouter();
-let notifications = useNotificationStore();
+const notifications = useNotificationStore();
 const loading = ref<boolean>(false)
 
 const userId = router.currentRoute.value.params.id.toString() || ""
@@ -41,11 +41,11 @@ const deleteUser = async(id: string) => {
   try {
     const response = await axios.delete(Endpoints.deleteUser(id), {withCredentials: true})
     if (response.status === 200) {
-      notifications.value.push("User deleted")
-      loadUsers()
+      notifications.addNotification("User deleted")
+      router.push("/profile/users")
     }
   } catch (error) {
-    notifications.value.push("Failed to delete user: " + error)
+    notifications.addNotification("Failed to delete user: " + error, "error")
   } finally {
   }
 }
