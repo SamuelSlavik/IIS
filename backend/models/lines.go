@@ -14,11 +14,12 @@ type Line struct {
 
 // todo id pk
 type Segment struct {
-	StopName1 string `gorm:"primaryKey;autoIncrement:false"`
-	StopName2 string `gorm:"primaryKey;autoIncrement:false"`
-	Stop1     Stop   `gorm:"foreignKey:StopName1;references:Name"`
-	Stop2     Stop   `gorm:"foreignKey:StopName2;references:Name"`
-	Time      uint   `gorm:"not null"`
+	ID        uint `gorm:"primaryKey;autoIncrement;not null"`
+	StopName1 string
+	StopName2 string
+	Stop1     Stop `gorm:"foreignKey:StopName1;references:Name"`
+	Stop2     Stop `gorm:"foreignKey:StopName2;references:Name"`
+	Time      uint `gorm:"not null"`
 	LineName  string
 }
 
