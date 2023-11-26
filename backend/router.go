@@ -66,8 +66,10 @@ func Router() *gin.Engine {
 	router.POST("/api/maintenance/maintenrep/create", middleware.RequireAuth(string(models.TechnicianRole)), views.CreateMaintenReport)
 	router.PUT("/api/maintenance/malfunc/update/:id", middleware.RequireAuth(string(models.DriverRole)), views.UpdateMalfuncReport)
 	router.PUT("/api/maintenance/maintenreq/update/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.UpdateMaintenRequest)
+	router.PUT("/api/maintenance/maintenrep/update/:id", middleware.RequireAuth(string(models.TechnicianRole)), views.UpdateMaintenReport)
 	router.DELETE("/api/maintenance/malfunc/delete/:id", middleware.RequireAuth(string(models.DriverRole)), views.DeleteMalfuncReport)
-	router.DELETE("/api/maintenance/maintenreq/delete/:id", middleware.RequireAuth(string(models.DriverRole)), views.DeleteMalfuncReport)
+	router.DELETE("/api/maintenance/maintenreq/delete/:id", middleware.RequireAuth(string(models.DriverRole)), views.DeleteMaintenRequest)
+	router.DELETE("/api/maintenance/maintenrep/delete/:id", middleware.RequireAuth(string(models.TechnicianRole)), views.DeleteMaintenReport)
 	router.GET("/api/maintenance/malfunc/list", middleware.RequireAuth(string(models.DriverRole), string(models.SuperuserRole)), views.ListStatusMalfuncReports)
 	router.GET("/api/maintenance/malfunc/get/:id", middleware.RequireAuth(string(models.DriverRole), string(models.SuperuserRole)), views.GetMalfuncReport)
 	router.GET("/api/maintenance/maintenreq/list", middleware.RequireAuth(string(models.TechnicianRole), string(models.SuperuserRole)), views.ListStatusMaintenRequests)
@@ -76,6 +78,7 @@ func Router() *gin.Engine {
 	router.GET("/api/maintenance/maintenreq/list/tech/:id/:status", middleware.RequireAuth(string(models.TechnicianRole), string(models.SuperuserRole)), views.ListResolverStatusMaintenRequests)
 	router.GET("/api/maintenance/maintenreq/get/:id", middleware.RequireAuth(string(models.TechnicianRole), string(models.SuperuserRole)), views.GetMaintenRequest)
 	router.GET("/api/maintenance/maintenrep/list", middleware.RequireAuth(string(models.TechnicianRole), string(models.SuperuserRole)), views.ListMaintenReports)
+	router.GET("/api/maintenance/maintenrep/get/:id", middleware.RequireAuth(string(models.TechnicianRole), string(models.SuperuserRole)), views.GetMaintenReport)
 
 	return router
 }
