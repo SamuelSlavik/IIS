@@ -13,6 +13,7 @@ type ConnectionSerializer struct {
 	ID            uint
 	LineName      string
 	DepartureTime string
+	ArrivalTime   string
 	VehicleReg    *string
 	DriverID      *uint
 	Dirrection    bool

@@ -37,7 +37,7 @@ func Router() *gin.Engine {
 	router.POST("/api/vehicles/create", views.Create_vehicle)
 	router.PUT("/api/vehicles/update/:id", views.UpdateVehicle)
 	router.DELETE("/api/vehicles/delete/:id", views.DeleteVehicle)
-	//router.GET("/api/vehicles/list/ok", views.ListNotBrokenVehicles))
+	router.GET("/api/vehicles/list/ok", views.ListNotBrokenVehicles)
 
 	// Connections
 	router.GET("/api/connections/list", views.ListConnections)

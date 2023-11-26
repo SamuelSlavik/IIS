@@ -26,6 +26,7 @@ func ListConnections(ctx *gin.Context) {
 			ID:            model.ID,
 			LineName:      model.LineName,
 			DepartureTime: model.DepartureTime.Format("2006-01-02 15:04"),
+			ArrivalTime:   model.ArrivalTime.Format("2006-01-02 15:04"),
 			DriverID:      model.DriverID,
 			VehicleReg:    model.VehicleRegistration,
 			Dirrection:    model.Dirrection,
@@ -78,11 +79,6 @@ func getStops(lineID uint) (*[]serializers.StopInConnection, error) {
 	dep_time := connection.DepartureTime
 	//todo zvalidovat funkcnost
 	for i := 0; i < len(line.Segments); i++ {
-		/*var segment models.Segment
-		err := utils.DB.First(&segment, "stop_name1=? AND line_name=?", stop1, line.Name).Error
-		if err != nil {
-			return nil, err
-		}*/
 		if line.Segments[i].StopName2 == line.FinalStop {
 			stops = append(stops, serializers.StopInConnection{
 				StopName:      line.Segments[i].StopName1,
