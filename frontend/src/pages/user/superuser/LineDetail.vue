@@ -6,7 +6,9 @@ import {Endpoints} from "@/lib/variables";
 import axios from "axios";
 import {useNotificationStore} from "@/stores/notification-store";
 import router from "@/router";
+// @ts-ignore
 import Delete from "vue-material-design-icons/Delete.vue";
+// @ts-ignore
 import Pencil from "vue-material-design-icons/Pencil.vue";
 
 const loading = ref<boolean>(false)

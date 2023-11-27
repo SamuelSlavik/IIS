@@ -6,13 +6,19 @@ import {Endpoints} from "@/lib/variables";
 import axios from "axios";
 import {useNotificationStore} from "@/stores/notification-store";
 import router from "@/router";
+// @ts-ignore
 import Delete from "vue-material-design-icons/Delete.vue";
+// @ts-ignore
 import Pencil from "vue-material-design-icons/Pencil.vue";
 import {formatDate} from "@/lib/utils";
+// @ts-ignore
 import Bus from "vue-material-design-icons/Bus.vue";
+// @ts-ignore
 import Tram from "vue-material-design-icons/Tram.vue";
+// @ts-ignore
 import Tank from "vue-material-design-icons/Tank.vue";
 import {useUserStore} from "@/stores/user-store";
+// @ts-ignore
 import Hammer from "vue-material-design-icons/HammerSickle.vue";
 
 const loading = ref<boolean>(false)
