@@ -6,7 +6,7 @@ import { useNotificationStore } from "@/stores/notification-store";
 import { useUserStore } from "@/stores/user-store";
 import Loader from "@/components/Loader.vue";
 import { useRouter } from 'vue-router';
-import {User} from "@/lib/models";
+import type {User} from "@/lib/models";
 
 const notifications = useNotificationStore();
 const router = useRouter();

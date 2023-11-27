@@ -8,7 +8,7 @@ import {useNotificationStore} from "@/stores/notification-store";
 
 const loading = ref<boolean>(false)
 const notifications = useNotificationStore()
-
+/*
 const loadConnections = async () => {
   try {
     loading.value = true
@@ -21,7 +21,7 @@ const loadConnections = async () => {
     loading.value = false
   }
 }
-
+*/
 
 
 </script>

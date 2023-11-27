@@ -9,7 +9,9 @@ import type {User} from "@/lib/models";
 import {Roles} from "@/lib/models";
 import Loader from "@/components/Loader.vue";
 import {formatDate} from "../../../lib/utils";
+// @ts-ignore
 import Delete from "vue-material-design-icons/Delete.vue";
+// @ts-ignore
 import Pencil from "vue-material-design-icons/Pencil.vue";
 
 const user = useUserStore()
