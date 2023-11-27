@@ -3,6 +3,7 @@ package views
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/AdamPekny/IIS/backend/models"
@@ -388,11 +389,13 @@ func UpdateConnection(ctx *gin.Context) {
 func DeleteConnection(ctx *gin.Context) {
 	id := ctx.Param("id")
 	connection_model := models.Connection{}
-	connection := serializers.ConnectionDeleteSerializer{}
-	if err := ctx.BindJSON(&connection); err != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+	numberOfDays := ctx.Param("days")
+	numDays, err := strconv.Atoi(numberOfDays)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid number of days"})
 		return
 	}
+
 	res := utils.DB.First(&connection_model, "id=?", id)
 	if res.Error != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
@@ -401,7 +404,7 @@ func DeleteConnection(ctx *gin.Context) {
 	line_name := connection_model.LineName
 	models_to_delete := []models.Connection{}
 	orig_deptime := connection_model.DepartureTime
-	for i := 0; i < connection.NumberOfDays; i++ {
+	for i := 0; i < numDays; i++ {
 		models_to_delete = append(models_to_delete, connection_model)
 		connection_model = models.Connection{}
 		orig_deptime = orig_deptime.AddDate(0, 0, 1)

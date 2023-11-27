@@ -71,10 +71,10 @@ onMounted(() => {loadConnections()})
             </router-link>
             <p class="list-item__role"><b>From:</b> {{ conn.InitialStop }}</p>
             <p class="list-item__role"><b>To:</b> {{conn.FinalStop}}</p>
-            <p v-if="conn.VehicleReg" class="list-item__role">{{ conn.VehicleReg }}</p>
-            <p v-else class="list-item__role">No vehicle</p>
-            <p v-if="conn.DriverID" class="list-item__role">Has driver</p>
-            <p v-else>No driver</p>
+            <p v-if="conn.VehicleReg" class="list-item__role green">{{ conn.VehicleReg }}</p>
+            <p v-else class="list-item__role red">No vehicle</p>
+            <p v-if="conn.DriverID" class="list-item__role green">{{conn.DriverName}}</p>
+            <p v-else class="list-item__role red">No driver</p>
           </div>
           <!-- Display table-hr only if it's not the last user for the current role -->
           <div v-if="index < connections.length - 1" class="table-hr"></div>

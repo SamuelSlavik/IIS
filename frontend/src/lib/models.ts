@@ -108,6 +108,11 @@ export interface NewConnection {
     Direction: boolean
     NumberOfDays: number | null
 }
+export interface AssignedConnection {
+    DriverID: string
+    VehicleReg: string
+    NumberOfDays: number | null
+}
 
 
 export interface MalfunctionReport {
@@ -159,4 +164,5 @@ export interface ConnectionList {
     Direction: boolean
     VehicleReg: string | null
     DriverID: string | null
+    DriverName: string | null
 }

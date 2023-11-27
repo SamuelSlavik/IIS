@@ -38,6 +38,7 @@ import NewConnection from "@/pages/user/superuser/NewConnection.vue";
 import LineConnections from "@/pages/user/superuser/LineConnections.vue";
 import EditConnection from "@/pages/user/superuser/EditConnection.vue";
 import LineConnectionDetailDispatcher from "@/pages/user/dispatcher/ConnectionDetail.vue";
+import Hello from "@/pages/user/Hello.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -62,6 +63,10 @@ const router = createRouter({
       name: 'profile',
       component: Profile,
       children: [
+        {
+          path: '',
+          component: Hello
+        },
         {
           path: 'users',
           component: UsersList

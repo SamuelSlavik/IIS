@@ -48,7 +48,7 @@ func Router() *gin.Engine {
 	router.POST("/api/connections/create", middleware.RequireAuth(string(models.SuperuserRole)), views.CreateConnection)
 	router.PATCH("/api/connections/assign/:id", middleware.RequireAuth(string(models.DispatcherRole)), views.AssignToConnection)
 	router.PATCH("/api/connections/update/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.UpdateConnection)
-	router.DELETE("/api/connections/delete/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.DeleteConnection)
+	router.DELETE("/api/connections/delete/:id/:days", middleware.RequireAuth(string(models.SuperuserRole)), views.DeleteConnection)
 
 	//stops
 	router.GET("/api/stops", middleware.RequireAuth(string(models.SuperuserRole)), views.ListStops)

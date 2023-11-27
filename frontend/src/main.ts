@@ -10,9 +10,10 @@ import App from './App.vue'
 import router from './router'
 import axios from "axios";
 
-axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
+//axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
 
 const app = createApp(App)
+
 
 axios.interceptors.response.use(
     (response) => response,

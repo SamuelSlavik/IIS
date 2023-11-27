@@ -7,10 +7,16 @@ import axios from "axios";
 import {useNotificationStore} from "@/stores/notification-store";
 import router from "@/router";
 import {formatDate, formatDateTime} from "@/lib/utils";
+// @ts-ignore
 import Magnify from "vue-material-design-icons/Magnify.vue";
+// @ts-ignore
 import Close from "vue-material-design-icons/Close.vue";
+// @ts-ignore
 import Check from "vue-material-design-icons/Check.vue";
+// @ts-ignore
 import Delete from "vue-material-design-icons/Delete.vue";
+// @ts-ignore
+
 import Pencil from "vue-material-design-icons/Pencil.vue";
 
 const loading = ref<boolean>(false)
@@ -36,7 +42,21 @@ const loadConnections = async () => {
 }
 
 const deleteConnection = async (id: string) => {
+  const numberOfDaysInput = window.prompt("Enter the number of days to delete:", "1");
 
+  let numberOfDays = parseInt(numberOfDaysInput || "1")
+
+  try {
+    const response = await axios.delete(Endpoints.deleteConnection(id, numberOfDays.toString()), {withCredentials: true})
+    if (response.status === 200) {
+      notifications.addNotification("Connection deleted", "success")
+      await loadConnections()
+    }
+  } catch (error) {
+    notifications.addNotification("Failed to delete connection: " + error, "error")
+  } finally {
+    loading.value = false
+  }
 }
 
 onMounted(() => {loadConnections()})
@@ -69,7 +89,7 @@ onMounted(() => {loadConnections()})
       <div class="table">
         <div v-for="(conn, index) in connections" :key="conn.ConnectionID" v-if="connections">
           <div class="list-item">
-            <router-link :to="'/profile/superuser/connection/detail/' + conn.ConnectionID" class="list-item__name">
+            <router-link :to="'/profile/superuser/connection/edit/' + conn.ConnectionID" class="list-item__name">
               <b>{{ formatDateTime(conn.DepartureTime) }}</b>
             </router-link>
             <p class="list-item__role"><b>From:</b> {{ conn.InitialStop }}</p>
