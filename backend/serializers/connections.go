@@ -10,31 +10,22 @@ import (
 )
 
 type ConnectionSerializer struct {
-	ID            uint
-	LineName      string
-	DepartureTime string
-	ArrivalTime   string
-	VehicleReg    *string
-	DriverID      *uint
-	Direction    bool
-}
-
-type ConnectionLineSerializer struct {
 	ConnectionID  uint
 	LineName      string
 	DepartureTime string
 	ArrivalTime   string
-	Direction    bool
+	Direction     bool
 	InitialStop   string
 	FinalStop     string
 	VehicleReg    *string
+	DriverID      *uint
 }
 
 type ConnectionCreateSerializer struct {
 	LineName      string `binding:"required"`
 	DepartureTime string `binding:"required"`
 	VehicleReg    *string
-	Direction    bool `binding:"required"`
+	Direction     bool
 	DriverID      *uint
 	NumberOfDays  int       `binding:"required"`
 	ArrivalTime   time.Time //neplnit z fe
@@ -52,7 +43,7 @@ type ConnectionAssignSerializer struct {
 type ConnectionUpdateSerializer struct {
 	LineName      string
 	DepartureTime string
-	Direction    bool
+	Direction     bool
 	ArrivalTime   time.Time //neplnit z fe
 	DriverID      *uint
 	VehicleReg    *string
@@ -77,7 +68,6 @@ func Get_arrival_time(dep_time time.Time, line_name string) (arrival_time time.T
 	utils.DB.Preload("Segments").First(&line, "name=?", line_name)
 	var duration time.Duration
 	for _, segment := range line.Segments {
-		fmt.Print(segment.Time)
 		duration += time.Minute * time.Duration(segment.Time)
 	}
 	arrival_time = dep_time.Add(duration)
@@ -92,7 +82,7 @@ func (conn *ConnectionCreateSerializer) Valid() bool {
 		return false
 	}
 
-	dep_time, _ := time.Parse("2006-01-02 15:04:05", conn.DepartureTime)
+	dep_time, _ := time.Parse("2006-01-02 15:04", conn.DepartureTime)
 	conn.ArrivalTime = Get_arrival_time(dep_time, conn.LineName)
 	validators.Vehicle_availability(-1, conn.VehicleReg, conn.DepartureTime, conn.ArrivalTime, conn.NumberOfDays, &conn.ValidatorErrs)
 	validators.Driver_availability(-1, conn.DriverID, conn.DepartureTime, conn.ArrivalTime, conn.NumberOfDays, &conn.ValidatorErrs)
@@ -111,17 +101,26 @@ func (conn *ConnectionAssignSerializer) Valid(id int) bool {
 }
 
 func (conn ConnectionCreateSerializer) CreateModel() (connection_model []models.Connection, err error) {
-	dep_time, err := time.Parse("2006-01-02 15:04:05", conn.DepartureTime)
+	dep_time, err := time.Parse("2006-01-02 15:04", conn.DepartureTime)
 	if err != nil {
 		return
 	}
 	for i := 0; i < int(conn.NumberOfDays); i++ {
+		res := utils.DB.Where("line_name = ? AND departure_time = ?", conn.LineName, dep_time).Find(&models.Connection{})
+		if res.Error != nil {
+			err = res.Error
+			return
+		}
+		if res.RowsAffected != 0 {
+			err = fmt.Errorf("Connection at same time for this line already exists")
+			return
+		}
 		connection_model = append(connection_model, models.Connection{
 			LineName:            conn.LineName,
 			DepartureTime:       dep_time,
 			ArrivalTime:         conn.ArrivalTime,
 			VehicleRegistration: conn.VehicleReg,
-			Direction:          conn.Direction,
+			Direction:           conn.Direction,
 			DriverID:            conn.DriverID,
 		})
 		dep_time = dep_time.Add(time.Hour * 24)

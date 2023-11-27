@@ -63,7 +63,7 @@ func Vehicle_availability(id int, registration *string, departure_time string, a
 	}
 	var vehicle models.Vehicle
 	timeString := departure_time
-	timeObject, err := time.Parse("2006-01-02 15:04:05", timeString)
+	timeObject, err := time.Parse("2006-01-02 15:04", timeString)
 	if err != nil {
 		*validator_errs = append(*validator_errs, ValidatorErr{"TimeParse", err.Error()})
 		return
@@ -104,7 +104,7 @@ func Driver_availability(id int, driverID *uint, departure_time string, arrival_
 	}
 	var user models.User
 	timeString := departure_time
-	timeObject, err := time.Parse("2006-01-02 15:04:05", timeString)
+	timeObject, err := time.Parse("2006-01-02 15:04", timeString)
 	if err != nil {
 		*validator_errs = append(*validator_errs, ValidatorErr{"TimeParse", err.Error()})
 		return
