@@ -31,7 +31,7 @@ const router = useRouter();
 let notifications = useNotificationStore();
 const loading = ref<boolean>(false)
 
-const malfunctionId = router.currentRoute.value.params.id.toString() || ""
+const malfunctionId = ref("")
 
 const malfunction = ref<Malfunction>()
 
@@ -53,7 +53,7 @@ const submitRequest = async () => {
       Status: newRequests.value.Status,
       Deadline: newRequests.value.Deadline,
       ResolvedByRef: newRequests.value.ResolvedByRef?.value || null,
-      MalfuncRepRef: parseInt(malfunctionId),
+      MalfuncRepRef: parseInt(malfunctionId.value),
     },{withCredentials: true})
     if (response.status === 200) {
       notifications.addNotification("Maintenance request created", 'success')
@@ -64,10 +64,32 @@ const submitRequest = async () => {
   }
 }
 
+const loadRequest = async () => {
+  try {
+    loading.value = true
+    const response = await axios.get(Endpoints.retrieveRequest(router.currentRoute.value.params.id.toString()), {withCredentials: true})
+    newRequests.value.Status = response.data.Status
+    newRequests.value.Deadline = response.data.Deadline.split('T')[0]
+    newRequests.value.ResolvedByRef = {
+      value: response.data.ResolvedBy?.ID || null,
+      label: response.data.ResolvedBy?.FirstName + " " + response.data.ResolvedBy?.LastName || "",
+    }
+    malfunctionId.value = response.data.MalfuncRep.ID.toString()
+    if (response.status === 200) {
+      await loadMalfunction()
+    }
+  } catch (error: any) {
+    notifications.addNotification("Failed to load request: " + error, "error")
+  } finally {
+    loading.value = false
+  }
+
+}
+
 const loadMalfunction = async () => {
   loading.value = true
   try {
-    const response = await axios.get<Malfunction>(Endpoints.retrieveMalfunction(malfunctionId), {withCredentials: true})
+    const response = await axios.get<Malfunction>(Endpoints.retrieveMalfunction(malfunctionId.value), {withCredentials: true})
     malfunction.value = response.data
   } catch (error) {
     notifications.addNotification("Failed to load malfunction: " + error, 'error')
@@ -75,7 +97,6 @@ const loadMalfunction = async () => {
     loading.value = false
   }
 }
-
 
 const loadUsers = async () => {
   try {
@@ -91,7 +112,7 @@ const loadUsers = async () => {
 
 onMounted(() => {
   loadUsers()
-  loadMalfunction()
+  loadRequest()
 })
 
 
@@ -148,16 +169,9 @@ onMounted(() => {
             <option value="progress">In progress</option>
             <option value="done">Done</option>
           </select>
-          <input
-            type="date"
-            name="deadline"
-            v-model="newRequests.Deadline"
-            required
-          />
-          <v-select v-model="newRequests.ResolvedByRef" :options="technicians.map(({ ID, LastName, FirstName }) => ({ value: ID, label: FirstName + ' ' + LastName }))" placeholder="Select driver"></v-select>
           <button
               type="submit"
-          >Create request</button>
+          >Update request</button>
         </form>
       </div>
     </div>

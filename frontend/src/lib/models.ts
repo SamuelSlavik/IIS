@@ -120,9 +120,11 @@ export interface selectedUser {
 
 
 export interface MalfunctionReport {
+    ID: string
     Title: string
     Description: string
     VehicleRef: string
+    VehicleType: string
 }
 export interface Malfunction {
     ID: string
@@ -151,6 +153,7 @@ export interface LastMaintenance {
 
 
 export interface NewRequest {
+    Status: string | null
     Deadline: string
     ResolvedByRef: selectedUser | null
 }
@@ -161,8 +164,8 @@ export interface RequestType {
     Deadline: string
     CreatedAt: string
     MalfuncRep: MalfunctionReport
-    CreatedByRef: User
-    ResolvedByRef: User
+    CreatedBy: User
+    ResolvedBy: User
 }
 
 export interface ConnectionList {
@@ -196,6 +199,12 @@ export interface ConnectionDetail {
 export interface StopInConnection {
     StopName: string
     DepartureTime: string
+}
+
+export interface NewReport {
+    Title: string
+    Description: string
+    Cost: number | null
 }
 
 export interface ConnectionUnauth {

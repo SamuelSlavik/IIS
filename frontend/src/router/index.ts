@@ -44,6 +44,7 @@ import Hello from "@/pages/user/Hello.vue";
 import MyPlanDetail from "@/pages/user/driver/MyPlanDetail.vue";
 import Drivers from "@/pages/user/admin/Drivers.vue";
 import DriversPlan from "@/pages/user/admin/DriversPlan.vue";
+import MyRequestEdit from "@/pages/user/technician/MyRequestEdit.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -195,7 +196,11 @@ const router = createRouter({
           component: MyRequestDetail
         },
         {
-          path: 'technician/requests/complete/:id',
+          path: 'technician/requests/edit/:id',
+          component: MyRequestEdit
+        },
+        {
+          path: 'technician/reports/create/:id',
           component: MyRequestComplete
         },
         {

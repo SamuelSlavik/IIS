@@ -177,6 +177,12 @@ export class Endpoints {
     static deleteRequest(id: string): string {
         return `${Endpoints.baseUrl}/maintenance/maintenreq/delete/${id}`;
     }
+    static get createReport(): string {
+        return `${Endpoints.baseUrl}/maintenance/maintenrep/create`;
+    }
+    static retrieveReport(id: string): string {
+        return `${Endpoints.baseUrl}/maintenance/maintenrep/get/${id}`;
+    }
 
 
 
