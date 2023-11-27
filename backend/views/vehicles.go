@@ -250,3 +250,72 @@ func ListNotBrokenVehicles(ctx *gin.Context) {
 	}
 	ctx.IndentedJSON(http.StatusOK, vehicle_serializers)
 }
+
+func CreateVehicleType(ctx *gin.Context) {
+	vehicle_type := serializers.VehicleTypeCreateSerializer{}
+
+	if err := ctx.BindJSON(&vehicle_type); err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	vehicle_type_model := models.VehicleType{
+		Type: vehicle_type.Type,
+	}
+	if result := utils.DB.Create(&vehicle_type_model); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
+		return
+	} else {
+		ctx.IndentedJSON(http.StatusOK, result)
+	}
+}
+
+func ListVehicleTypes(ctx *gin.Context) {
+	var vehicle_types []models.VehicleType
+	if result := utils.DB.Find(&vehicle_types); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
+		return
+	}
+	var vehicle_type_serializers []serializers.VehicleTypeSerializer
+	for _, vehicle_type := range vehicle_types {
+		vehicle_type_serializer := serializers.VehicleTypeSerializer{
+			Type: vehicle_type.Type,
+		}
+		result := utils.DB.Where("vehicle_type_name=?", vehicle_type.Type).Find(&models.Vehicle{})
+		if result.Error != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, result.Error)
+			return
+		}
+		if result.RowsAffected > 0 {
+			vehicle_type_serializer.Active = true
+		} else {
+			vehicle_type_serializer.Active = false
+		}
+		vehicle_type_serializers = append(vehicle_type_serializers, vehicle_type_serializer)
+	}
+	ctx.IndentedJSON(http.StatusOK, vehicle_type_serializers)
+}
+
+func DeleteVehicleType(ctx *gin.Context) {
+	vehicle_type := ctx.Param("id")
+	var vehicle_type_model models.VehicleType
+	if result := utils.DB.First(&vehicle_type_model, "id = ?", vehicle_type); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
+		return
+	}
+	vehicles := []models.Vehicle{}
+	result := utils.DB.Where("vehicle_type_name=?", vehicle_type_model.Type).Find(&vehicles)
+	if result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
+		return
+	}
+	if len(vehicles) > 0 {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Vehicle type is still in use"})
+		return
+	}
+	if result := utils.DB.Delete(&vehicle_type_model); result.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
+		return
+	} else {
+		ctx.IndentedJSON(http.StatusOK, gin.H{"message": "Vehicle type deleted successfully"})
+	}
+}

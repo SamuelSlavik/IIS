@@ -38,6 +38,9 @@ func Router() *gin.Engine {
 	router.PUT("/api/vehicles/update/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.UpdateVehicle)
 	router.DELETE("/api/vehicles/delete/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.DeleteVehicle)
 	router.GET("/api/vehicles/list/ok", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.ListNotBrokenVehicles)
+	router.GET("/api/vehicletypes/list", middleware.RequireAuth(string(models.SuperuserRole)), views.ListVehicleTypes)
+	router.POST("/api/vehicletypes/create", middleware.RequireAuth(string(models.SuperuserRole)), views.CreateVehicleType)
+	router.DELETE("/api/vehicletypes/delete/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.DeleteVehicleType)
 
 	// Connections
 	router.GET("/api/connections/list", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.ListConnections)

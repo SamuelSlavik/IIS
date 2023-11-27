@@ -81,7 +81,7 @@ func GetDetailOfConnection(ctx *gin.Context) {
 		ID:       connection_model.ID,
 		LineName: connection_model.LineName,
 	}
-	connection.ListStops, err = getStops(connection.LineName, connection_model.Direction, connection_model.DepartureTime)
+	connection.ListStops, err = getStops(connection_model.LineName, connection_model.Direction, connection_model.DepartureTime)
 	if err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
