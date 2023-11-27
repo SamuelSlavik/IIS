@@ -1,47 +1,54 @@
 <script setup lang="ts">
-import ConnectionCard from "@/components/ConnectionCard.vue"
 import {onMounted, ref} from "vue";
-import axios from "axios";
-import type {Connection} from "@/lib/models";
-import {Endpoints} from "@/lib/variables";
-import { useNotificationStore} from "@/stores/notification-store";
 import Loader from "@/components/Loader.vue";
+import type {LineInList, User} from "@/lib/models";
+import {Endpoints} from "@/lib/variables";
+import axios from "axios";
+import {useNotificationStore} from "@/stores/notification-store";
 
+const loading = ref<boolean>(false)
 const notifications = useNotificationStore()
-const searchInProgress = ref<boolean>(false)
+const lines = ref<LineInList[]>([])
 
-const connections = ref<Connection[]>([])
-
-const getConnections = async () => {
+const loadLines = async () => {
   try {
-    searchInProgress.value = true
-    const response = await axios.get<Connection[]>(Endpoints.connections)
-    connections.value = response.data
-  } catch (error) {
-    notifications.addNotification("Failed to get connections: " + error, "error")
+    loading.value = true
+    const response = await axios.get(Endpoints.listLines, {withCredentials: true})
+    lines.value = response.data
+  } catch (error: any) {
+    notifications.addNotification("Failed to load lines: " + error, "error")
   } finally {
-    searchInProgress.value = false
+    loading.value = false
   }
-
-  console.log(connections.value)
 }
 
-onMounted(() => {
-  getConnections()
-})
+onMounted(() => {loadLines()})
+
 </script>
 
 <template>
   <div class="container">
-    <h1>Connections</h1>
-    <Loader v-if="searchInProgress"/>
-    <ConnectionCard
-      v-for="connection in connections"
-      :key="connection.ID"
-      :id="connection.ID"
-      :lineName="connection.LineName"
-      :type="connection.Type"
-      :stops="connection.ListStops"
-    />
+    <div class="header"><h2>Search Connections</h2></div>
+
+    <Loader v-if="loading"/>
+    <div v-else>
+      <div class="table">
+        <div v-for="(line, index) in lines" :key="line.Name">
+          <div class="list-item">
+            <router-link :to="'/connections/' + line.Name" class="list-item__name">
+              <b>{{ line.Name }}</b>
+            </router-link>
+            <p class="list-item__role"><b>From:</b> {{ line.InitialStop }}</p>
+            <p><b>To:</b> {{line.FinalStop}}</p>
+          </div>
+          <!-- Display table-hr only if it's not the last user for the current role -->
+          <div v-if="index < lines.length - 1" class="table-hr"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
+
+<style>
+
+</style>

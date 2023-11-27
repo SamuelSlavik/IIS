@@ -65,7 +65,7 @@ func Router() *gin.Engine {
 	router.DELETE("/api/stops/delete/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.DeleteStop)
 
 	//lines
-	router.GET("/api/lines/list", middleware.RequireAuth(string(models.SuperuserRole)), views.ListLines)
+	router.GET("/api/lines/list", views.ListLines)
 	router.GET("/api/lines/get/:line", middleware.RequireAuth(string(models.SuperuserRole)), views.GetLine)
 	router.POST("/api/lines/create", middleware.RequireAuth(string(models.SuperuserRole)), views.CreateLine)
 	router.PATCH("/api/lines/update/:line", middleware.RequireAuth(string(models.SuperuserRole)), views.UpdateLine)

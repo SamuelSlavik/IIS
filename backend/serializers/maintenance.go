@@ -89,6 +89,7 @@ type MalfuncRepShortPublicSerialzier struct {
 	Title string `binding:"required"`
 	CreatedByEmail string `binding:"required"`
 	VehicleRef *string `binding:"required"`
+	VehicleType string `binding:"required"`
 	CreatedAt time.Time
 }
 
@@ -100,13 +101,28 @@ func (m *MalfuncRepShortPublicSerialzier) FromModel(malfunc_report *models.Malfu
 
 
 	if malfunc_report.CreatedBy == nil {
-		malfunc_report.CreatedBy = &models.User{} 
-		if result := utils.DB.First(malfunc_report.CreatedBy); result.Error != nil {
-			return result.Error
+		malfunc_report.CreatedBy = &models.User{}
+		result := utils.DB.Find(malfunc_report.CreatedBy, malfunc_report.CreatedByRef)
+		if result.RowsAffected == 0 {
+			result = utils.DB.Unscoped().First(malfunc_report.CreatedBy, malfunc_report.CreatedByRef)
+			if result.Error != nil {
+				return result.Error
+			}
 		}
 	}
 
 	m.CreatedByEmail = malfunc_report.CreatedBy.Email
+
+	if malfunc_report.Vehicle == nil {
+		malfunc_report.Vehicle = &models.Vehicle{}
+		result := utils.DB.First(malfunc_report.Vehicle, malfunc_report.VehicleRef)
+		if result.Error != nil {
+			return result.Error
+		}
+	}
+
+	m.VehicleType = malfunc_report.Vehicle.VehicleTypeName
+
 
 	return nil
 }
