@@ -1,5 +1,5 @@
 export class Endpoints {
-    private static readonly baseUrl = "http://164.92.139.71:8080/api"; // Replace with your base URL
+    private static readonly baseUrl = "https://adam.mihocka.cz/api"; // Replace with your base URL
 
     static get connections(): string {
         return `${Endpoints.baseUrl}/connections`;
