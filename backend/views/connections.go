@@ -28,6 +28,14 @@ func ListConnections(ctx *gin.Context) {
 			ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 			return
 		}
+		driver := models.User{}
+		if model.DriverID != nil {
+			err = utils.DB.Find(&driver, "id=?", model.DriverID).Error
+			if err != nil {
+				ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+				return
+			}
+		}
 		connection := serializers.ConnectionSerializer{
 			ConnectionID:  model.ID,
 			LineName:      model.LineName,
@@ -38,6 +46,7 @@ func ListConnections(ctx *gin.Context) {
 			DriverID:      model.DriverID,
 			VehicleReg:    model.VehicleRegistration,
 			Direction:     model.Direction,
+			DriverName:    driver.FullName,
 		}
 		if connection.Direction == true {
 			connection.InitialStop = line.FinalStop
@@ -127,6 +136,14 @@ func GetConnectionById(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
+	driver := models.User{}
+	if connection_model.DriverID != nil {
+		err = utils.DB.Find(&driver, "id=?", connection_model.DriverID).Error
+		if err != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+			return
+		}
+	}
 	connection := serializers.ConnectionSerializer{
 		ConnectionID:  connection_model.ID,
 		LineName:      connection_model.LineName,
@@ -137,6 +154,7 @@ func GetConnectionById(ctx *gin.Context) {
 		DriverID:      connection_model.DriverID,
 		VehicleReg:    connection_model.VehicleRegistration,
 		Direction:     connection_model.Direction,
+		DriverName:    driver.FullName,
 	}
 	if connection.Direction == true {
 		connection.InitialStop = line.FinalStop
@@ -162,6 +180,14 @@ func ListConnectionsByLine(ctx *gin.Context) {
 	}
 	connections := []serializers.ConnectionSerializer{}
 	for _, model := range connection_models {
+		driver := models.User{}
+		if model.DriverID != nil {
+			err = utils.DB.Find(&driver, "id=?", model.DriverID).Error
+			if err != nil {
+				ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+				return
+			}
+		}
 		connection := serializers.ConnectionSerializer{
 			ConnectionID:  model.ID,
 			LineName:      model.LineName,
@@ -172,6 +198,7 @@ func ListConnectionsByLine(ctx *gin.Context) {
 			FinalStop:     line_model.FinalStop,
 			VehicleReg:    model.VehicleRegistration,
 			DriverID:      model.DriverID,
+			DriverName:    driver.FullName,
 		}
 		if connection.Direction == true {
 			connection.InitialStop = line_model.FinalStop
@@ -200,6 +227,14 @@ func ListConnectionsByLineAndDate(ctx *gin.Context) {
 	}
 	connections := []serializers.ConnectionSerializer{}
 	for _, model := range connection_models {
+		driver := models.User{}
+		if model.DriverID != nil {
+			err = utils.DB.Find(&driver, "id=?", model.DriverID).Error
+			if err != nil {
+				ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+				return
+			}
+		}
 		connection := serializers.ConnectionSerializer{
 			ConnectionID:  model.ID,
 			LineName:      model.LineName,
@@ -210,6 +245,7 @@ func ListConnectionsByLineAndDate(ctx *gin.Context) {
 			FinalStop:     line_model.FinalStop,
 			VehicleReg:    model.VehicleRegistration,
 			DriverID:      model.DriverID,
+			DriverName:    driver.FullName,
 		}
 		if connection.Direction == true {
 			connection.InitialStop = line_model.FinalStop
@@ -245,6 +281,14 @@ func ListDriverConnections(ctx *gin.Context) {
 			ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 			return
 		}
+		driver := models.User{}
+		if model.DriverID != nil {
+			err = utils.DB.Find(&driver, "id=?", model.DriverID).Error
+			if err != nil {
+				ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+				return
+			}
+		}
 		connection := serializers.ConnectionSerializer{
 			ConnectionID:  model.ID,
 			LineName:      model.LineName,
@@ -255,6 +299,7 @@ func ListDriverConnections(ctx *gin.Context) {
 			DriverID:      model.DriverID,
 			VehicleReg:    model.VehicleRegistration,
 			Direction:     model.Direction,
+			DriverName:    driver.FullName,
 		}
 		if connection.Direction == true {
 			connection.InitialStop = line.FinalStop
