@@ -32,36 +32,37 @@ func Router() *gin.Engine {
 	router.DELETE("/api/users/delete/:id", middleware.RequireAuth(string(models.AdminRole)), views.DeleteUser)
 
 	// Vehicles
-	router.GET("/api/vehicles/list", views.List_vehicles)
-	router.GET("/api/vehicles/get/:id", views.GetVehicle)
-	router.POST("/api/vehicles/create", views.Create_vehicle)
-	router.PUT("/api/vehicles/update/:id", views.UpdateVehicle)
-	router.DELETE("/api/vehicles/delete/:id", views.DeleteVehicle)
-	router.GET("/api/vehicles/list/ok", views.ListNotBrokenVehicles)
+	router.GET("/api/vehicles/list", middleware.RequireAuth(string(models.SuperuserRole)), views.List_vehicles)
+	router.GET("/api/vehicles/get/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.GetVehicle)
+	router.POST("/api/vehicles/create", middleware.RequireAuth(string(models.SuperuserRole)), views.Create_vehicle)
+	router.PUT("/api/vehicles/update/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.UpdateVehicle)
+	router.DELETE("/api/vehicles/delete/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.DeleteVehicle)
+	router.GET("/api/vehicles/list/ok", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.ListNotBrokenVehicles)
 
 	// Connections
-	router.GET("/api/connections/list", views.ListConnections)
-	router.GET("/api/connections/list/:line", views.ListConnectionsByLine)
-	router.GET("/api/connections/list/:line/:date", views.ListConnectionsByLineAndDate)
-	router.GET("/api/connections/get/:id", views.GetConnectionById)
-	router.GET("/api/connections/get/details/:id", views.GetDetailOfConnection)
-	router.POST("/api/connections/create", views.CreateConnection)
-	router.PATCH("/api/connections/assign/:id", views.AssignToConnection)
-	router.PATCH("/api/connections/update/:id", views.UpdateConnection)
-	router.DELETE("/api/connections/delete/:id", views.DeleteConnection)
+	router.GET("/api/connections/list", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.ListConnections)
+	router.GET("/api/connections/list/:line", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.ListConnectionsByLine)
+	router.GET("/api/connections/list/:line/:date", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.ListConnectionsByLineAndDate)
+	router.GET("/api/connections/get/:id", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.GetConnectionById)
+	router.GET("/api/connections/get/details/:id", views.GetDetailOfConnection) //unregistered ???
+	router.POST("/api/connections/create", middleware.RequireAuth(string(models.SuperuserRole)), views.CreateConnection)
+	router.PATCH("/api/connections/assign/:id", middleware.RequireAuth(string(models.DispatcherRole)), views.AssignToConnection)
+	router.PATCH("/api/connections/update/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.UpdateConnection)
+	router.DELETE("/api/connections/delete/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.DeleteConnection)
 
-	router.GET("/api/stops", views.ListStops)
-	router.GET("/api/stops/get/:id", views.GetStop)
-	router.DELETE("/api/stops/delete/:id", views.DeleteStop)
-	router.PUT("/api/stops/edit/:id", views.EditStop)
-	router.POST("/api/stops/create", views.CreateStop)
+	//stops
+	router.GET("/api/stops", middleware.RequireAuth(string(models.SuperuserRole)), views.ListStops)
+	router.GET("/api/stops/get/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.GetStop)
+	router.POST("/api/stops/create", middleware.RequireAuth(string(models.SuperuserRole)), views.CreateStop)
+	router.PUT("/api/stops/edit/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.EditStop)
+	router.DELETE("/api/stops/delete/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.DeleteStop)
 
 	//lines
-	router.GET("/api/lines/list", views.ListLines)
-	router.GET("/api/lines/get/:line", views.GetLine)
-	router.POST("/api/lines/create", views.CreateLine)
-	router.PATCH("/api/lines/update/:line", views.UpdateLine)
-	router.DELETE("/api/lines/delete/:line", views.DeleteLine)
+	router.GET("/api/lines/list", middleware.RequireAuth(string(models.SuperuserRole)), views.ListLines)
+	router.GET("/api/lines/get/:line", middleware.RequireAuth(string(models.SuperuserRole)), views.GetLine)
+	router.POST("/api/lines/create", middleware.RequireAuth(string(models.SuperuserRole)), views.CreateLine)
+	router.PATCH("/api/lines/update/:line", middleware.RequireAuth(string(models.SuperuserRole)), views.UpdateLine)
+	router.DELETE("/api/lines/delete/:line", middleware.RequireAuth(string(models.SuperuserRole)), views.DeleteLine)
 
 	// Maintenance
 	router.POST("/api/maintenance/malfunc/create", middleware.RequireAuth(string(models.DriverRole)), views.CreateMalfuncReport)

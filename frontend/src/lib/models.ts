@@ -157,4 +157,5 @@ export interface ConnectionList {
     FinalStop: string
     ArrivalTime: string
     Direction: boolean
+    VehicleReg: string | null
 }
