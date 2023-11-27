@@ -16,7 +16,7 @@ func Router() *gin.Engine {
 
 	config := cors.DefaultConfig()
 	config.AllowCredentials = true
-	config.AllowOrigins = []string{"http://127.0.0.1:5173"}
+	config.AllowOrigins = []string{"http://127.0.0.1:5173", "https://iis-beryl.vercel.app"}
 
 	router.Use(cors.New(config))
 
