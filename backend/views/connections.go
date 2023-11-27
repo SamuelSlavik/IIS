@@ -22,20 +22,29 @@ func ListConnections(ctx *gin.Context) {
 		return
 	}
 	for _, model := range connection_models {
+		line := models.Line{}
+		err = utils.DB.First(&line, "name=?", model.LineName).Error
+		if err != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+			return
+		}
 		connection := serializers.ConnectionSerializer{
-			ID:            model.ID,
+			ConnectionID:  model.ID,
 			LineName:      model.LineName,
 			DepartureTime: model.DepartureTime.Format("2006-01-02 15:04"),
 			ArrivalTime:   model.ArrivalTime.Format("2006-01-02 15:04"),
+			InitialStop:   line.InitialStop,
+			FinalStop:     line.FinalStop,
 			DriverID:      model.DriverID,
 			VehicleReg:    model.VehicleRegistration,
-			Direction:    model.Direction,
+			Direction:     model.Direction,
 		}
 		connections = append(connections, connection)
 	}
 	ctx.IndentedJSON(http.StatusOK, connections)
 }
 
+// for unregistered
 func GetDetailOfConnection(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var connection_model models.Connection
@@ -75,9 +84,7 @@ func getStops(lineID uint) (*[]serializers.StopInConnection, error) {
 	if err := utils.DB.Model(&line).Preload("Segments").First(&line, "Name = ?", connection.LineName).Error; err != nil {
 		return nil, err
 	}
-	//stop1 := line.InitialStop
 	dep_time := connection.DepartureTime
-	//todo zvalidovat funkcnost
 	for i := 0; i < len(line.Segments); i++ {
 		if line.Segments[i].StopName2 == line.FinalStop {
 			stops = append(stops, serializers.StopInConnection{
@@ -96,7 +103,6 @@ func getStops(lineID uint) (*[]serializers.StopInConnection, error) {
 			DepartureTime: dep_time.Format("15:04"),
 		})
 		dep_time = dep_time.Add(time.Minute * time.Duration(line.Segments[i].Time))
-		//stop1 = segment.StopName2
 
 	}
 	return &stops, nil
@@ -111,13 +117,22 @@ func GetConnectionById(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
+	line := models.Line{}
+	err = utils.DB.First(&line, "name=?", connection_model.LineName).Error
+	if err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
 	connection := serializers.ConnectionSerializer{
-		ID:            connection_model.ID,
+		ConnectionID:  connection_model.ID,
 		LineName:      connection_model.LineName,
 		DepartureTime: connection_model.DepartureTime.Format("2006-01-02 15:04"),
+		ArrivalTime:   connection_model.ArrivalTime.Format("2006-01-02 15:04"),
+		InitialStop:   line.InitialStop,
+		FinalStop:     line.FinalStop,
 		DriverID:      connection_model.DriverID,
 		VehicleReg:    connection_model.VehicleRegistration,
-		Direction:    connection_model.Direction,
+		Direction:     connection_model.Direction,
 	}
 	ctx.IndentedJSON(http.StatusOK, connection)
 }
@@ -137,17 +152,18 @@ func ListConnectionsByLine(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	connections := []serializers.ConnectionLineSerializer{}
+	connections := []serializers.ConnectionSerializer{}
 	for _, model := range connection_models {
-		connection := serializers.ConnectionLineSerializer{
+		connection := serializers.ConnectionSerializer{
 			ConnectionID:  model.ID,
 			LineName:      model.LineName,
 			ArrivalTime:   model.ArrivalTime.Format("2006-01-02 15:04"),
 			DepartureTime: model.DepartureTime.Format("2006-01-02 15:04"),
-			Direction:    model.Direction,
+			Direction:     model.Direction,
 			InitialStop:   line_model.InitialStop,
 			FinalStop:     line_model.FinalStop,
 			VehicleReg:    model.VehicleRegistration,
+			DriverID:      model.DriverID,
 		}
 		connections = append(connections, connection)
 	}
@@ -171,17 +187,18 @@ func ListConnectionsByLineAndDate(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	connections := []serializers.ConnectionLineSerializer{}
+	connections := []serializers.ConnectionSerializer{}
 	for _, model := range connection_models {
-		connection := serializers.ConnectionLineSerializer{
+		connection := serializers.ConnectionSerializer{
 			ConnectionID:  model.ID,
 			LineName:      model.LineName,
 			ArrivalTime:   model.ArrivalTime.Format("2006-01-02 15:04"),
 			DepartureTime: model.DepartureTime.Format("2006-01-02 15:04"),
-			Direction:    model.Direction,
+			Direction:     model.Direction,
 			InitialStop:   line_model.InitialStop,
 			FinalStop:     line_model.FinalStop,
 			VehicleReg:    model.VehicleRegistration,
+			DriverID:      model.DriverID,
 		}
 		connections = append(connections, connection)
 	}
@@ -206,7 +223,6 @@ func CreateConnection(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	//res := utils.DB.Where("line_name=? AND departure_time IS ?", connection_model.).Find(&models.Connection{})
 
 	if result := utils.DB.Create(connection_model); result.Error != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
@@ -229,7 +245,7 @@ func AssignToConnection(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	connection.DepartureTime = connection_model.DepartureTime.Format("2006-01-02 15:04:05")
+	connection.DepartureTime = connection_model.DepartureTime.Format("2006-01-02 15:04")
 	connection.ArrivalTime = connection_model.ArrivalTime
 	if !connection.Valid(int(connection_model.ID)) {
 		ctx.IndentedJSON(http.StatusBadRequest, connection.ValidatorErrs)
@@ -275,7 +291,7 @@ func UpdateConnection(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, connection.ValidatorErrs)
 		return
 	}
-	dep_time, _ := time.Parse("2006-01-02 15:04:05", connection.DepartureTime)
+	dep_time, _ := time.Parse("2006-01-02 15:04", connection.DepartureTime)
 	if !connection_model.DepartureTime.Equal(dep_time) {
 		arr_time := serializers.Get_arrival_time(dep_time, connection_model.LineName)
 		validators.Driver_availability(int(connection_model.ID), connection_model.DriverID, connection.DepartureTime, arr_time, 1, &connection.ValidatorErrs)

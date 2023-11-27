@@ -47,7 +47,7 @@ func List_vehicles(ctx *gin.Context) {
 				Type:         vehicle.VehicleType.Type,
 				LastMaintenance: serializers.LastMaintenance{
 					Status: string(mainteneces[0].Status),
-					Date:   mainteneces[0].MaintenRep.CreatedAt.Format("2006-01-02 15:04:05"),
+					Date:   mainteneces[0].MaintenRep.CreatedAt.Format("2006-01-02 15:04"),
 				},
 			}
 			vehicle_serializers = append(vehicle_serializers, vehicle_serializer)
@@ -59,7 +59,7 @@ func List_vehicles(ctx *gin.Context) {
 				Type:         vehicle.VehicleType.Type,
 				LastMaintenance: serializers.LastMaintenance{
 					Status: string(mainteneces[0].Status),
-					Date:   mainteneces[0].CreatedAt.Format("2006-01-02 "),
+					Date:   mainteneces[0].CreatedAt.Format("2006-01-02"),
 				},
 			}
 			vehicle_serializers = append(vehicle_serializers, vehicle_serializer)
@@ -128,7 +128,7 @@ func GetVehicle(ctx *gin.Context) {
 			Type:         vehicle.VehicleType.Type,
 			LastMaintenance: serializers.LastMaintenance{
 				Status: string(mainteneces[0].Status),
-				Date:   mainteneces[0].MaintenRep.CreatedAt.Format("2006-01-02 15:04:05"),
+				Date:   mainteneces[0].MaintenRep.CreatedAt.Format("2006-01-02 15:04"),
 			},
 		}
 		ctx.IndentedJSON(http.StatusOK, vehicle_serializer)
@@ -141,7 +141,7 @@ func GetVehicle(ctx *gin.Context) {
 			Type:         vehicle.VehicleType.Type,
 			LastMaintenance: serializers.LastMaintenance{
 				Status: string(mainteneces[0].Status),
-				Date:   mainteneces[0].CreatedAt.Format("2006-01-02 "),
+				Date:   mainteneces[0].CreatedAt.Format("2006-01-02"),
 			},
 		}
 		ctx.IndentedJSON(http.StatusOK, vehicle_serializer)
@@ -241,7 +241,7 @@ func ListNotBrokenVehicles(ctx *gin.Context) {
 				Type:         vehicle.VehicleType.Type,
 				LastMaintenance: serializers.LastMaintenance{
 					Status: string(mainteneces[0].Status),
-					Date:   mainteneces[0].CreatedAt.Format("2006-01-02 "),
+					Date:   mainteneces[0].CreatedAt.Format("2006-01-02"),
 				},
 			}
 			vehicle_serializers = append(vehicle_serializers, vehicle_serializer)
