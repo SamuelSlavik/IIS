@@ -7,8 +7,11 @@ import axios from "axios";
 import {useNotificationStore} from "@/stores/notification-store";
 import router from "@/router";
 import {formatDate, formatDateTime} from "@/lib/utils";
+// @ts-ignore
 import Magnify from "vue-material-design-icons/Magnify.vue";
+// @ts-ignore
 import Close from "vue-material-design-icons/Close.vue";
+// @ts-ignore
 import Check from "vue-material-design-icons/Check.vue";
 
 const loading = ref<boolean>(false)
@@ -70,7 +73,7 @@ onMounted(() => {loadConnections()})
             <p class="list-item__role"><b>To:</b> {{conn.FinalStop}}</p>
             <p v-if="conn.VehicleReg" class="list-item__role">{{ conn.VehicleReg }}</p>
             <p v-else class="list-item__role">No vehicle</p>
-            <p v-if="conn.VehicleReg" class="list-item__role">{{ conn.VehicleReg }}</p>
+            <p v-if="conn.DriverID" class="list-item__role">Has driver</p>
             <p v-else>No driver</p>
           </div>
           <!-- Display table-hr only if it's not the last user for the current role -->

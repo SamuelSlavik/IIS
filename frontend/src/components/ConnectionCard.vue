@@ -1,6 +1,9 @@
 <script setup lang="ts">
+// @ts-ignore
 import Tram from 'vue-material-design-icons/Tram.vue';
+// @ts-ignore
 import Bus from 'vue-material-design-icons/Bus.vue';
+// @ts-ignore
 import Settings from 'vue-material-design-icons/Cog.vue';
 import type {ConnectionStop} from "@/lib/models";
 

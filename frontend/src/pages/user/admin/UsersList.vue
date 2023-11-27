@@ -4,10 +4,14 @@ import Loader from "@/components/Loader.vue";
 import type {User} from "@/lib/models";
 import {Endpoints} from "@/lib/variables";
 import axios from "axios";
+// @ts-ignore
 import Pencil from "vue-material-design-icons/Pencil.vue";
+// @ts-ignore
 import Delete from "vue-material-design-icons/Delete.vue";
+// @ts-ignore
 import Tank from "vue-material-design-icons/Tank.vue";
 import {useNotificationStore} from "@/stores/notification-store";
+// @ts-ignore
 import Magnify from "vue-material-design-icons/Magnify.vue";
 
 

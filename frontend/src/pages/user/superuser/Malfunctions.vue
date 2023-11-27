@@ -5,13 +5,21 @@ import type {Malfunction, User} from "@/lib/models";
 import {Endpoints} from "@/lib/variables";
 import axios from "axios";
 import {useNotificationStore} from "@/stores/notification-store";
+// @ts-ignore
 import Delete from "vue-material-design-icons/Delete.vue";
+// @ts-ignore
 import Pencil from "vue-material-design-icons/Pencil.vue";
+// @ts-ignore
 import Close from "vue-material-design-icons/Close.vue";
+// @ts-ignore
 import Check from "vue-material-design-icons/Check.vue";
+// @ts-ignore
 import Bus from "vue-material-design-icons/Bus.vue";
+// @ts-ignore
 import Tram from "vue-material-design-icons/Tram.vue";
+// @ts-ignore
 import Tank from "vue-material-design-icons/Tank.vue";
+// @ts-ignore
 import Hammer from "vue-material-design-icons/HammerSickle.vue";
 import router from "@/router";
 

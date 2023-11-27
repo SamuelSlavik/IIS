@@ -1,5 +1,7 @@
 <script setup lang="ts">
+// @ts-ignore
 import MenuIcon from 'vue-material-design-icons/Menu.vue';
+// @ts-ignore
 import Close from 'vue-material-design-icons/Close.vue';
 import {ref} from "vue";
 import {useUserStore} from "@/stores/user-store";

@@ -5,8 +5,11 @@ import type {Stop, User} from "@/lib/models";
 import {Endpoints} from "@/lib/variables";
 import axios from "axios";
 import {useNotificationStore} from "@/stores/notification-store";
+// @ts-ignore
 import Delete from "vue-material-design-icons/Delete.vue";
+// @ts-ignore
 import Pencil from "vue-material-design-icons/Pencil.vue";
+// @ts-ignore
 import Magnify from "vue-material-design-icons/Magnify.vue";
 
 const loading = ref<boolean>(false)
