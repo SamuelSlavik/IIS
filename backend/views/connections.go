@@ -39,6 +39,10 @@ func ListConnections(ctx *gin.Context) {
 			VehicleReg:    model.VehicleRegistration,
 			Direction:     model.Direction,
 		}
+		if connection.Direction == true {
+			connection.InitialStop = line.FinalStop
+			connection.FinalStop = line.InitialStop
+		}
 		connections = append(connections, connection)
 	}
 	ctx.IndentedJSON(http.StatusOK, connections)
@@ -134,6 +138,10 @@ func GetConnectionById(ctx *gin.Context) {
 		VehicleReg:    connection_model.VehicleRegistration,
 		Direction:     connection_model.Direction,
 	}
+	if connection.Direction == true {
+		connection.InitialStop = line.FinalStop
+		connection.FinalStop = line.InitialStop
+	}
 	ctx.IndentedJSON(http.StatusOK, connection)
 }
 
@@ -164,6 +172,10 @@ func ListConnectionsByLine(ctx *gin.Context) {
 			FinalStop:     line_model.FinalStop,
 			VehicleReg:    model.VehicleRegistration,
 			DriverID:      model.DriverID,
+		}
+		if connection.Direction == true {
+			connection.InitialStop = line_model.FinalStop
+			connection.FinalStop = line_model.InitialStop
 		}
 		connections = append(connections, connection)
 	}
@@ -198,6 +210,10 @@ func ListConnectionsByLineAndDate(ctx *gin.Context) {
 			FinalStop:     line_model.FinalStop,
 			VehicleReg:    model.VehicleRegistration,
 			DriverID:      model.DriverID,
+		}
+		if connection.Direction == true {
+			connection.InitialStop = line_model.FinalStop
+			connection.FinalStop = line_model.InitialStop
 		}
 		connections = append(connections, connection)
 	}
