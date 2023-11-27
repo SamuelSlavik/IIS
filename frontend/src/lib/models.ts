@@ -109,9 +109,13 @@ export interface NewConnection {
     NumberOfDays: number | null
 }
 export interface AssignedConnection {
-    DriverID: string
+    DriverID: selectedUser | null
     VehicleReg: string
     NumberOfDays: number | null
+}
+export interface selectedUser {
+    label: string | null
+    value: number | null
 }
 
 

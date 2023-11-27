@@ -29,7 +29,10 @@ const drivers = ref<User[]>([])
 const selectedDriver = ref('')
 
 const assignedConnection = ref<AssignedConnection>({
-  DriverID: "",
+  DriverID: {
+    value: null,
+    label: "",
+  },
   VehicleReg: "",
   NumberOfDays: null,
 })
@@ -39,7 +42,8 @@ const loadConnection = async () => {
     loading.value = true
     const response = await axios.get(Endpoints.retrieveConnection(connectionID), {withCredentials: true})
     connection.value = response.data
-    assignedConnection.value.DriverID = response.data.DriverName
+    assignedConnection.value.DriverID.label = response.data.DriverName
+    assignedConnection.value.DriverID.value = response.data.DriverID
     assignedConnection.value.VehicleReg = response.data.VehicleReg
   } catch (error: any) {
     notifications.addNotification("Failed to load lines: " + error, "error")
@@ -77,7 +81,7 @@ const loadVehicles = async () => {
 const assign = async () => {
   try {
     const response = await axios.patch(Endpoints.assignConnection(connectionID), {
-      DriverID: assignedConnection.value.DriverID.value || null,
+      DriverID: assignedConnection.value.DriverID?.value || null,
       VehicleReg: assignedConnection.value.VehicleReg || null,
       NumberOfDays: assignedConnection.value.NumberOfDays,
     }, {withCredentials: true})
@@ -126,7 +130,8 @@ onMounted(() => {
       </div>
       <div class="hr"></div>
       <form @submit.prevent="assign" class="form">
-        <v-select v-model="assignedConnection.DriverID" :options="drivers.map(({ ID, LastName, FirstName }) => ({ value: ID, label: FirstName + ' ' + LastName }))" placeholder="Select driver"></v-select>        <v-select v-model="assignedConnection.VehicleReg" :options="vehicles.map(({Registration}) => {return Registration})" placeholder="Select vehicle"></v-select>
+        <v-select v-model="assignedConnection.DriverID" :options="drivers.map(({ ID, LastName, FirstName }) => ({ value: ID, label: FirstName + ' ' + LastName }))" placeholder="Select driver"></v-select>
+        <v-select v-model="assignedConnection.VehicleReg" :options="vehicles.map(({Registration}) => {return Registration})" placeholder="Select vehicle"></v-select>
         <input
           type="number"
           name="number-of-days"

@@ -216,12 +216,12 @@ func ListConnectionsByLineAndDate(ctx *gin.Context) {
 	var connection_models []models.Connection
 	var err error
 	line_model := models.Line{}
-	err = utils.DB.First(&line_model, "name=?", line).Order("departure_time").Error
+	err = utils.DB.First(&line_model, "name=?", line).Error
 	if err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	err = utils.DB.Find(&connection_models, "line_name=? AND departure_time BETWEEN ? AND ? ", line, date, date+" 23:59:59").Error
+	err = utils.DB.Order("departure_time").Find(&connection_models, "line_name=? AND departure_time BETWEEN ? AND ? ", line, date, date+" 23:59:59").Error
 	if err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
