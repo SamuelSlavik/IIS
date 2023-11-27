@@ -68,7 +68,6 @@ func Get_arrival_time(dep_time time.Time, line_name string) (arrival_time time.T
 	utils.DB.Preload("Segments").First(&line, "name=?", line_name)
 	var duration time.Duration
 	for _, segment := range line.Segments {
-		fmt.Print(segment.Time)
 		duration += time.Minute * time.Duration(segment.Time)
 	}
 	arrival_time = dep_time.Add(duration)

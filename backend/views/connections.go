@@ -182,7 +182,6 @@ func ListConnectionsByLineAndDate(ctx *gin.Context) {
 		return
 	}
 	err = utils.DB.Find(&connection_models, "line_name=? AND departure_time BETWEEN ? AND ? ", line, date, date+" 23:59:59").Error
-	fmt.Print(len(connection_models))
 	if err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
@@ -232,6 +231,7 @@ func CreateConnection(ctx *gin.Context) {
 	}
 }
 
+// todo number of days
 func AssignToConnection(ctx *gin.Context) {
 	id := ctx.Param("id")
 	connection_model := models.Connection{}
@@ -264,6 +264,7 @@ func AssignToConnection(ctx *gin.Context) {
 func UpdateConnection(ctx *gin.Context) {
 	id := ctx.Param("id")
 	connection_model := models.Connection{}
+	models_to_change := []models.Connection{}
 	res := utils.DB.First(&connection_model, "id=?", id)
 	if res.Error != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
@@ -274,40 +275,76 @@ func UpdateConnection(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	connection.ArrivalTime = connection_model.ArrivalTime
-	if connection.LineName != connection_model.LineName {
-		validators.Line_name_validator(connection.LineName, &connection.ValidatorErrs)
-		connection_model.LineName = connection.LineName
+	//todo asi funguje ???? xd
+	orig_deptime := connection_model.DepartureTime
+	for i := 0; i < connection.NumberOfDays; i++ {
+		connection.ArrivalTime = connection_model.ArrivalTime
+		if connection.LineName != connection_model.LineName {
+			validators.Line_name_validator(connection.LineName, &connection.ValidatorErrs)
+			connection_model.LineName = connection.LineName
+		}
+		if connection.VehicleReg != connection_model.VehicleRegistration {
+			validators.Vehicle_registration_validator(connection.VehicleReg, &connection.ValidatorErrs)
+			connection_model.VehicleRegistration = connection.VehicleReg
+		}
+		if connection.DriverID != connection_model.DriverID {
+			validators.Driver_id_validator(connection.DriverID, &connection.ValidatorErrs)
+			connection_model.DriverID = connection.DriverID
+		}
+		if len(connection.ValidatorErrs) != 0 {
+			ctx.IndentedJSON(http.StatusBadRequest, connection.ValidatorErrs)
+			return
+		}
+		dep_time, err := time.Parse("2006-01-02 15:04", connection.DepartureTime)
+		if err != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+			return
+		}
+		if !connection_model.DepartureTime.Equal(dep_time) {
+			arr_time := serializers.Get_arrival_time(dep_time, connection_model.LineName)
+			validators.Driver_availability(int(connection_model.ID), connection_model.DriverID, connection.DepartureTime, arr_time, 1, &connection.ValidatorErrs)
+			validators.Vehicle_availability(int(connection_model.ID), connection_model.VehicleRegistration, connection.DepartureTime, arr_time, 1, &connection.ValidatorErrs)
+			connection_model.DepartureTime = dep_time
+			connection_model.ArrivalTime = arr_time
+		}
+		if len(connection.ValidatorErrs) != 0 {
+			ctx.IndentedJSON(http.StatusBadRequest, connection.ValidatorErrs)
+			return
+		}
+		models_to_change = append(models_to_change, connection_model)
+		connection_model = models.Connection{}
+		orig_deptime = orig_deptime.AddDate(0, 0, 1)
+		res := utils.DB.Where("departure_time=? AND line_name=?", orig_deptime, connection.LineName).Find(&connection_model)
+		if res.Error != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
+			return
+		}
+		if res.RowsAffected == 0 {
+			break
+		}
+		connection.DepartureTime = connection_model.DepartureTime.Format("2006-01-02 15:04")
+		orig_deptime = connection_model.DepartureTime
+
 	}
-	if connection.VehicleReg != connection_model.VehicleRegistration {
-		validators.Vehicle_registration_validator(connection.VehicleReg, &connection.ValidatorErrs)
-		connection_model.VehicleRegistration = connection.VehicleReg
+	for i := 0; i < len(models_to_change); i++ {
+		res := utils.DB.Where("departure_time=? AND line_name=?", models_to_change[i].DepartureTime, models_to_change[i].LineName).Find(&models.Connection{})
+		if res.Error != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
+			return
+		}
+		if res.RowsAffected != 0 {
+			ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Some connection at same time for this line already exists"})
+			return
+		}
 	}
-	if connection.DriverID != connection_model.DriverID {
-		validators.Driver_id_validator(connection.DriverID, &connection.ValidatorErrs)
-		connection_model.DriverID = connection.DriverID
-	}
-	if len(connection.ValidatorErrs) != 0 {
-		ctx.IndentedJSON(http.StatusBadRequest, connection.ValidatorErrs)
-		return
-	}
-	dep_time, _ := time.Parse("2006-01-02 15:04", connection.DepartureTime)
-	if !connection_model.DepartureTime.Equal(dep_time) {
-		arr_time := serializers.Get_arrival_time(dep_time, connection_model.LineName)
-		validators.Driver_availability(int(connection_model.ID), connection_model.DriverID, connection.DepartureTime, arr_time, 1, &connection.ValidatorErrs)
-		validators.Vehicle_availability(int(connection_model.ID), connection_model.VehicleRegistration, connection.DepartureTime, arr_time, 1, &connection.ValidatorErrs)
-		connection_model.DepartureTime = dep_time
-		connection_model.ArrivalTime = arr_time
-	}
-	if len(connection.ValidatorErrs) != 0 {
-		ctx.IndentedJSON(http.StatusBadRequest, connection.ValidatorErrs)
-		return
-	}
-	if result := utils.DB.Save(&connection_model); result.Error != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
-		return
-	} else {
-		ctx.IndentedJSON(http.StatusOK, result)
+	for i := 0; i < len(models_to_change); i++ {
+		fmt.Print("Models to change: ", models_to_change[i].ID, "\n") //todo debug print
+		if result := utils.DB.Save(&models_to_change[i]); result.Error != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, result.Error)
+			return
+		} else {
+			ctx.IndentedJSON(http.StatusOK, result)
+		}
 	}
 }
 
