@@ -19,6 +19,7 @@ type ConnectionSerializer struct {
 	FinalStop     string
 	VehicleReg    *string
 	DriverID      *uint
+	DriverName    string
 }
 
 type ConnectionCreateSerializer struct {

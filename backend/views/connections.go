@@ -17,7 +17,7 @@ func ListConnections(ctx *gin.Context) {
 	var connections []serializers.ConnectionSerializer
 	var connection_models []models.Connection
 	var err error
-	err = utils.DB.Find(&connection_models).Error
+	err = utils.DB.Find(&connection_models).Order("departure_time").Error
 	if err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
@@ -29,6 +29,14 @@ func ListConnections(ctx *gin.Context) {
 			ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 			return
 		}
+		driver := models.User{}
+		if model.DriverID != nil {
+			err = utils.DB.Find(&driver, "id=?", model.DriverID).Error
+			if err != nil {
+				ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+				return
+			}
+		}
 		connection := serializers.ConnectionSerializer{
 			ConnectionID:  model.ID,
 			LineName:      model.LineName,
@@ -39,6 +47,7 @@ func ListConnections(ctx *gin.Context) {
 			DriverID:      model.DriverID,
 			VehicleReg:    model.VehicleRegistration,
 			Direction:     model.Direction,
+			DriverName:    driver.FullName,
 		}
 		if connection.Direction == true {
 			connection.InitialStop = line.FinalStop
@@ -128,6 +137,14 @@ func GetConnectionById(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
+	driver := models.User{}
+	if connection_model.DriverID != nil {
+		err = utils.DB.Find(&driver, "id=?", connection_model.DriverID).Error
+		if err != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+			return
+		}
+	}
 	connection := serializers.ConnectionSerializer{
 		ConnectionID:  connection_model.ID,
 		LineName:      connection_model.LineName,
@@ -138,6 +155,7 @@ func GetConnectionById(ctx *gin.Context) {
 		DriverID:      connection_model.DriverID,
 		VehicleReg:    connection_model.VehicleRegistration,
 		Direction:     connection_model.Direction,
+		DriverName:    driver.FullName,
 	}
 	if connection.Direction == true {
 		connection.InitialStop = line.FinalStop
@@ -156,13 +174,21 @@ func ListConnectionsByLine(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	err = utils.DB.Find(&connection_models, "line_name=?", line).Error
+	err = utils.DB.Find(&connection_models, "line_name=?", line).Order("departure_time").Error
 	if err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 	connections := []serializers.ConnectionSerializer{}
 	for _, model := range connection_models {
+		driver := models.User{}
+		if model.DriverID != nil {
+			err = utils.DB.Find(&driver, "id=?", model.DriverID).Error
+			if err != nil {
+				ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+				return
+			}
+		}
 		connection := serializers.ConnectionSerializer{
 			ConnectionID:  model.ID,
 			LineName:      model.LineName,
@@ -173,6 +199,7 @@ func ListConnectionsByLine(ctx *gin.Context) {
 			FinalStop:     line_model.FinalStop,
 			VehicleReg:    model.VehicleRegistration,
 			DriverID:      model.DriverID,
+			DriverName:    driver.FullName,
 		}
 		if connection.Direction == true {
 			connection.InitialStop = line_model.FinalStop
@@ -189,7 +216,7 @@ func ListConnectionsByLineAndDate(ctx *gin.Context) {
 	var connection_models []models.Connection
 	var err error
 	line_model := models.Line{}
-	err = utils.DB.First(&line_model, "name=?", line).Error
+	err = utils.DB.First(&line_model, "name=?", line).Order("departure_time").Error
 	if err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
@@ -201,6 +228,14 @@ func ListConnectionsByLineAndDate(ctx *gin.Context) {
 	}
 	connections := []serializers.ConnectionSerializer{}
 	for _, model := range connection_models {
+		driver := models.User{}
+		if model.DriverID != nil {
+			err = utils.DB.Find(&driver, "id=?", model.DriverID).Error
+			if err != nil {
+				ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+				return
+			}
+		}
 		connection := serializers.ConnectionSerializer{
 			ConnectionID:  model.ID,
 			LineName:      model.LineName,
@@ -211,10 +246,65 @@ func ListConnectionsByLineAndDate(ctx *gin.Context) {
 			FinalStop:     line_model.FinalStop,
 			VehicleReg:    model.VehicleRegistration,
 			DriverID:      model.DriverID,
+			DriverName:    driver.FullName,
 		}
 		if connection.Direction == true {
 			connection.InitialStop = line_model.FinalStop
 			connection.FinalStop = line_model.InitialStop
+		}
+		connections = append(connections, connection)
+	}
+	ctx.IndentedJSON(http.StatusOK, connections)
+}
+
+func ListDriverConnections(ctx *gin.Context) {
+	user_id := ctx.Param("id")
+	var connection_models []models.Connection
+	res := utils.DB.Where("role = ?", "driver").Find(&models.User{}, user_id)
+	if res.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
+		return
+	}
+	if res.RowsAffected == 0 {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "No such driver"})
+		return
+	}
+	err := utils.DB.Find(&connection_models, "driver_id=?", user_id).Order("departure_time").Error
+	if err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	connections := []serializers.ConnectionSerializer{}
+	for _, model := range connection_models {
+		line := models.Line{}
+		err = utils.DB.First(&line, "name=?", model.LineName).Error
+		if err != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+			return
+		}
+		driver := models.User{}
+		if model.DriverID != nil {
+			err = utils.DB.Find(&driver, "id=?", model.DriverID).Error
+			if err != nil {
+				ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+				return
+			}
+		}
+		connection := serializers.ConnectionSerializer{
+			ConnectionID:  model.ID,
+			LineName:      model.LineName,
+			DepartureTime: model.DepartureTime.Format("2006-01-02 15:04"),
+			ArrivalTime:   model.ArrivalTime.Format("2006-01-02 15:04"),
+			InitialStop:   line.InitialStop,
+			FinalStop:     line.FinalStop,
+			DriverID:      model.DriverID,
+			VehicleReg:    model.VehicleRegistration,
+			Direction:     model.Direction,
+			DriverName:    driver.FullName,
+		}
+		if connection.Direction == true {
+			connection.InitialStop = line.FinalStop
+			connection.FinalStop = line.InitialStop
 		}
 		connections = append(connections, connection)
 	}
