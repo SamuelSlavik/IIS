@@ -42,7 +42,9 @@ const loadConnection = async () => {
     loading.value = true
     const response = await axios.get(Endpoints.retrieveConnection(connectionID), {withCredentials: true})
     connection.value = response.data
+    // @ts-ignore
     assignedConnection.value.DriverID.label = response.data.DriverName
+    // @ts-ignore
     assignedConnection.value.DriverID.value = response.data.DriverID
     assignedConnection.value.VehicleReg = response.data.VehicleReg
   } catch (error: any) {
