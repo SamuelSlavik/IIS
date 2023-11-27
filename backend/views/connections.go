@@ -16,7 +16,7 @@ func ListConnections(ctx *gin.Context) {
 	var connections []serializers.ConnectionSerializer
 	var connection_models []models.Connection
 	var err error
-	err = utils.DB.Where("driver_id IS NOT NULL AND vehicle_registration IS NOT NULL").Find(&connection_models).Error
+	err = utils.DB.Find(&connection_models).Error
 	if err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
@@ -147,6 +147,7 @@ func ListConnectionsByLine(ctx *gin.Context) {
 			Direction:    model.Direction,
 			InitialStop:   line_model.InitialStop,
 			FinalStop:     line_model.FinalStop,
+			VehicleReg:    model.VehicleRegistration,
 		}
 		connections = append(connections, connection)
 	}
@@ -180,6 +181,7 @@ func ListConnectionsByLineAndDate(ctx *gin.Context) {
 			Direction:    model.Direction,
 			InitialStop:   line_model.InitialStop,
 			FinalStop:     line_model.FinalStop,
+			VehicleReg:    model.VehicleRegistration,
 		}
 		connections = append(connections, connection)
 	}
@@ -199,7 +201,12 @@ func CreateConnection(ctx *gin.Context) {
 		return
 	}
 
-	connection_model := connection.CreateModel()
+	connection_model, err := connection.CreateModel()
+	if err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	//res := utils.DB.Where("line_name=? AND departure_time IS ?", connection_model.).Find(&models.Connection{})
 
 	if result := utils.DB.Create(connection_model); result.Error != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, result.Error)

@@ -27,6 +27,7 @@ type ConnectionLineSerializer struct {
 	Direction    bool
 	InitialStop   string
 	FinalStop     string
+	VehicleReg    *string
 }
 
 type ConnectionCreateSerializer struct {
@@ -55,6 +56,7 @@ type ConnectionUpdateSerializer struct {
 	ArrivalTime   time.Time //neplnit z fe
 	DriverID      *uint
 	VehicleReg    *string
+	NumberOfDays  int `binding:"required"`
 	ValidatorErrs []validators.ValidatorErr
 }
 
@@ -108,8 +110,11 @@ func (conn *ConnectionAssignSerializer) Valid(id int) bool {
 	return len(conn.ValidatorErrs) == 0
 }
 
-func (conn ConnectionCreateSerializer) CreateModel() (connection_model []models.Connection) {
-	dep_time, _ := time.Parse("2006-01-02 15:04:05", conn.DepartureTime) //todo lolik error
+func (conn ConnectionCreateSerializer) CreateModel() (connection_model []models.Connection, err error) {
+	dep_time, err := time.Parse("2006-01-02 15:04:05", conn.DepartureTime)
+	if err != nil {
+		return
+	}
 	for i := 0; i < int(conn.NumberOfDays); i++ {
 		connection_model = append(connection_model, models.Connection{
 			LineName:            conn.LineName,
