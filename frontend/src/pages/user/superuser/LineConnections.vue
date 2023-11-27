@@ -89,7 +89,7 @@ onMounted(() => {loadConnections()})
       <div class="table">
         <div v-for="(conn, index) in connections" :key="conn.ConnectionID" v-if="connections">
           <div class="list-item">
-            <router-link :to="'/profile/superuser/connection/edit/' + conn.ConnectionID" class="list-item__name">
+            <router-link :to="'/profile/superuser/connections/edit/' + conn.ConnectionID" class="list-item__name">
               <b>{{ formatDateTime(conn.DepartureTime) }}</b>
             </router-link>
             <p class="list-item__role"><b>From:</b> {{ conn.InitialStop }}</p>
