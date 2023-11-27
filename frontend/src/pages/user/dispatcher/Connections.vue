@@ -8,10 +8,12 @@ import {useNotificationStore} from "@/stores/notification-store";
 import router from "@/router";
 import {formatDate, formatDateTime} from "@/lib/utils";
 import Magnify from "vue-material-design-icons/Magnify.vue";
+import Close from "vue-material-design-icons/Close.vue";
+import Check from "vue-material-design-icons/Check.vue";
 
 const loading = ref<boolean>(false)
 const notifications = useNotificationStore()
-const conncetions = ref<ConnectionList[]>()
+const connections = ref<ConnectionList[]>()
 const line = router.currentRoute.value.params.line.toString() || ""
 
 const cetTime = new Date()
@@ -23,7 +25,7 @@ const loadConnections = async () => {
     loading.value = true
     const querydatefmt = querydate.value.split("T")[0]
     const response = await axios.get(Endpoints.listConnectionsDatetime(line, querydatefmt), {withCredentials: true})
-    conncetions.value = response.data
+    connections.value = response.data
   } catch (error: any) {
     notifications.addNotification("Failed to load lines: " + error, "error")
   } finally {
@@ -59,16 +61,20 @@ onMounted(() => {loadConnections()})
     <Loader v-if="loading"/>
     <div v-else>
       <div class="table">
-        <div v-for="(conn, index) in conncetions" :key="conn.ConnectionID">
+        <div v-for="(conn, index) in connections" :key="conn.ConnectionID" v-if="connections">
           <div class="list-item">
             <router-link :to="'/profile/dispatcher/connection/detail/' + conn.ConnectionID" class="list-item__name">
               <b>{{ formatDateTime(conn.DepartureTime) }}</b>
             </router-link>
             <p class="list-item__role"><b>From:</b> {{ conn.InitialStop }}</p>
-            <p><b>To:</b> {{conn.FinalStop}}</p>
+            <p class="list-item__role"><b>To:</b> {{conn.FinalStop}}</p>
+            <p v-if="conn.VehicleReg" class="list-item__role">{{ conn.VehicleReg }}</p>
+            <p v-else class="list-item__role">No vehicle</p>
+            <p v-if="conn.VehicleReg" class="list-item__role">{{ conn.VehicleReg }}</p>
+            <p v-else>No driver</p>
           </div>
           <!-- Display table-hr only if it's not the last user for the current role -->
-          <div v-if="index < conncetions.length - 1" class="table-hr"></div>
+          <div v-if="index < connections.length - 1" class="table-hr"></div>
         </div>
       </div>
     </div>
