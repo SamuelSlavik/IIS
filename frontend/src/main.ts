@@ -10,7 +10,7 @@ import App from './App.vue'
 import router from './router'
 import axios from "axios";
 
-axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
+axios.defaults.headers.common['Access-Control-Allow-Origin'] = 'https://adam.mihocka.cz'
 
 const app = createApp(App)
 
