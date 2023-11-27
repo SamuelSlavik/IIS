@@ -13,6 +13,7 @@ const notifications = useNotificationStore()
 
 const vehicles = ref<Vehicle[]>([])
 
+// @ts-ignore
 const newReport = ref<MalfunctionReport>({
   Title: "",
   Description: "",
@@ -34,6 +35,7 @@ const loadVehicles = async () => {
 const submitReport = async () => {
   loading.value = true
   try {
+    // @ts-ignore
     const response = await axios.post(Endpoints.reportMalfunction, newReport.value, {withCredentials: true})
     if (response.status === 200) {
       notifications.addNotification("Malfunction reported", 'success')

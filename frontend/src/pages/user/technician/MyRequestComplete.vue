@@ -136,9 +136,10 @@ onMounted(() => {loadRequest()})
           <p>{{ formatDate(request.Deadline) }}</p>
         </div>
         <br/>
-        <div class="details-item" v-if="request.ResolvedByRef">
+        <div class="details-item" v-if="// @ts-ignore
+        request.ResolvedBy">
           <p>Assigned to:</p>
-          <p>{{request.ResolvedByRef.FirstName }} {{request.ResolvedByRef.LastName }}<br/>{{request.ResolvedByRef.Email }}</p>
+          <p>{{ request.ResolvedBy.FirstName }} {{ request.ResolvedBy.LastName }}<br/>{{ request.ResolvedBy.Email }}</p>
         </div>
         <br/>
         <div class="details-item">

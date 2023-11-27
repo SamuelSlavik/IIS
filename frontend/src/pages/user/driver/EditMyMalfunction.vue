@@ -18,6 +18,7 @@ const vehicles = ref<Vehicle[]>([])
 
 const reportId = router.currentRoute.value.params.id.toString() || ""
 
+// @ts-ignore
 const newReport = ref<MalfunctionReport>({
   Title: "",
   Description: "",
@@ -28,8 +29,11 @@ const loadMalfunction = async () => {
   loading.value = true
   try {
     const response = await axios.get<Malfunction>(Endpoints.retrieveMalfunction(reportId), {withCredentials: true})
+    // @ts-ignore
     newReport.value.Title = response.data.Title
+    // @ts-ignore
     newReport.value.Description = response.data.Description
+    // @ts-ignore
     newReport.value.VehicleRef = response.data.Vehicle.Registration
   } catch (error) {
     notifications.addNotification("Failed to load malfunction: " + error, 'error')
@@ -52,6 +56,7 @@ const loadVehicles = async () => {
 const submitReport = async () => {
   loading.value = true
   try {
+    // @ts-ignore
     const response = await axios.put(Endpoints.editMalfunction(reportId), newReport.value, {withCredentials: true})
     if (response.status === 200) {
       notifications.addNotification("Malfunction updated", 'success')
