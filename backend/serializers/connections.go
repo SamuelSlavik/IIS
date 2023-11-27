@@ -10,6 +10,21 @@ import (
 )
 
 type ConnectionSerializer struct {
+	ConnectionID     uint
+	LineName         string
+	DepartureTime    string
+	ArrivalTime      string
+	Direction        bool
+	InitialStop      string
+	FinalStop        string
+	VehicleReg       *string
+	DriverID         *uint
+	DriverName       string
+	VehicleType      string
+	StopInConnection *[]StopInConnection
+}
+
+type ConnectionUserSerializer struct {
 	ConnectionID  uint
 	LineName      string
 	DepartureTime string
@@ -17,9 +32,7 @@ type ConnectionSerializer struct {
 	Direction     bool
 	InitialStop   string
 	FinalStop     string
-	VehicleReg    *string
-	DriverID      *uint
-	DriverName    string
+	VehicleType   string
 }
 
 type ConnectionCreateSerializer struct {
