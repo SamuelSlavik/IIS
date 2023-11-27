@@ -44,13 +44,16 @@ func Router() *gin.Engine {
 	router.GET("/api/connections/list/:line", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.ListConnectionsByLine)
 	router.GET("/api/connections/list/:line/:date", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.ListConnectionsByLineAndDate)
 	router.GET("/api/connections/get/:id", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.GetConnectionById)
-	router.GET("/api/connections/get/details/:id", views.GetDetailOfConnection) //unregistered ???
 	router.POST("/api/connections/create", middleware.RequireAuth(string(models.SuperuserRole)), views.CreateConnection)
 	router.PATCH("/api/connections/assign/:id", middleware.RequireAuth(string(models.DispatcherRole)), views.AssignToConnection)
 	router.PATCH("/api/connections/update/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.UpdateConnection)
 	router.DELETE("/api/connections/delete/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.DeleteConnection)
 	router.GET("/api/connections/list/driver/:id", middleware.RequireAuth(string(models.DriverRole)), views.ListDriverConnections)
-
+	// not logged user
+	router.GET("/api/connections/search", views.ListUserConnections)
+	router.GET("/api/connections/search/:line", views.ListUserConnectionsByLine)
+	router.GET("/api/connections/search/:line/:date", views.ListConnectionsUserByLineAndDate)
+	router.GET("/api/connections/get/details/:id", views.GetDetailOfConnection) //unregistered ???
 	//stops
 	router.GET("/api/stops", middleware.RequireAuth(string(models.SuperuserRole)), views.ListStops)
 	router.GET("/api/stops/get/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.GetStop)
