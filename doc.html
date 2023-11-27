@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0067)https://www.fit.vutbr.cz/study/courses/IIS/private/projekt/doc.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2">
+    
+    <title>Projekt IIS</title>
+    <style type="text/css">
+    	table { border-collapse: collapse; }
+    	td, th { border: 1px solid black; padding: 0.3em 0.5em; text-align: left; }
+    	dt { font-weight: bold; margin-top: 0.5em; }
+    </style>
+</head>
+<body>
+
+<!-- Zkontrolujte prosím nastavení kódování v hlavičce dokumentu 
+     podle použitého editoru -->
+
+<h1>Dopravní podnik</h1> <!-- Nahradte názvem svého zadání -->
+
+<dl>
+	<dt>Autoři</dt>
+	<dd>Adam Pekný <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
+	    <a href="mailto:xpekny00@stud.fit.vutbr.cz">xpekny00@stud.fit.vutbr.cz</a> -
+		Správa užívateľov, správa porúch
+	</dd>
+	<dd>Jakub Kontrík <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
+	    <a href="mailto:xkontr02@stud.fit.vutbr.cz">xkontr02@stud.fit.vutbr.cz</a> - 
+		Správa liniek a spojov, seeding databázi
+	</dd>
+  <dd>Samuel Slávik <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
+	    <a href="mailto:xslavi37@stud.fit.vutbr.cz">xslavi37@stud.fit.vutbr.cz</a> - 
+		Správa zastávok, správa vozidiel, správa údržby
+	</dd>
+	<dt>URL aplikace</dt>
+	<dd><a href="https://iis-beryl.vercel.app/">https://iis-beryl.vercel.app/</a></dd>
+</dl>
+
+<h2>Uživatelé systému pro testování</h2>
+<p>Uveďte prosím existující zástupce <strong>všech rolí uživatelů</strong>.</p>
+<table>
+<tbody><tr><th>Login</th><th>Heslo</th><th>Role</th></tr>
+<tr><td>user@admin.com</td><td>DmiInbN5</td><td>Administrátor</td></tr>
+<tr><td>user@superuser.com</td><td>password</td><td>Správca</td></tr>
+<tr><td>user@dispatcher.com</td><td>password</td><td>Dispečer</td></tr>
+<tr><td>user@driver.com</td><td>password</td><td>Vodič</td></tr>
+<tr><td>user@technician.com</td><td>password</td><td>Technik</td></tr>
+</tbody></table>
+
+<p>(Diagram případů užití není nutné vkládat, pokud IS implementuje role a případy užití definované zadáním.)</p> 
+
+<h3>Video</h3>
+
+<p>Přiložte odkaz na komentované video demostrující použití informačního systému. Zaměřte se na případy užití definované zadáním (např. registrace uživatele, správa uživatelů a činnosti jednotlivých rolí). Video nahrajte například na VUT Google Drive, kde ho bude možné přímo spustit z odkazu.</p> 
+
+<h2>Implementace</h2>
+<p>Stručná dokumentace k implementaci, která popisuje, které části projektu (např. PHP skripty) implementují jednotlivé případy použití.</p>
+<p>Implementácia pozostáva z dvoch hlavných častí, a to frontendu a backendu.</p>
+<h3>Frontend:</h3>
+<p>
+	Frontend je implementovaný pomocou frameworku VueJS a nachádza sa na adrese <a href="https://iis-beryl.vercel.app/">https://iis-beryl.vercel.app/</a>.
+	Frontend prostredníctvom axiosu zasiela HTTP požiadavky na doménu https://adam.mihocka.cz, ktorá preposiela požiadavky backend API a následne vracia odpoveď.
+</p>
+
+<h3>Backend:</h3>
+<p>
+	Backend je implementovaný pomocou PostgreSQL, Golang a frameworkov Gin a GORM. Backend príma požiadavky pomocou súboru <i>router.go</i>, kde rozhoduje aká funkcia zo súborov z priečinku <i>backend/views/</i> danú požiadavku obslúži.
+	Obsluha požiadavku prebieha vo <i>views</i> pomocou serializérov a modelov v odpovedajúcich súboroch v priečinkoch <i>backend/serializers/</i> a <i>backend/models/</i>.
+	Serializéry slúžia pre serializáciu dát z požiadavkov a následne aj do nich.
+	Modely slúžia pre prácu s databázou ako získavanie, ukladanie alebo menenie dát a pre migrácie modelov (aktualizáciu schémy relačnej databáze).
+	Pre overovanie užívateľských rolí a prístupových práv sa používa modul <i>middleware/requireauth.go</i>
+</p>
+
+<h3>Administrátor</h3>
+<p>Zabezpečenie všetkých práv pre administrátora je v moduli <i>middleware/requireauth.go</i>, ktorý zabezpečuje že pri administrátorovi sa neoveruje vyžadovaná rola.</p>
+<p><b>Správa užívateľov:</b></p>
+<p>Frontend komponenty:</p>
+<ul>
+	<li>frontend/pages/user/admin/EditUser.vue</li>
+	<li>frontend/pages/user/admin/NewUser.vue</li>
+	<li>frontend/pages/user/admin/UserDetail.vue</li>
+	<li>frontend/pages/user/admin/UsersList.vue</li>
+</ul>
+<p>Backend:</p>
+<ul>
+	<li>backend/views/users.go</li>
+	<li>backend/serializers/users.go</li>
+	<li>backend/validators/users.go</li>
+	<li>backend/models/users.go</li>
+</ul>
+
+<h3>Správca</h3>
+<p><b>Správa liniek a spojov:</b></p>
+<p>Frontend komponenty:</p>
+<ul>
+	<li>frontend/pages/user/superuser/Connections.vue</li>
+	<li>frontend/pages/user/superuser/EditLine.vue</li>
+	<li>frontend/pages/user/superuser/EditStop.vue</li>
+	<li>frontend/pages/user/superuser/LineDetail.vue</li>
+	<li>frontend/pages/user/superuser/Lines.vue</li>
+	<li>frontend/pages/user/superuser/NewLine.vue</li>
+	<li>frontend/pages/user/superuser/NewStop.vue</li>
+	<li>frontend/pages/user/superuser/StopDetail.vue</li>
+	<li>frontend/pages/user/superuser/Stops.vue</li>
+</ul>
+<p>Backend:</p>
+<ul>
+	<li>backend/views/connections.go</li>
+	<li>backend/views/lines.go</li>
+	<li>backend/views/stops.go</li>
+	<li>backend/serializers/connections.go</li>
+	<li>backend/serializers/lines.go</li>
+	<li>backend/serializers/stops.go</li>
+	<li>backend/validators/connections.go</li>
+	<li>backend/validators/lines.go</li>
+	<li>backend/models/connections.go</li>
+	<li>backend/models/lines.go</li>
+	<li>backend/models/stops.go</li>
+</ul>
+
+<p><b>Správa vozidiel a údržby:</b></p>
+<p>Frontend komponenty:</p>
+<ul>
+	<li>frontend/pages/user/superuser/Malfunctions.vue</li>
+	<li>frontend/pages/user/superuser/NewRequest.vue</li>
+	<li>frontend/pages/user/superuser/RequestDetail.vue</li>
+	<li>frontend/pages/user/superuser/Requests.vue</li>
+	<li>frontend/pages/user/superuser/VehiclesList.vue</li>
+	<li>frontend/pages/user/superuser/VehicleDetail.vue</li>
+</ul>
+<p>Backend:</p>
+<ul>
+	<li>backend/views/maintenance.go</li>
+	<li>backend/views/vehicles.go</li>
+	<li>backend/serializers/maintenance.go</li>
+	<li>backend/serializers/vehicles.go</li>
+	<li>backend/validators/maintenance.go</li>
+	<li>backend/validators/vehicles.go</li>
+	<li>backend/models/maintenance.go</li>
+	<li>backend/models/vehicles.go</li>
+</ul>
+
+<h3>Technik</h3>
+<p><b>Správa záznamov o údržbe vozidiel:</b></p>
+<p>Frontend komponenty:</p>
+<ul>
+	<li>frontend/pages/user/technician/MyRequestComplete.vue</li>
+	<li>frontend/pages/user/technician/MyRequestDetail.vue</li>
+	<li>frontend/pages/user/technician/MyRequests.vue</li>
+	<li>frontend/pages/user/technician/MyRequestComplete.vue</li>
+</ul>
+<p>Backend:</p>
+<ul>
+	<li>backend/views/maintenance.go</li>
+	<li>backend/serializers/maintenance.go</li>
+	<li>backend/serializers/vehicles.go</li>
+	<li>backend/serializers/users.go</li>
+	<li>backend/validators/maintenance.go</li>
+	<li>backend/validators/vehicles.go</li>
+	<li>backend/validators/users.go</li>
+	<li>backend/models/maintenance.go</li>
+	<li>backend/models/vehicles.go</li>
+	<li>backend/models/users.go</li>
+</ul>
+
+<h3>Dispečer</h3>
+<p><b>Alokácia vozidiel a vodičov na spoje:</b></p>
+<p>Frontend komponenty:</p>
+<ul>
+	<li>frontend/pages/user/dispatcher/ConnectionDetail.vue</li>
+	<li>frontend/pages/user/dispatcher/Connections.vue</li>
+	<li>frontend/pages/user/dispatcher/Lines.vue</li>
+</ul>
+<p>Backend:</p>
+<ul>
+	<li>backend/views/connections.go</li>
+	<li>backend/serializers/connections.go</li>
+	<li>backend/serializers/vehicles.go</li>
+	<li>backend/serializers/users.go</li>
+	<li>backend/validators/connections.go</li>
+	<li>backend/validators/vehicles.go</li>
+	<li>backend/validators/users.go</li>
+	<li>backend/models/connections.go</li>
+	<li>backend/models/vehicles.go</li>
+	<li>backend/models/users.go</li>
+</ul>
+
+<h3>Vodič</h3>
+<p><b>Hlásenie závad:</b></p>
+<p>Frontend komponenty:</p>
+<ul>
+	<li>frontend/pages/user/driver/EditMyMalfunction.vue</li>
+	<li>frontend/pages/user/driver/MalfunctionDetail.vue</li>
+	<li>frontend/pages/user/driver/MyMalfunctions.vue</li>
+	<li>frontend/pages/user/driver/NewMalfunction.vue</li>
+</ul>
+<p>Backend:</p>
+<ul>
+	<li>backend/views/maintenance.go</li>
+	<li>backend/serializers/maintenance.go</li>
+	<li>backend/serializers/vehicles.go</li>
+	<li>backend/serializers/users.go</li>
+	<li>backend/validators/maintenance.go</li>
+	<li>backend/validators/vehicles.go</li>
+	<li>backend/validators/users.go</li>
+	<li>backend/models/maintenance.go</li>
+	<li>backend/models/vehicles.go</li>
+	<li>backend/models/users.go</li>
+</ul>
+
+<p><b>Sledovanie svojho plánu:</b></p>
+<p>Frontend komponenty:</p>
+<ul>
+	<li>frontend/pages/user/driver/MyPlan.vue</li>
+</ul>
+<p>Backend:</p>
+<ul>
+	<li>backend/views/connections.go</li>
+	<li>backend/serializers/connections.go</li>
+	<li>backend/serializers/vehicles.go</li>
+	<li>backend/serializers/users.go</li>
+	<li>backend/validators/connections.go</li>
+	<li>backend/validators/vehicles.go</li>
+	<li>backend/validators/users.go</li>
+	<li>backend/models/connections.go</li>
+	<li>backend/models/vehicles.go</li>
+	<li>backend/models/users.go</li>
+</ul>
+
+<h3>Neregistrovaný užívateľ</h3>
+<p><b>Prechádzanie spojov:</b></p>
+<p>Frontend komponenty:</p>
+<ul>
+	<li>frontend/pages/homepage/Homepage.vue</li>
+</ul>
+<p>Backend:</p>
+<ul>
+	<li>backend/views/connections.go</li>
+	<li>backend/serializers/connections.go</li>
+	<li>backend/validators/connections.go</li>
+	<li>backend/models/connections.go</li>
+</ul>
+
+<h3>Databáze</h3>
+
+Zde vložte grafické schéma relační databáze (tabulek v databázi).
+
+<h2>Instalace</h2>
+
+Stručně popište: 
+<ul>
+<li>postup instalace na server,</li>
+<li>softwarové požadavky (verze PHP apod.),</li>
+<li>jak rozbalit, konfigurovat, inicializovat databázi, ...</li>
+</ul>
+
+<h3>Postup inštalácie</h3>
+<p><b>Backend:</b></p>
+<ol>
+	<li>Pomocou príkazu '<i>docker-compose up -d</i>' v koreňovom priečinku vytvoríme a spustíme kontainer s databázou.</li>
+	<li>Pomocou príkazu '<i>go build</i>' v koreňovom priečinku preložíme backend.</li>
+	<li>Výsledný binárny súbor spustíme pomocou príkazu '<i>./IIS</i>'.</li>
+	<li>Spustenie backendu automaticky vykoná migrácie v databáze a vytvorí administrátorský účet pokiaľ žiadny neexistuje.</li>
+	<li>Automaticky vytvorený administrátor bude mať prístupové údaje email: <i>user@admin.com</i> a heslo: <i>DmiInbN5</i></li>
+</ol>
+<p><b>Frontend:</b></p>
+<ol>
+	<li>Pomocou príkazu '<i>npm install</i>' v priečinku <i>frontend/</i> nainštalujeme potrebné závislosti.</li>
+	<li>Pomocou príkazu '<i>npm run dev</i>' v priečinku <i>frontend/</i> spustíme frontend.</li>
+</ol>
+
+<h3>Softwarové požiadavky</h3>
+<ul>
+	<li>node verzia 14+</li>
+	<li>Golang verzia 1.18+</li>
+	<li>docker-compose</li>
+</ul>
+
+
+<h2>Známé problémy</h2>
+<p>Zde popište, které body zadání nejsou implementovány a z jakého důvodu. Např. &#8222;Z časových důvodů nebyla implementována správa uživatelů.&#8221; Pomůžete tím zrychlit hodnocení, když neimplementované funkce nebudeme muset dlouze hledat.</p>
+
+
+
+</body></html>

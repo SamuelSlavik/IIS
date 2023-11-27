@@ -7,10 +7,10 @@ import (
 
 type VehicleSerializer struct {
 	//Registration string `binding:"required"`
-	Capacity      uint   `binding:"required"`
-	Registration  string `binding:"required"`
-	Brand         string
-	ImageData     []byte
+	Capacity     uint   `binding:"required"`
+	Registration string `binding:"required"`
+	Brand        string
+	//ImageData     []byte
 	Type          string `binding:"required"`
 	ValidatorErrs []validators.ValidatorErr
 }
@@ -22,6 +22,15 @@ type VehicleGetSerializer struct {
 	//image lol
 	Type            string
 	LastMaintenance LastMaintenance
+}
+type VehicleTypeSerializer struct {
+	Type   string
+	Active bool
+	//IconPath string `binding:"required"`
+}
+type VehicleTypeCreateSerializer struct {
+	Type string `binding:"required"`
+	//IconPath string `binding:"required"`
 }
 
 type LastMaintenance struct {
@@ -39,10 +48,10 @@ type VehicleUpdateSerializer struct {
 
 func (vehicle VehicleSerializer) Create_model() (vehicle_model *models.Vehicle) {
 	vehicle_model = &models.Vehicle{
-		Capacity:        vehicle.Capacity,
-		Registration:    vehicle.Registration,
-		Brand:           vehicle.Brand,
-		ImageData:       vehicle.ImageData,
+		Capacity:     vehicle.Capacity,
+		Registration: vehicle.Registration,
+		Brand:        vehicle.Brand,
+		//ImageData:       vehicle.ImageData,
 		VehicleTypeName: vehicle.Type,
 	}
 	return
