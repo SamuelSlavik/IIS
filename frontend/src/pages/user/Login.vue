@@ -110,4 +110,11 @@ const login = async () => {
   button.small-button {
     padding: 0.5rem;
   }
+  label {
+    margin-bottom: 0;
+  }
+  input[type="checkbox"] {
+    width: auto;
+    margin-left: 0.5rem;
+  }
 </style>

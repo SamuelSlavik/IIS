@@ -1,5 +1,5 @@
 export class Endpoints {
-    private static readonly baseUrl = "https://adam.mihocka.cz/api"; // Replace with your base URL
+    private static readonly baseUrl = "http://localhost:8080/api"; // Replace with your base URL
 
     static get connections(): string {
         return `${Endpoints.baseUrl}/connections`;
@@ -36,12 +36,18 @@ export class Endpoints {
         }
         return `${Endpoints.baseUrl}/users/list`;
     }
+    static listUsersByRole(role: string): string {
+        return `${Endpoints.baseUrl}/users/list/${role}`;
+    }
 
 
 
 
     static get listVehicles(): string {
         return `${Endpoints.baseUrl}/vehicles/list`;
+    }
+    static get listOkVehicles(): string {
+        return `${Endpoints.baseUrl}/vehicles/list/ok`;
     }
     static get createVehicle(): string {
         return `${Endpoints.baseUrl}/vehicles/create`;
@@ -101,6 +107,31 @@ export class Endpoints {
     }
 
 
+
+    static get listConnections(): string {
+        return `${Endpoints.baseUrl}/connections/list`;
+    }
+    static get createConnection(): string {
+        return `${Endpoints.baseUrl}/connections/create`;
+    }
+    static deleteConnection(id: string, days: string): string {
+        return `${Endpoints.baseUrl}/connections/delete/${id}/${days}`;
+    }
+    static retrieveConnection(id: string): string {
+        return `${Endpoints.baseUrl}/connections/get/${id}`;
+    }
+    static editConnection(id: string): string {
+        return `${Endpoints.baseUrl}/connections/update/${id}`;
+    }
+    static assignConnection(id: string): string {
+        return `${Endpoints.baseUrl}/connections/assign/${id}`;
+    }
+    static listConnectionsByDriver(id: string): string {
+        return `${Endpoints.baseUrl}/connections/list/driver/${id}`;
+    }
+    static driverDetailConnection(id: string): string {
+        return `${Endpoints.baseUrl}/connections/get/${id}`;
+    }
 
 
     static get reportMalfunction(): string {

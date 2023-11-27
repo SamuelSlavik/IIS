@@ -52,8 +52,6 @@ const logOut = async () => {
         <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/vehicles/new">Create new vehicle</router-link></p>
         <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/malfunctions">Manage malfunction reports</router-link></p>
         <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/requests">Manage maintenance requests</router-link></p>
-        <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/requests/new">Create maintenance request</router-link></p>
-
         <br/>
         <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/stops">Manage stops</router-link></p>
         <p v-if="user.role === 'admin' || user.role === 'superuser'"><router-link to="/profile/superuser/stops/new">Create new stop</router-link></p>
@@ -62,7 +60,8 @@ const logOut = async () => {
         <br/>
         <p v-if="user.role === 'admin' || user.role === 'dispatcher'"><router-link to="/profile/dispatcher/lines">Manage lines</router-link></p>
         <br/>
-        <p v-if="user.role === 'admin' || user.role === 'driver'"><router-link to="/profile/driver/plans">My Plan</router-link></p>
+        <p v-if="user.role === 'driver'"><router-link to="/profile/driver/plans">My Plan</router-link></p>
+        <p v-if="user.role === 'admin'"><router-link to="/profile/admin/drivers">Plans</router-link></p>
         <br/>
         <p v-if="user.role === 'admin' || user.role === 'driver'"><router-link to="/profile/driver/reports/new">Report vehicle problem</router-link></p>
         <p v-if="user.role === 'admin' || user.role === 'driver'"><router-link to="/profile/driver/reports">Manage malfunction reports</router-link></p>

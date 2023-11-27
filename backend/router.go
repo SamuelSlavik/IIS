@@ -13,7 +13,7 @@ func Router() *gin.Engine {
 
 	config := cors.DefaultConfig()
 	config.AllowCredentials = true
-	config.AllowOrigins = []string{"http://127.0.0.1:5173", "https://iis-beryl.vercel.app"}
+	config.AllowOrigins = []string{"http://localhost:5173"}
 
 	router.Use(cors.New(config))
 
@@ -32,7 +32,7 @@ func Router() *gin.Engine {
 	router.DELETE("/api/users/delete/:id", middleware.RequireAuth(string(models.AdminRole)), views.DeleteUser)
 
 	// Vehicles
-	router.GET("/api/vehicles/list", middleware.RequireAuth(string(models.SuperuserRole)), views.List_vehicles)
+	router.GET("/api/vehicles/list", middleware.RequireAuth(string(models.SuperuserRole), string(models.DriverRole)), views.List_vehicles)
 	router.GET("/api/vehicles/get/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.GetVehicle)
 	router.POST("/api/vehicles/create", middleware.RequireAuth(string(models.SuperuserRole)), views.Create_vehicle)
 	router.PUT("/api/vehicles/update/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.UpdateVehicle)
@@ -46,11 +46,11 @@ func Router() *gin.Engine {
 	router.GET("/api/connections/list", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.ListConnections)
 	router.GET("/api/connections/list/:line", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.ListConnectionsByLine)
 	router.GET("/api/connections/list/:line/:date", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.ListConnectionsByLineAndDate)
-	router.GET("/api/connections/get/:id", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.GetConnectionById)
+	router.GET("/api/connections/get/:id", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole), string(models.DriverRole)), views.GetConnectionById)
 	router.POST("/api/connections/create", middleware.RequireAuth(string(models.SuperuserRole)), views.CreateConnection)
 	router.PATCH("/api/connections/assign/:id", middleware.RequireAuth(string(models.DispatcherRole)), views.AssignToConnection)
 	router.PATCH("/api/connections/update/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.UpdateConnection)
-	router.DELETE("/api/connections/delete/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.DeleteConnection)
+	router.DELETE("/api/connections/delete/:id/:days", middleware.RequireAuth(string(models.SuperuserRole)), views.DeleteConnection)
 	router.GET("/api/connections/list/driver/:id", middleware.RequireAuth(string(models.DriverRole)), views.ListDriverConnections)
 	// not logged user
 	router.GET("/api/connections/search", views.ListUserConnections)

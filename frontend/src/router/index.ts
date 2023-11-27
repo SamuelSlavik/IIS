@@ -5,7 +5,7 @@ import Registration from '../pages/user/Registration.vue'
 import Profile from '../pages/user/Profile.vue'
 import UsersList from "@/pages/user/admin/UsersList.vue";
 import NewUser from "@/pages/user/admin/NewUser.vue";
-import VehiclesList from "@/pages/user/superuser/VahiclesList.vue";
+import VehiclesList from "@/pages/user/superuser/VehiclesList.vue";
 import NewVehicle from "@/pages/user/superuser/NewVehicle.vue";
 import UserDetail from "@/pages/user/admin/UserDetail.vue";
 import MaintenanceRequests from "@/pages/user/superuser/Requests.vue";
@@ -34,7 +34,14 @@ import MalfunctionDetail from "@/pages/user/driver/MalfunctionDetail.vue";
 import Malfunctions from "@/pages/user/superuser/Malfunctions.vue";
 import LinesListDispatcher from "@/pages/user/dispatcher/Lines.vue";
 import LineConnectionsListDispatcher from "@/pages/user/dispatcher/Connections.vue";
+import NewConnection from "@/pages/user/superuser/NewConnection.vue";
+import LineConnections from "@/pages/user/superuser/LineConnections.vue";
+import EditConnection from "@/pages/user/superuser/EditConnection.vue";
 import LineConnectionDetailDispatcher from "@/pages/user/dispatcher/ConnectionDetail.vue";
+import Hello from "@/pages/user/Hello.vue";
+import MyPlanDetail from "@/pages/user/driver/MyPlanDetail.vue";
+import Drivers from "@/pages/user/admin/Drivers.vue";
+import DriversPlan from "@/pages/user/admin/DriversPlan.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -59,6 +66,10 @@ const router = createRouter({
       name: 'profile',
       component: Profile,
       children: [
+        {
+          path: '',
+          component: Hello
+        },
         {
           path: 'users',
           component: UsersList
@@ -96,7 +107,7 @@ const router = createRouter({
           component: MaintenanceRequests
         },
         {
-          path: 'superuser/requests/new',
+          path: 'superuser/requests/create/:id',
           component: NewMaintenanceRequest
         },
         {
@@ -110,6 +121,18 @@ const router = createRouter({
         {
           path: 'superuser/connections',
           component: Connections
+        },
+        {
+          path: 'superuser/connections/:line',
+          component: LineConnections
+        },
+        {
+          path: 'superuser/connections/new',
+          component: NewConnection
+        },
+        {
+          path: 'superuser/connections/edit/:id',
+          component: EditConnection
         },
         {
           path: 'superuser/stops/new',
@@ -164,8 +187,20 @@ const router = createRouter({
           component: MyRequestComplete
         },
         {
-          path: 'driver/my-plan',
+          path: 'admin/drivers',
+          component: Drivers
+        },
+        {
+          path: 'admin/drivers/detail/:id',
+          component: DriversPlan
+        },
+        {
+          path: 'driver/plans',
           component: MyPlan
+        },
+        {
+          path: 'driver/connection/detail/:id',
+          component: MyPlanDetail
         },
         {
           path: 'driver/reports/new',

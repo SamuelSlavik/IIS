@@ -13,6 +13,11 @@ import Magnify from "vue-material-design-icons/Magnify.vue";
 import Close from "vue-material-design-icons/Close.vue";
 // @ts-ignore
 import Check from "vue-material-design-icons/Check.vue";
+// @ts-ignore
+import Delete from "vue-material-design-icons/Delete.vue";
+// @ts-ignore
+
+import Pencil from "vue-material-design-icons/Pencil.vue";
 
 const loading = ref<boolean>(false)
 const notifications = useNotificationStore()
@@ -36,12 +41,30 @@ const loadConnections = async () => {
   }
 }
 
+const deleteConnection = async (id: string) => {
+  const numberOfDaysInput = window.prompt("Enter the number of days to delete:", "1");
+
+  let numberOfDays = parseInt(numberOfDaysInput || "1")
+
+  try {
+    const response = await axios.delete(Endpoints.deleteConnection(id, numberOfDays.toString()), {withCredentials: true})
+    if (response.status === 200) {
+      notifications.addNotification("Connection deleted", "success")
+      await loadConnections()
+    }
+  } catch (error) {
+    notifications.addNotification("Failed to delete connection: " + error, "error")
+  } finally {
+    loading.value = false
+  }
+}
+
 onMounted(() => {loadConnections()})
 
 </script>
 
 <template>
-    <div>
+  <div>
     <div class="header">
       <h2>Manage connections</h2>
       <h3>Line: <i>{{ line }}</i></h3>
@@ -66,15 +89,15 @@ onMounted(() => {loadConnections()})
       <div class="table">
         <div v-for="(conn, index) in connections" :key="conn.ConnectionID" v-if="connections">
           <div class="list-item">
-            <router-link :to="'/profile/dispatcher/connection/detail/' + conn.ConnectionID" class="list-item__name">
+            <router-link :to="'/profile/superuser/connection/edit/' + conn.ConnectionID" class="list-item__name">
               <b>{{ formatDateTime(conn.DepartureTime) }}</b>
             </router-link>
             <p class="list-item__role"><b>From:</b> {{ conn.InitialStop }}</p>
             <p class="list-item__role"><b>To:</b> {{conn.FinalStop}}</p>
-            <p v-if="conn.VehicleReg" class="list-item__role green">{{ conn.VehicleReg }}</p>
-            <p v-else class="list-item__role red">No vehicle</p>
-            <p v-if="conn.DriverID" class="list-item__role green">{{conn.DriverName}}</p>
-            <p v-else class="list-item__role red">No driver</p>
+            <div class="list-item__tools">
+              <router-link :to="'/profile/superuser/connections/edit/' + conn.ConnectionID"><Pencil :size="24" /></router-link>
+              <a @click="deleteConnection(conn.ConnectionID)"><Delete :size="24" /></a>
+            </div>
           </div>
           <!-- Display table-hr only if it's not the last user for the current role -->
           <div v-if="index < connections.length - 1" class="table-hr"></div>
