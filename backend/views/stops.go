@@ -1,3 +1,5 @@
+// package views contains views used in router handlers
+// this file contains views for stops
 package views
 
 import (
@@ -10,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// ListStops lists every stop in the database
 func ListStops(ctx *gin.Context) {
 	var stopModels []models.Stop
 	var stopSerializers []serializers.StopSerializer
@@ -42,6 +45,7 @@ func ListStops(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, stopSerializers)
 }
 
+// GetStop gets a stop with given stop id
 func GetStop(ctx *gin.Context) {
 	stopID := ctx.Param("id")
 
@@ -62,6 +66,7 @@ func GetStop(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, stopSerializer)
 }
 
+// EditStop edits a stop with given stop id
 func EditStop(ctx *gin.Context) {
 	stopID := ctx.Param("id")
 
@@ -100,6 +105,7 @@ func EditStop(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, stopSerializer)
 }
 
+// CreateStop creates a new stop
 func CreateStop(ctx *gin.Context) {
 	// Bind the form data to a StopCreateRequest struct
 	var createRequest serializers.StopCreateRequest
@@ -143,6 +149,7 @@ func CreateStop(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, stopSerializer)
 }
 
+// DeleteStop deletes a stop if it is not used in any segment
 func DeleteStop(ctx *gin.Context) {
 	stopID := ctx.Param("id")
 

@@ -1,3 +1,5 @@
+// package serializers holds structures and functions for serializing data
+// this file contains serializers for lines
 package serializers
 
 import (
@@ -5,30 +7,42 @@ import (
 	"github.com/AdamPekny/IIS/backend/utils"
 )
 
+// LineInList is used to serialize data about line
+// it is used in GET request to get data about line
 type LineInList struct {
 	Name        string
 	InitialStop string
 	FinalStop   string
 }
 
+// LineSerializer is used to serialize data about line
+// it is used in GET request to get data about line
 type LineSerializer struct {
 	Name          string
 	StopsSequence []CreateSeqStops
 }
 
+// LineCreateSerializer is used to serialize data about line
+// it is used in POST request to create a new line
 type LineCreateSerializer struct {
 	Name          string `binding:"required"`
 	StopsSequence []CreateSeqStops
 }
+
+// CreateSeqStops is used to serialize stops in line
+// it is used in POST request to create line segments
 type CreateSeqStops struct {
 	StopName string `binding:"required"`
 	Duration uint   `binding:"required"`
 }
 
+// LineUpdateSerializer is used to serialize stops for line update
+// it is used in PATCH request to update line segments
 type LineUpdateSerializer struct {
 	StopsSequence []CreateSeqStops
 }
 
+// GetStops gets serializes stops for line
 func (line_s *LineSerializer) GetStops(line_name string) error {
 	var line models.Line
 	if err := utils.DB.Model(&line).Preload("Segments").First(&line, "Name = ?", line_name).Error; err != nil {
@@ -55,6 +69,7 @@ func (line_s *LineSerializer) GetStops(line_name string) error {
 	return nil
 }
 
+// FromModel loads data from model into serializer
 func (l *LineInList) FromModel(line models.Line) {
 	l.Name = line.Name
 	l.InitialStop = line.InitialStop

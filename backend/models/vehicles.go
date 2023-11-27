@@ -1,3 +1,5 @@
+// package models contains gorm model definitions for ORM usage
+// this file contains models for vehicles
 package models
 
 type Vehicle struct {

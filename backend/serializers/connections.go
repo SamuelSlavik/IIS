@@ -1,3 +1,5 @@
+// package serializers holds structures and functions for serializing data
+// this file contains serializers for connections
 package serializers
 
 import (
@@ -9,6 +11,8 @@ import (
 	"github.com/AdamPekny/IIS/backend/validators"
 )
 
+// ConnectionSerializer is used to serialize data about connection for registered user
+// it is used in GET request to get data about connection
 type ConnectionSerializer struct {
 	ConnectionID     uint
 	LineName         string
@@ -24,6 +28,8 @@ type ConnectionSerializer struct {
 	StopInConnection *[]StopInConnection
 }
 
+// ConnectionUserSerializer is used to serialize data about connection for not registered user
+// it is used in GET request to get data about connection
 type ConnectionUserSerializer struct {
 	ConnectionID  uint
 	LineName      string
@@ -35,6 +41,8 @@ type ConnectionUserSerializer struct {
 	VehicleType   string
 }
 
+// ConnectionCreateSerializer is used to serialize data for creating connection
+// it is used in POST request to create a new connection
 type ConnectionCreateSerializer struct {
 	LineName      string `binding:"required"`
 	DepartureTime string `binding:"required"`
@@ -46,6 +54,8 @@ type ConnectionCreateSerializer struct {
 	ValidatorErrs []validators.ValidatorErr
 }
 
+// ConnectionAssignSerializer is used to serialize data for assigning driver and vehicle
+// it is used in PATCH request to assign driver and vehicle
 type ConnectionAssignSerializer struct {
 	DriverID      *uint
 	VehicleReg    *string
@@ -55,6 +65,8 @@ type ConnectionAssignSerializer struct {
 	ValidatorErrs []validators.ValidatorErr
 }
 
+// ConnectionUpdateSerializer is used to serialize data for updating connection
+// it is used in PATCH request to update connection
 type ConnectionUpdateSerializer struct {
 	LineName      string
 	DepartureTime string
@@ -66,10 +78,8 @@ type ConnectionUpdateSerializer struct {
 	ValidatorErrs []validators.ValidatorErr
 }
 
-type ConnectionDeleteSerializer struct {
-	NumberOfDays int `binding:"required"`
-}
-
+// ConnectionDetailsSerializer is used to serialize data about connection for not registered user
+// it is used in GET request to get data about connection
 type ConnectionDetailsSerializer struct {
 	ID        uint
 	LineName  string
@@ -77,11 +87,13 @@ type ConnectionDetailsSerializer struct {
 	ListStops *[]StopInConnection
 }
 
+// StopInConnection is used to serialize data about stop in connection
 type StopInConnection struct {
 	DepartureTime string
 	StopName      string
 }
 
+// Get_arrival_time calculates arrival time from departure time depending on line
 func Get_arrival_time(dep_time time.Time, line_name string) (arrival_time time.Time) {
 	line := models.Line{}
 	utils.DB.Preload("Segments").First(&line, "name=?", line_name)
@@ -93,6 +105,7 @@ func Get_arrival_time(dep_time time.Time, line_name string) (arrival_time time.T
 	return
 }
 
+// Valid checks if connection data for creating are valid
 func (conn *ConnectionCreateSerializer) Valid() bool {
 	validators.Line_name_validator(conn.LineName, &conn.ValidatorErrs)
 	validators.Vehicle_registration_validator(conn.VehicleReg, &conn.ValidatorErrs)
@@ -108,6 +121,8 @@ func (conn *ConnectionCreateSerializer) Valid() bool {
 	return len(conn.ValidatorErrs) == 0
 
 }
+
+// Valid checks if connection data for assign are valid
 func (conn *ConnectionAssignSerializer) Valid(id int) bool {
 	validators.Vehicle_registration_validator(conn.VehicleReg, &conn.ValidatorErrs)
 	validators.Driver_id_validator(conn.DriverID, &conn.ValidatorErrs)
@@ -119,6 +134,7 @@ func (conn *ConnectionAssignSerializer) Valid(id int) bool {
 	return len(conn.ValidatorErrs) == 0
 }
 
+// CreateModel creates model from serializer
 func (conn ConnectionCreateSerializer) CreateModel() (connection_model []models.Connection, err error) {
 	dep_time, err := time.Parse("2006-01-02 15:04", conn.DepartureTime)
 	if err != nil {

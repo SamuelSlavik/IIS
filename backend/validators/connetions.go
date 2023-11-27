@@ -1,3 +1,5 @@
+// package validators contains functions for validating recieved data
+// this file contains validators for connections
 package validators
 
 import (
@@ -7,6 +9,8 @@ import (
 	"github.com/AdamPekny/IIS/backend/utils"
 )
 
+// Line_name_validator validates line name
+// loads any errors into validator_errs
 func Line_name_validator(name string, validator_errs *[]ValidatorErr) {
 	res := utils.DB.Where("name = ?", name).Find(&models.Line{})
 	if res.Error != nil {
@@ -18,6 +22,7 @@ func Line_name_validator(name string, validator_errs *[]ValidatorErr) {
 	}
 }
 
+// Vehicle_registration_validator validates if vehicle registration exists
 func Vehicle_registration_validator(registration *string, validator_errs *[]ValidatorErr) {
 	if registration == nil {
 		return
@@ -33,6 +38,7 @@ func Vehicle_registration_validator(registration *string, validator_errs *[]Vali
 	}
 }
 
+// Driver_id_validator validates if driver exists and if it is a driver
 func Driver_id_validator(id *uint, validator_errs *[]ValidatorErr) {
 	if id == nil {
 		return
@@ -53,6 +59,7 @@ func Driver_id_validator(id *uint, validator_errs *[]ValidatorErr) {
 	}
 }
 
+// Vehicle_availability checks if vehicle is available at given time
 func Vehicle_availability(id int, registration *string, departure_time string, arrival_time time.Time, NumberOfDays int, validator_errs *[]ValidatorErr) {
 	if registration == nil {
 		return
@@ -93,7 +100,7 @@ func Vehicle_availability(id int, registration *string, departure_time string, a
 
 }
 
-// todo optimalizovat 2x pristup do db
+// Driver_availability checks if driver is available at given time
 func Driver_availability(id int, driverID *uint, departure_time string, arrival_time time.Time, NumberOfDays int, validator_errs *[]ValidatorErr) {
 	if driverID == nil {
 		return

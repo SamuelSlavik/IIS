@@ -1,3 +1,5 @@
+// package api contains api implementation for backend
+// this file contains definition of endpoints and CRUD operations
 package api
 
 import (
@@ -8,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Router returns a gin router with all endpoints defined
 func Router() *gin.Engine {
 	router := gin.Default()
 

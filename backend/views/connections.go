@@ -1,3 +1,5 @@
+// package views contains views used in router handlers
+// this file contains views for connections
 package views
 
 import (
@@ -13,6 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// ListConnections loads all connections from database
 func ListConnections(ctx *gin.Context) {
 	var connections []serializers.ConnectionSerializer
 	var connection_models []models.Connection
@@ -68,7 +71,7 @@ func ListConnections(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, connections)
 }
 
-// for unregistered
+// GetDetailOfConnection handles request for detail of connection for not reqistered user
 func GetDetailOfConnection(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var connection_model models.Connection
@@ -98,6 +101,8 @@ func GetDetailOfConnection(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, connection)
 }
 
+// getStops is helper function that loads stops depending on line
+// returns slice of loaded stops with their corresponding time and error if any
 func getStops(line_name string, direction bool, departure time.Time) (*[]serializers.StopInConnection, error) {
 	stops := []serializers.StopInConnection{}
 	var line models.Line
@@ -153,6 +158,7 @@ func getStops(line_name string, direction bool, departure time.Time) (*[]seriali
 	return &stops, nil
 }
 
+// GetConnectionById handles request for connection with given id for registered user
 func GetConnectionById(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var connection_model models.Connection
@@ -212,6 +218,7 @@ func GetConnectionById(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, connection)
 }
 
+// ListConnectionsByLine lists all connections for given line for registered user
 func ListConnectionsByLine(ctx *gin.Context) {
 	line := ctx.Param("line")
 	var connection_models []models.Connection
@@ -268,6 +275,7 @@ func ListConnectionsByLine(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, connections)
 }
 
+// GetConnectionById list all connections for given line and date for registered user
 func ListConnectionsByLineAndDate(ctx *gin.Context) {
 	line := ctx.Param("line")
 	date := ctx.Param("date")
@@ -325,6 +333,7 @@ func ListConnectionsByLineAndDate(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, connections)
 }
 
+// GetConnectionById list all connections for specific driver
 func ListDriverConnections(ctx *gin.Context) {
 	user_id := ctx.Param("id")
 	var connection_models []models.Connection
@@ -389,6 +398,8 @@ func ListDriverConnections(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, connections)
 }
 
+// CreateConnection handles request for creating new connections
+// can create multiple days depending of request
 func CreateConnection(ctx *gin.Context) {
 	connection := serializers.ConnectionCreateSerializer{}
 
@@ -396,7 +407,10 @@ func CreateConnection(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-
+	if connection.NumberOfDays > 365 || connection.NumberOfDays < 1 {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid number of days"})
+		return
+	}
 	if !connection.Valid() {
 		ctx.IndentedJSON(http.StatusBadRequest, connection.ValidatorErrs)
 		return
@@ -416,7 +430,8 @@ func CreateConnection(ctx *gin.Context) {
 	}
 }
 
-// todo number of days
+// AssignToConnection handles request for assigning driver and vehicle to connection
+// can assign to multiple days depending of request
 func AssignToConnection(ctx *gin.Context) {
 	id := ctx.Param("id")
 	connection_model := models.Connection{}
@@ -430,6 +445,10 @@ func AssignToConnection(ctx *gin.Context) {
 	orig_deptime := connection_model.DepartureTime
 	if err := ctx.BindJSON(&connection); err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	if connection.NumberOfDays > 365 || connection.NumberOfDays < 1 {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid number of days"})
 		return
 	}
 	line_name := connection_model.LineName
@@ -467,6 +486,8 @@ func AssignToConnection(ctx *gin.Context) {
 	}
 }
 
+// UpdateConnection handles request for updating connection
+// can update multiple days depending of request
 func UpdateConnection(ctx *gin.Context) {
 	id := ctx.Param("id")
 	connection_model := models.Connection{}
@@ -481,7 +502,11 @@ func UpdateConnection(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	//todo asi funguje ???? xd
+	if connection.NumberOfDays > 365 || connection.NumberOfDays < 1 {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid number of days"})
+		return
+	}
+	// multiple days handling
 	orig_deptime := connection_model.DepartureTime
 	for i := 0; i < connection.NumberOfDays; i++ {
 		connection.ArrivalTime = connection_model.ArrivalTime
@@ -532,6 +557,7 @@ func UpdateConnection(ctx *gin.Context) {
 		orig_deptime = connection_model.DepartureTime
 
 	}
+	//checking validity of updated connections
 	for i := 0; i < len(models_to_change); i++ {
 		res := utils.DB.Where("departure_time=? AND line_name=?", models_to_change[i].DepartureTime, models_to_change[i].LineName).Find(&models.Connection{})
 		if res.Error != nil {
@@ -554,6 +580,8 @@ func UpdateConnection(ctx *gin.Context) {
 	}
 }
 
+// DeleteConnection handles request for deleting connection
+// can delete multiple days depending of request
 func DeleteConnection(ctx *gin.Context) {
 	id := ctx.Param("id")
 	connection_model := models.Connection{}
@@ -563,7 +591,10 @@ func DeleteConnection(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid number of days"})
 		return
 	}
-
+	if numDays > 365 || numDays < 1 {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid number of days"})
+		return
+	}
 	res := utils.DB.First(&connection_model, "id=?", id)
 	if res.Error != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
@@ -595,6 +626,7 @@ func DeleteConnection(ctx *gin.Context) {
 	}
 }
 
+// ListUserConnections lists all connections for not registered user
 func ListUserConnections(ctx *gin.Context) {
 	var connection_models []models.Connection
 	var connections []serializers.ConnectionUserSerializer
@@ -637,6 +669,7 @@ func ListUserConnections(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, connections)
 }
 
+// ListConnectionsUserByLine lists all connections for given line for not registered user
 func ListUserConnectionsByLine(ctx *gin.Context) {
 	line := ctx.Param("line")
 	var connection_models []models.Connection
@@ -680,6 +713,7 @@ func ListUserConnectionsByLine(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, connections)
 }
 
+// ListConnectionsUserByLineAndDate lists all connections for given line and date for not registered user
 func ListConnectionsUserByLineAndDate(ctx *gin.Context) {
 	line := ctx.Param("line")
 	date := ctx.Param("date")
@@ -722,6 +756,5 @@ func ListConnectionsUserByLineAndDate(ctx *gin.Context) {
 		connections = append(connections, connection)
 	}
 
-	
 	ctx.IndentedJSON(http.StatusOK, connections)
 }

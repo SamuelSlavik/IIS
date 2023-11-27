@@ -1,3 +1,5 @@
+// package models contains gorm model definitions for ORM usage
+// this file contains models for users
 package models
 
 import (
@@ -20,21 +22,21 @@ const (
 
 type User struct {
 	gorm.Model
-	FirstName   string       `gorm:"not null"`
-	LastName    string       `gorm:"not null"`
-	Email       string       `gorm:"not null"` // Unique among non deleted users
-	BirthDate   time.Time    `gorm:"not null"`
-	Password    string       `gorm:"not null"`
-	Role        Role         `gorm:"not null"`
-	FullName string
-	Connections []Connection `gorm:"foreignKey:DriverID"`
+	FirstName      string    `gorm:"not null"`
+	LastName       string    `gorm:"not null"`
+	Email          string    `gorm:"not null"` // Unique among non deleted users
+	BirthDate      time.Time `gorm:"not null"`
+	Password       string    `gorm:"not null"`
+	Role           Role      `gorm:"not null"`
+	FullName       string
+	Connections    []Connection        `gorm:"foreignKey:DriverID"`
 	MalfuncReports []MalfunctionReport `gorm:"foreignKey:CreatedByRef"`
 }
 
 func (u *User) BeforeSave(tx *gorm.DB) (err error) {
 	new_values := tx.Statement.Dest.(*User)
 	new_values.FullName = new_values.FirstName + " " + new_values.LastName
-	
+
 	return nil
 }
 
@@ -64,11 +66,11 @@ func (u *User) AfterDelete(tx *gorm.DB) (err error) {
 func GetUserFromCtx(ctx *gin.Context) (*User, error) {
 	if user_ctx, ok := ctx.Get("user"); ok {
 		user, ok := user_ctx.(User)
-	
+
 		if !ok {
 			return nil, fmt.Errorf("not a valid user")
 		}
-	
+
 		return &user, nil
 	} else {
 		return nil, fmt.Errorf("user not in context")

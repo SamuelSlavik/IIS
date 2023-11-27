@@ -1,3 +1,5 @@
+// package validators contains functions for validating recieved data
+// this file contains validators for vehicles
 package validators
 
 import (
@@ -7,6 +9,8 @@ import (
 	"github.com/AdamPekny/IIS/backend/utils"
 )
 
+// Registration_validator validates registration number
+// loads any errors into validator_errs
 func Registration_validator(registration string, validator_errs *[]ValidatorErr) {
 	pattern := "^[A-Z0-9]{3}[0-9]{4}$"
 
@@ -25,6 +29,8 @@ func Registration_validator(registration string, validator_errs *[]ValidatorErr)
 	}
 }
 
+// Vehicle_type_validator validates vehicle type
+// loads any errors into validator_errs
 func Vehicle_type_validator(vehicle_type string, validator_errs *[]ValidatorErr) {
 	res := utils.DB.Where("type = ?", vehicle_type).Find(&models.VehicleType{})
 	if res.Error != nil {

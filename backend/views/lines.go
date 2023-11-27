@@ -1,3 +1,5 @@
+// package views contains views used in router handlers
+// this file contains views for lines
 package views
 
 import (
@@ -10,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// ListsLines lists every line in the database
 func ListLines(ctx *gin.Context) {
 	var lineModels []models.Line
 	var lineSerializers []serializers.LineInList
@@ -32,6 +35,7 @@ func ListLines(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, lineSerializers)
 }
 
+// GetLine gets a line with given line name
 func GetLine(ctx *gin.Context) {
 	lineName := ctx.Param("line")
 	var lineSerializer serializers.LineSerializer
@@ -44,6 +48,7 @@ func GetLine(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, lineSerializer)
 }
 
+// CreateLine creates a new line and its segments
 func CreateLine(ctx *gin.Context) {
 	var lineSerializer serializers.LineCreateSerializer
 	err := ctx.BindJSON(&lineSerializer)
@@ -79,6 +84,7 @@ func CreateLine(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, lineSerializer)
 }
 
+// UpdateLine updates a line deletes its segments and creates new ones
 func UpdateLine(ctx *gin.Context) {
 	lineName := ctx.Param("line")
 	var lineSerializer serializers.LineUpdateSerializer
@@ -142,6 +148,7 @@ func UpdateLine(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, lineSerializer)
 }
 
+// DeleteLine deletes a line and its segments
 func DeleteLine(ctx *gin.Context) {
 	lineName := ctx.Param("line")
 	res := utils.DB.Delete(&models.Line{Name: lineName})

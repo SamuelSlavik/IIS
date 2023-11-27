@@ -1,3 +1,5 @@
+// package models contains gorm model definitions for ORM usage
+// this file contains models for lines
 package models
 
 import (
@@ -12,7 +14,6 @@ type Line struct {
 	Segments    []Segment    `gorm:"constraint:OnDelete:CASCADE"`
 }
 
-// todo id pk
 type Segment struct {
 	ID        uint `gorm:"primaryKey;autoIncrement;not null"`
 	StopName1 string
@@ -27,7 +28,7 @@ type Connection struct {
 	ID                  uint `gorm:"primaryKey;autoIncrement;not null"`
 	DepartureTime       time.Time
 	ArrivalTime         time.Time
-	Direction          bool    //TRUE: Initial->Final FALSE: Final->Initial
+	Direction           bool    //TRUE: Initial->Final FALSE: Final->Initial
 	VehicleRegistration *string `gorm:"default:null"`
 	LineName            string  `gorm:"not null"`
 	DriverID            *uint   `gorm:"default:null"`

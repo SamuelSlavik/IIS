@@ -1,3 +1,5 @@
+// package api contains api implementation for backend
+// this file contains ORM migrations
 package api
 
 import (
@@ -8,6 +10,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Migrate_all migrates ORM all models
 func Migrate_all() {
 	// Migrate User models
 	utils.DB.AutoMigrate(&models.User{})
@@ -22,7 +25,7 @@ func Migrate_all() {
 
 	var users []models.User
 	result := utils.DB.Where("role = ?", string(models.AdminRole)).Find(&users)
-	
+
 	if result.Error != nil {
 		return
 	}
@@ -35,11 +38,11 @@ func Migrate_all() {
 	if result.RowsAffected == 0 {
 		utils.DB.Create(&models.User{
 			FirstName: "user",
-			LastName: "admin",
-			Email: "user@admin.com",
+			LastName:  "admin",
+			Email:     "user@admin.com",
 			BirthDate: time.Now(),
-			Password: string(pwd_hash),
-			Role: models.AdminRole,
+			Password:  string(pwd_hash),
+			Role:      models.AdminRole,
 		})
 	}
 }

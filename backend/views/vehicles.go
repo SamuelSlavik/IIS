@@ -1,3 +1,4 @@
+// package views contains views used in router handlers
 package views
 
 import (
@@ -9,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// List_vehicles lists every vehicle in the database
 func List_vehicles(ctx *gin.Context) {
 	var vehicles []models.Vehicle
 	res := utils.DB.Preload("VehicleType").Find(&vehicles)
@@ -68,6 +70,7 @@ func List_vehicles(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, vehicle_serializers)
 }
 
+// Create_vehicle creates a new vehicle
 func Create_vehicle(ctx *gin.Context) {
 	vehicle := serializers.VehicleSerializer{}
 
@@ -91,6 +94,7 @@ func Create_vehicle(ctx *gin.Context) {
 	}
 }
 
+// GetVehicle gets a vehicle by its registration number
 func GetVehicle(ctx *gin.Context) {
 	vehicle_id := ctx.Param("id")
 	vehicle := models.Vehicle{}
@@ -149,6 +153,7 @@ func GetVehicle(ctx *gin.Context) {
 	}
 }
 
+// UpdateVehicle updates a vehicle with given attributes
 func UpdateVehicle(ctx *gin.Context) {
 	vehicle_id := ctx.Param("id")
 	vehicle := models.Vehicle{}
@@ -179,6 +184,7 @@ func UpdateVehicle(ctx *gin.Context) {
 	}
 }
 
+// DeleteVehicle deletes a vehicle
 func DeleteVehicle(ctx *gin.Context) {
 	vehicle_id := ctx.Param("id")
 	vehicle := models.Vehicle{}
@@ -195,6 +201,7 @@ func DeleteVehicle(ctx *gin.Context) {
 	}
 }
 
+// ListNotBrokenVehicles lists vehicles that does not have any malfunction report or all of its malfunction reports are done
 func ListNotBrokenVehicles(ctx *gin.Context) {
 	var vehicles []models.Vehicle
 	res := utils.DB.Preload("VehicleType").Find(&vehicles)
@@ -251,6 +258,7 @@ func ListNotBrokenVehicles(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, vehicle_serializers)
 }
 
+// CreateVehicleType creates a new vehicle unique vehicle type
 func CreateVehicleType(ctx *gin.Context) {
 	vehicle_type := serializers.VehicleTypeCreateSerializer{}
 
@@ -258,6 +266,16 @@ func CreateVehicleType(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
+	res := utils.DB.Where("type = ?", vehicle_type.Type).Find(&models.VehicleType{})
+	if res.Error != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, res.Error)
+		return
+	}
+	if res.RowsAffected > 0 {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Vehicle type already exists"})
+		return
+	}
+
 	vehicle_type_model := models.VehicleType{
 		Type: vehicle_type.Type,
 	}
@@ -269,6 +287,7 @@ func CreateVehicleType(ctx *gin.Context) {
 	}
 }
 
+// ListVehicleTypes lists all vehicle types
 func ListVehicleTypes(ctx *gin.Context) {
 	var vehicle_types []models.VehicleType
 	if result := utils.DB.Find(&vehicle_types); result.Error != nil {
@@ -295,6 +314,7 @@ func ListVehicleTypes(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, vehicle_type_serializers)
 }
 
+// DeleteVehicleType deletes a vehicle type if it is not used by any vehicle
 func DeleteVehicleType(ctx *gin.Context) {
 	vehicle_type := ctx.Param("id")
 	var vehicle_type_model models.VehicleType
