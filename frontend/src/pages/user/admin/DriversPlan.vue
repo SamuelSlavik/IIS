@@ -69,13 +69,13 @@ onMounted(() => {
       <div class="table">
         <div v-for="(conn, index) in connections" :key="conn.ConnectionID" v-if="connections">
           <div class="list-item">
-            <router-link :to="'/profile/drivers/connection/detail/' + conn.ConnectionID" class="list-item__name">
+            <router-link :to="'/profile/driver/connection/detail/' + conn.ConnectionID" class="list-item__name">
               <b>{{ formatDateTime(conn.DepartureTime) }} - {{ formatDateTime(conn.ArrivalTime) }}</b>
             </router-link>
             <p class="list-item__role">{{conn.LineName}}</p>
             <p class="list-item__role"><b>From:</b> {{ conn.InitialStop }}</p>
             <p class="list-item__role"><b>To:</b> {{conn.FinalStop}}</p>
-            <p class="list-item__role">
+            <p class="list-item__role connection-title">
               <Bus v-if="conn.VehicleType === 'bus'" class="connection-icon"/>
               <Tram v-if="conn.VehicleType === 'tram'" class="connection-icon"/>
               <Tank v-if="conn.VehicleType === 'obrnena_dodavka'" class="connection-icon"/>

@@ -107,7 +107,7 @@ const router = createRouter({
           component: MaintenanceRequests
         },
         {
-          path: 'superuser/requests/new',
+          path: 'superuser/requests/create/:id',
           component: NewMaintenanceRequest
         },
         {
@@ -199,7 +199,7 @@ const router = createRouter({
           component: MyPlan
         },
         {
-          path: 'driver/connections/detiail/:id',
+          path: 'driver/connection/detail/:id',
           component: MyPlanDetail
         },
         {

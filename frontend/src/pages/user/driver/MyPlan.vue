@@ -55,7 +55,7 @@ onMounted(() => {loadPlan()})
             <p class="list-item__role">{{conn.LineName}}</p>
             <p class="list-item__role"><b>From:</b> {{ conn.InitialStop }}</p>
             <p class="list-item__role"><b>To:</b> {{conn.FinalStop}}</p>
-            <p class="list-item__role">
+            <p class="list-item__role connection-title">
               <Bus v-if="conn.VehicleType === 'bus'" class="connection-icon"/>
               <Tram v-if="conn.VehicleType === 'tram'" class="connection-icon"/>
               <Tank v-if="conn.VehicleType === 'obrnena_dodavka'" class="connection-icon"/>

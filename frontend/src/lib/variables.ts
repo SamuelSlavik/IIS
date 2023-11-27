@@ -130,7 +130,7 @@ export class Endpoints {
         return `${Endpoints.baseUrl}/connections/list/driver/${id}`;
     }
     static driverDetailConnection(id: string): string {
-        return `${Endpoints.baseUrl}/connections/list/driver/${id}`;
+        return `${Endpoints.baseUrl}/connections/get/${id}`;
     }
 
 

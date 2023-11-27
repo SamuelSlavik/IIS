@@ -151,11 +151,18 @@ export interface LastMaintenance {
 
 
 export interface NewRequest {
+    Deadline: string
+    ResolvedByRef: selectedUser | null
+}
+
+export interface RequestType {
+    ID: string
     Status: string
     Deadline: string
-    MalfuncRepRef: string
-    CreatedByRef: string
-    ResolvedByRef: string
+    CreatedAt: string
+    MalfuncRep: MalfunctionReport
+    CreatedByRef: User
+    ResolvedByRef: User
 }
 
 export interface ConnectionList {
@@ -171,4 +178,21 @@ export interface ConnectionList {
     DriverID: string | null
     DriverName: string | null
 }
-
+export interface ConnectionDetail {
+    ConnectionID: string
+    LineName: string
+    DepartureTime:string
+    ArrivalTime: string
+    Direction:boolean
+    InitialStop: string
+    FinalStop: string
+    VehicleReg: string
+    DriverID: number
+    DriverName: string
+    VehicleType: string
+    StopInConnection: StopInConnection[]
+}
+export interface StopInConnection {
+    StopName: string
+    DepartureTime: string
+}

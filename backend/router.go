@@ -43,7 +43,7 @@ func Router() *gin.Engine {
 	router.GET("/api/connections/list", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.ListConnections)
 	router.GET("/api/connections/list/:line", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.ListConnectionsByLine)
 	router.GET("/api/connections/list/:line/:date", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.ListConnectionsByLineAndDate)
-	router.GET("/api/connections/get/:id", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole)), views.GetConnectionById)
+	router.GET("/api/connections/get/:id", middleware.RequireAuth(string(models.SuperuserRole), string(models.DispatcherRole), string(models.DriverRole)), views.GetConnectionById)
 	router.POST("/api/connections/create", middleware.RequireAuth(string(models.SuperuserRole)), views.CreateConnection)
 	router.PATCH("/api/connections/assign/:id", middleware.RequireAuth(string(models.DispatcherRole)), views.AssignToConnection)
 	router.PATCH("/api/connections/update/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.UpdateConnection)

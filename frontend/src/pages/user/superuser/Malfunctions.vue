@@ -35,10 +35,10 @@ const loadMalfunctions = async () => {
   loading.value = true
   try {
     const response = await axios.get(Endpoints.listMalfunctions("ack"), {withCredentials: true})
-    ackMalfunctions.value = response.data
+    ackMalfunctions.value = response.data || []
 
     const response2 = await axios.get(Endpoints.listMalfunctions("unack"), {withCredentials: true})
-    unAckMalfunctions.value = response2.data
+    unAckMalfunctions.value = response2.data || []
   } catch (error) {
     notifications.addNotification("Failed to load malfunctions: " + error, 'error')
   } finally {
