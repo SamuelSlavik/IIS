@@ -10,6 +10,8 @@ import App from './App.vue'
 import router from './router'
 import axios from "axios";
 
+axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
+
 const app = createApp(App)
 
 app.component("v-select", vSelect);
