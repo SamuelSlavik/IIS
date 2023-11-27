@@ -35,6 +35,8 @@ import Malfunctions from "@/pages/user/superuser/Malfunctions.vue";
 import LinesListDispatcher from "@/pages/user/dispatcher/Lines.vue";
 import LineConnectionsListDispatcher from "@/pages/user/dispatcher/Connections.vue";
 import NewConnection from "@/pages/user/superuser/NewConnection.vue";
+import LineConnections from "@/pages/user/superuser/LineConnections.vue";
+import EditConnection from "@/pages/user/superuser/EditConnection.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -112,8 +114,16 @@ const router = createRouter({
           component: Connections
         },
         {
+          path: 'superuser/connections/:line',
+          component: LineConnections
+        },
+        {
           path: 'superuser/connections/new',
           component: NewConnection
+        },
+        {
+          path: 'superuser/connections/edit/:id',
+          component: EditConnection
         },
         {
           path: 'superuser/stops/new',

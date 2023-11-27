@@ -20,10 +20,27 @@ const newConnection = ref<NewConnection>({
   NumberOfDays: null
 })
 
-const createConnection = async () => {
+const connectionID = router.currentRoute.value.params.id.toString() || ""
+
+const loadConnection = async () => {
   loading.value = true
   try {
-    const response = await axios.post(Endpoints.createConnection, {
+    const response = await axios.get(Endpoints.retrieveConnection(connectionID), {withCredentials: true})
+    newConnection.value.LineName = response.data.LineName
+    newConnection.value.DepartureTime = response.data.DepartureTime
+    newConnection.value.Direction = response.data.Direction
+    newConnection.value.NumberOfDays = response.data.NumberOfDays
+  } catch (error) {
+    notifications.addNotification("Failed to load connection: " + error, 'error')
+  } finally {
+    loading.value = false
+  }
+}
+
+const updateConnection = async () => {
+  loading.value = true
+  try {
+    const response = await axios.patch(Endpoints.editConnection(connectionID), {
       LineName: newConnection.value.LineName,
       DepartureTime: formatTimeForCreate(newConnection.value.DepartureTime),
       Direction: newConnection.value.Direction,
@@ -55,6 +72,7 @@ const loadLines = async () => {
 }
 
 onMounted(() => {
+  loadConnection()
   loadLines()
 
   const now = new Date();
@@ -67,12 +85,12 @@ onMounted(() => {
 <template>
   <div>
     <div class="header">
-      <h2>Create new connection</h2>
+      <h2>Edit connection</h2>
     </div>
 
     <Loader v-if="loading"/>
     <div v-else>
-      <form @submit.prevent="createConnection" class="form">
+      <form @submit.prevent="updateConnection" class="form">
         <v-select
             v-model="newConnection.LineName"
             placeholder="Select line"
@@ -101,12 +119,13 @@ onMounted(() => {
             type="number"
             name="numberOfDays"
             v-model="newConnection.NumberOfDays"
-            placeholder="Number of days"
+            placeholder="Apply the change for x days"
             required
+            min="1"
         />
         <button
             type="submit"
-        >Create connection</button>
+        >Update connection</button>
       </form>
     </div>
   </div>
