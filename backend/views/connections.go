@@ -251,29 +251,50 @@ func CreateConnection(ctx *gin.Context) {
 func AssignToConnection(ctx *gin.Context) {
 	id := ctx.Param("id")
 	connection_model := models.Connection{}
+	models_to_change := []models.Connection{}
 	res := utils.DB.First(&connection_model, "id=?", id)
 	if res.Error != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
 		return
 	}
 	connection := serializers.ConnectionAssignSerializer{}
+	orig_deptime := connection_model.DepartureTime
 	if err := ctx.BindJSON(&connection); err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	connection.DepartureTime = connection_model.DepartureTime.Format("2006-01-02 15:04")
-	connection.ArrivalTime = connection_model.ArrivalTime
-	if !connection.Valid(int(connection_model.ID)) {
-		ctx.IndentedJSON(http.StatusBadRequest, connection.ValidatorErrs)
-		return
+	line_name := connection_model.LineName
+	for i := 0; i < int(connection.NumberOfDays); i++ {
+		connection.DepartureTime = connection_model.DepartureTime.Format("2006-01-02 15:04")
+		connection.ArrivalTime = connection_model.ArrivalTime
+		if !connection.Valid(int(connection_model.ID)) {
+			ctx.IndentedJSON(http.StatusBadRequest, connection.ValidatorErrs)
+			return
+		}
+		connection_model.VehicleRegistration = connection.VehicleReg
+		connection_model.DriverID = connection.DriverID
+		models_to_change = append(models_to_change, connection_model)
+		connection_model = models.Connection{}
+		orig_deptime = orig_deptime.AddDate(0, 0, 1)
+		res := utils.DB.Where("departure_time=? AND line_name=?", orig_deptime, line_name).Find(&connection_model)
+		if res.Error != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
+			return
+		}
+		if res.RowsAffected == 0 {
+			break
+		}
+		connection.DepartureTime = connection_model.DepartureTime.Format("2006-01-02 15:04")
+		connection.ArrivalTime = connection_model.ArrivalTime
+		orig_deptime = connection_model.DepartureTime
 	}
-	connection_model.VehicleRegistration = connection.VehicleReg
-	connection_model.DriverID = connection.DriverID
-	if result := utils.DB.Save(&connection_model); result.Error != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
-		return
-	} else {
-		ctx.IndentedJSON(http.StatusOK, result)
+	for i := 0; i < len(models_to_change); i++ {
+		if result := utils.DB.Save(&models_to_change[i]); result.Error != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, result.Error)
+			return
+		} else {
+			ctx.IndentedJSON(http.StatusOK, result)
+		}
 	}
 }
 
@@ -367,15 +388,38 @@ func UpdateConnection(ctx *gin.Context) {
 func DeleteConnection(ctx *gin.Context) {
 	id := ctx.Param("id")
 	connection_model := models.Connection{}
+	connection := serializers.ConnectionDeleteSerializer{}
+	if err := ctx.BindJSON(&connection); err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
 	res := utils.DB.First(&connection_model, "id=?", id)
 	if res.Error != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
 		return
 	}
-	if result := utils.DB.Delete(&connection_model); result.Error != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
-		return
-	} else {
-		ctx.IndentedJSON(http.StatusOK, gin.H{"message": "Connection deleted successfully"})
+	line_name := connection_model.LineName
+	models_to_delete := []models.Connection{}
+	orig_deptime := connection_model.DepartureTime
+	for i := 0; i < connection.NumberOfDays; i++ {
+		models_to_delete = append(models_to_delete, connection_model)
+		connection_model = models.Connection{}
+		orig_deptime = orig_deptime.AddDate(0, 0, 1)
+		res := utils.DB.Where("departure_time=? AND line_name=?", orig_deptime, line_name).Find(&connection_model)
+		if res.Error != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
+			return
+		}
+		if res.RowsAffected == 0 {
+			break
+		}
+	}
+	for i := 0; i < len(models_to_delete); i++ {
+		if result := utils.DB.Delete(&models_to_delete[i]); result.Error != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, result.Error)
+			return
+		} else {
+			ctx.IndentedJSON(http.StatusOK, gin.H{"message": "Connection deleted successfully"})
+		}
 	}
 }
