@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../pages/homepage/Homepage.vue'
+import HomeSearch from '../pages/homepage/HomepageLineConnections.vue'
 import Login from '../pages/user/Login.vue'
 import Registration from '../pages/user/Registration.vue'
 import Profile from '../pages/user/Profile.vue'
@@ -50,6 +51,11 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView
+    },
+    {
+      path: '/connections/:line',
+      name: 'homeSearch',
+      component: HomeSearch
     },
     {
       path: '/login',

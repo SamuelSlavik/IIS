@@ -715,11 +715,13 @@ func ListConnectionsUserByLineAndDate(ctx *gin.Context) {
 			Direction:     model.Direction,
 			VehicleType:   vehicle.VehicleType.Type,
 		}
-		if connection.Direction == true {
+		if connection.Direction {
 			connection.InitialStop = line_model.FinalStop
 			connection.FinalStop = line_model.InitialStop
 		}
 		connections = append(connections, connection)
 	}
 
+	
+	ctx.IndentedJSON(http.StatusOK, connections)
 }
