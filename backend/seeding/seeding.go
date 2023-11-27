@@ -115,7 +115,7 @@ func main() {
 			DepartureTime:       gofakeit.Date(),
 			VehicleRegistration: &vehicles[rand.Intn(len(vehicles)-1)].Registration,
 			LineName:            lines[i%2].Name,
-			Dirrection:          i%2 == 1,
+			Direction:          i%2 == 1,
 		}
 		utils.DB.Create(&connection)
 	}

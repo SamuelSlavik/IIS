@@ -32,6 +32,8 @@ import EditMyMalfunction from "@/pages/user/driver/EditMyMalfunction.vue";
 import MyMalfunctions from "@/pages/user/driver/MyMalfunctions.vue";
 import MalfunctionDetail from "@/pages/user/driver/MalfunctionDetail.vue";
 import Malfunctions from "@/pages/user/superuser/Malfunctions.vue";
+import LinesListDispatcher from "@/pages/user/dispatcher/Lines.vue";
+import LineConnectionsListDispatcher from "@/pages/user/dispatcher/Connections.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -176,6 +178,15 @@ const router = createRouter({
           path: 'malfunctions/edit/:id',
           component: EditMyMalfunction
         },
+
+        {
+          path: 'dispatcher/lines',
+          component: LinesListDispatcher
+        },
+        {
+          path: 'dispatcher/connections/:line',
+          component: LineConnectionsListDispatcher
+        }
       ]
     }
   ]
