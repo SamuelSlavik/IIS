@@ -167,6 +167,8 @@ export interface ConnectionList {
     ArrivalTime: string
     Direction: boolean
     VehicleReg: string | null
+    VehicleType: string | null
     DriverID: string | null
     DriverName: string | null
 }
+

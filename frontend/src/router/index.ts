@@ -5,7 +5,7 @@ import Registration from '../pages/user/Registration.vue'
 import Profile from '../pages/user/Profile.vue'
 import UsersList from "@/pages/user/admin/UsersList.vue";
 import NewUser from "@/pages/user/admin/NewUser.vue";
-import VehiclesList from "@/pages/user/superuser/VahiclesList.vue";
+import VehiclesList from "@/pages/user/superuser/VehiclesList.vue";
 import NewVehicle from "@/pages/user/superuser/NewVehicle.vue";
 import UserDetail from "@/pages/user/admin/UserDetail.vue";
 import MaintenanceRequests from "@/pages/user/superuser/Requests.vue";
@@ -39,6 +39,9 @@ import LineConnections from "@/pages/user/superuser/LineConnections.vue";
 import EditConnection from "@/pages/user/superuser/EditConnection.vue";
 import LineConnectionDetailDispatcher from "@/pages/user/dispatcher/ConnectionDetail.vue";
 import Hello from "@/pages/user/Hello.vue";
+import MyPlanDetail from "@/pages/user/driver/MyPlanDetail.vue";
+import Drivers from "@/pages/user/admin/Drivers.vue";
+import DriversPlan from "@/pages/user/admin/DriversPlan.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -184,8 +187,20 @@ const router = createRouter({
           component: MyRequestComplete
         },
         {
-          path: 'driver/my-plan',
+          path: 'admin/drivers',
+          component: Drivers
+        },
+        {
+          path: 'admin/drivers/detail/:id',
+          component: DriversPlan
+        },
+        {
+          path: 'driver/plans',
           component: MyPlan
+        },
+        {
+          path: 'driver/connections/detiail/:id',
+          component: MyPlanDetail
         },
         {
           path: 'driver/reports/new',

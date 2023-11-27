@@ -126,6 +126,12 @@ export class Endpoints {
     static assignConnection(id: string): string {
         return `${Endpoints.baseUrl}/connections/assign/${id}`;
     }
+    static listConnectionsByDriver(id: string): string {
+        return `${Endpoints.baseUrl}/connections/list/driver/${id}`;
+    }
+    static driverDetailConnection(id: string): string {
+        return `${Endpoints.baseUrl}/connections/list/driver/${id}`;
+    }
 
 
     static get reportMalfunction(): string {

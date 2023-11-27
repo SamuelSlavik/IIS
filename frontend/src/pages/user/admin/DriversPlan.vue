@@ -14,18 +14,23 @@ import Bus from "vue-material-design-icons/Bus.vue";
 import Tram from "vue-material-design-icons/Tram.vue";
 // @ts-ignore
 import Tank from "vue-material-design-icons/Tank.vue";
+import router from "@/router";
 
 const loading = ref<boolean>(false)
 const notifications = useNotificationStore()
 
 const user = useUserStore()
 
+const driverId = router.currentRoute.value.params.id.toString() || ""
+
+const driver = ref<User>()
+
 const connections = ref<ConnectionList[]>([])
 
 const loadPlan = async () => {
   loading.value = true
   try {
-    const response = await axios.get(Endpoints.listConnectionsByDriver(user.id), {withCredentials: true})
+    const response = await axios.get(Endpoints.listConnectionsByDriver(driverId), {withCredentials: true})
     connections.value = response.data
   } catch (error) {
     notifications.addNotification("Failed to load lines: " + error, 'error')
@@ -34,14 +39,29 @@ const loadPlan = async () => {
   }
 }
 
-onMounted(() => {loadPlan()})
+const loadUser = async () => {
+loading.value = true
+  try {
+    const response = await axios.get<User>(Endpoints.retrieveUser(driverId), {withCredentials: true})
+    driver.value = response.data
+  } catch (error) {
+    notifications.addNotification("Failed to load user: " + error, 'error')
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  loadPlan()
+  loadUser()
+})
 
 </script>
 
 <template>
   <div>
-    <div class="header">
-      <h2>My plan</h2>
+    <div class="header" v-if="driver">
+      <h2>Plan for {{driver.FirstName}} {{driver.LastName}}</h2>
     </div>
 
     <Loader v-if="loading"/>
@@ -49,7 +69,7 @@ onMounted(() => {loadPlan()})
       <div class="table">
         <div v-for="(conn, index) in connections" :key="conn.ConnectionID" v-if="connections">
           <div class="list-item">
-            <router-link :to="'/profile/driver/connection/detail/' + conn.ConnectionID" class="list-item__name">
+            <router-link :to="'/profile/drivers/connection/detail/' + conn.ConnectionID" class="list-item__name">
               <b>{{ formatDateTime(conn.DepartureTime) }} - {{ formatDateTime(conn.ArrivalTime) }}</b>
             </router-link>
             <p class="list-item__role">{{conn.LineName}}</p>

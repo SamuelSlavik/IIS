@@ -32,7 +32,7 @@ func Router() *gin.Engine {
 	router.DELETE("/api/users/delete/:id", middleware.RequireAuth(string(models.AdminRole)), views.DeleteUser)
 
 	// Vehicles
-	router.GET("/api/vehicles/list", middleware.RequireAuth(string(models.SuperuserRole)), views.List_vehicles)
+	router.GET("/api/vehicles/list", middleware.RequireAuth(string(models.SuperuserRole), string(models.DriverRole)), views.List_vehicles)
 	router.GET("/api/vehicles/get/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.GetVehicle)
 	router.POST("/api/vehicles/create", middleware.RequireAuth(string(models.SuperuserRole)), views.Create_vehicle)
 	router.PUT("/api/vehicles/update/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.UpdateVehicle)
@@ -49,6 +49,7 @@ func Router() *gin.Engine {
 	router.PATCH("/api/connections/assign/:id", middleware.RequireAuth(string(models.DispatcherRole)), views.AssignToConnection)
 	router.PATCH("/api/connections/update/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.UpdateConnection)
 	router.DELETE("/api/connections/delete/:id/:days", middleware.RequireAuth(string(models.SuperuserRole)), views.DeleteConnection)
+	router.GET("/api/connections/list/driver/:id", middleware.RequireAuth(string(models.DriverRole)), views.ListDriverConnections)
 
 	//stops
 	router.GET("/api/stops", middleware.RequireAuth(string(models.SuperuserRole)), views.ListStops)
