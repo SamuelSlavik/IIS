@@ -7,6 +7,7 @@ import axios from "axios";
 import {useNotificationStore} from "@/stores/notification-store";
 import router from "@/router";
 import type {LineInList} from "@/lib/models";
+import {formatTimeForCreate} from "@/lib/utils";
 
 const loading = ref<boolean>(false)
 const notifications = useNotificationStore()
@@ -22,7 +23,13 @@ const newConnection = ref<NewConnection>({
 const createConnection = async () => {
   loading.value = true
   try {
-    const response = await axios.post(Endpoints.createConnection, newConnection.value, {withCredentials: true})
+    const response = await axios.post(Endpoints.createConnection, {
+      LineName: newConnection.value.LineName,
+      DepartureTime: formatTimeForCreate(newConnection.value.DepartureTime),
+      ArrivalTime: formatTimeForCreate(newConnection.value.ArrivalTime),
+      Direction: newConnection.value.Direction,
+      NumberOfDays: newConnection.value.NumberOfDays
+    }, {withCredentials: true})
     if (response.status === 200) {
       notifications.addNotification("Connection created", 'success')
       await router.push('/profile/superuser/connections');
@@ -74,7 +81,7 @@ onMounted(() => {
         <div>
           <label>Departure time:</label>
           <input
-              type="time"
+              type="datetime-local"
               name="departureTime"
               v-model="newConnection.DepartureTime"
               required
@@ -83,7 +90,7 @@ onMounted(() => {
         <div>
           <label>Arrival time:</label>
           <input
-              type="time"
+              type="datetime-local"
               name="arrivalTime"
               v-model="newConnection.ArrivalTime"
               required

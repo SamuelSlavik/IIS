@@ -15,3 +15,18 @@ export const formatDateTime = (isoDateString: string) => {
     const minute = date.getMinutes().toString().padStart(2, '0');
     return `${day}.${month}.${year} ${hour}:${minute}`;
 }
+
+export const formatTimeForCreate = (timeString: string): string => {
+    const inputDate = new Date(timeString);
+
+    // Check if the input is a valid date
+    if (isNaN(inputDate.getTime())) {
+        // Handle invalid date input
+        return "";
+    }
+
+    // Format the date according to the desired output format
+    const formattedTime = `${inputDate.toISOString().slice(0, 10)} ${inputDate.toISOString().slice(11, 16)}:00`;
+
+    return formattedTime;
+};
