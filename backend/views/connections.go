@@ -630,7 +630,8 @@ func DeleteConnection(ctx *gin.Context) {
 func ListUserConnections(ctx *gin.Context) {
 	var connection_models []models.Connection
 	var connections []serializers.ConnectionUserSerializer
-	res := utils.DB.Order("departure_time").Where("driver_id IS NOT NULL AND vehicle_registration IS NOT NULL").Find(&connection_models)
+	currentTime := time.Now()
+	res := utils.DB.Order("departure_time").Where("driver_id IS NOT NULL AND vehicle_registration IS NOT NULL AND departure_time > ?", currentTime).Find(&connection_models)
 	if res.Error != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
 		return
@@ -680,7 +681,8 @@ func ListUserConnectionsByLine(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
 		return
 	}
-	res = utils.DB.Order("departure_time").Where("driver_id IS NOT NULL AND vehicle_registration IS NOT NULL").Find(&connection_models, "line_name=?", line)
+	currentTime := time.Now()
+	res = utils.DB.Order("departure_time").Where("driver_id IS NOT NULL AND vehicle_registration IS NOT NULL AND departure_time > ?", currentTime).Find(&connection_models, "line_name=?", line)
 	if res.Error != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, res.Error.Error())
 		return
