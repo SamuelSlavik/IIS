@@ -4,7 +4,9 @@ import Loader from "@/components/Loader.vue";
 import type {User, Vehicle} from "@/lib/models";
 import {Endpoints} from "@/lib/variables";
 import axios from "axios";
+// @ts-ignore
 import Pencil from "vue-material-design-icons/Pencil.vue";
+// @ts-ignore
 import Delete from "vue-material-design-icons/Delete.vue";
 import {useNotificationStore} from "@/stores/notification-store";
 import router from "@/router";

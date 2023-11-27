@@ -35,6 +35,7 @@ type ConnectionCreateSerializer struct {
 type ConnectionAssignSerializer struct {
 	DriverID      *uint
 	VehicleReg    *string
+	NumberOfDays  int       `binding:"required"`
 	DepartureTime string    //neplnit z fe
 	ArrivalTime   time.Time //neplnit z fe
 	ValidatorErrs []validators.ValidatorErr
@@ -49,6 +50,10 @@ type ConnectionUpdateSerializer struct {
 	VehicleReg    *string
 	NumberOfDays  int `binding:"required"`
 	ValidatorErrs []validators.ValidatorErr
+}
+
+type ConnectionDeleteSerializer struct {
+	NumberOfDays int `binding:"required"`
 }
 
 type ConnectionDetailsSerializer struct {

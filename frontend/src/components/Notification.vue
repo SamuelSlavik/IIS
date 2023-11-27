@@ -8,8 +8,12 @@ const notifications = useNotificationStore().notifications;
 
 <template>
   <div v-if="notifications.length" class="notification-container">
-    <div v-for="(notification, index) in notifications" :key="index" class="notification" :class="notification.type">
-      {{ notification.message }}
+    <div v-for="(notification, index) in notifications" :key="index" class="notification" :class="// @ts-ignore
+    notification.type">
+      {{ 
+        // @ts-ignore
+        notification.message 
+      }}
     </div>
   </div>
 </template>

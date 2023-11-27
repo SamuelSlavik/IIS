@@ -5,6 +5,7 @@ export const useNotificationStore = defineStore('notification', () => {
     const notifications = ref([]);
 
     const addNotification = (message: string = "", type: string = 'info') => {
+        // @ts-ignore
         notifications.value.push({ message, type });
         setTimeout(() => {
             removeNotification(0);

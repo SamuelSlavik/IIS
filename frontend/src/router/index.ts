@@ -37,6 +37,7 @@ import LineConnectionsListDispatcher from "@/pages/user/dispatcher/Connections.v
 import NewConnection from "@/pages/user/superuser/NewConnection.vue";
 import LineConnections from "@/pages/user/superuser/LineConnections.vue";
 import EditConnection from "@/pages/user/superuser/EditConnection.vue";
+import LineConnectionDetailDispatcher from "@/pages/user/dispatcher/ConnectionDetail.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -201,6 +202,10 @@ const router = createRouter({
         {
           path: 'dispatcher/connections/:line',
           component: LineConnectionsListDispatcher
+        },
+        {
+          path: '/profile/dispatcher/connection/detail/:id',
+          component: LineConnectionDetailDispatcher
         }
       ]
     }
