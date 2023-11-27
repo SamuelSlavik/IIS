@@ -81,7 +81,7 @@ func GetDetailOfConnection(ctx *gin.Context) {
 		ID:       connection_model.ID,
 		LineName: connection_model.LineName,
 	}
-	connection.ListStops, err = getStops(connection.LineName, connection_model.Direction, connection_model.DepartureTime, connection_model.ArrivalTime)
+	connection.ListStops, err = getStops(connection.LineName, connection_model.Direction, connection_model.DepartureTime)
 	if err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
@@ -97,7 +97,7 @@ func GetDetailOfConnection(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, connection)
 }
 
-func getStops(line_name string, direction bool, departure time.Time, arrival time.Time) (*[]serializers.StopInConnection, error) {
+func getStops(line_name string, direction bool, departure time.Time) (*[]serializers.StopInConnection, error) {
 	stops := []serializers.StopInConnection{}
 	var line models.Line
 	if err := utils.DB.Model(&line).Preload("Segments").First(&line, "Name = ?", line_name).Error; err != nil {
@@ -184,7 +184,7 @@ func GetConnectionById(ctx *gin.Context) {
 		}
 	}
 	var stops *[]serializers.StopInConnection
-	stops, err = getStops(connection_model.LineName, connection_model.Direction, connection_model.DepartureTime, connection_model.ArrivalTime)
+	stops, err = getStops(connection_model.LineName, connection_model.Direction, connection_model.DepartureTime)
 	if err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
