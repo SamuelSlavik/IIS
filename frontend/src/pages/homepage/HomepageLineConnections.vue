@@ -26,7 +26,7 @@ const loadConnections = async () => {
     const response = await axios.get(Endpoints.listConnectionsNotLoggedDatetime(line, querydatefmt), {withCredentials: true})
     connections.value = response.data
   } catch (error: any) {
-    notifications.addNotification("Failed to load lines: " + error, "error")
+    notifications.addNotification("Failed to load line connections: " + error, "error")
   } finally {
     loading.value = false
   }
@@ -62,7 +62,7 @@ onMounted(() => {loadConnections()})
       <div class="table">
         <div v-for="(conn, index) in connections" :key="conn.ConnectionID" v-if="connections">
           <div class="list-item">
-            <router-link :to="'/profile/dispatcher/connection/detail/' + conn.ConnectionID" class="list-item__name">
+            <router-link :to="'/connection/' + conn.ConnectionID" class="list-item__name">
               <b>{{ formatDateTime(conn.DepartureTime) + " - " + formatDateTime(conn.ArrivalTime) }}</b>
             </router-link>
             <p class="list-item__role"><b>From:</b> {{ conn.InitialStop }}</p>

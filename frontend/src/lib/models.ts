@@ -192,7 +192,15 @@ export interface ConnectionDetail {
     VehicleType: string
     StopInConnection: StopInConnection[]
 }
+
 export interface StopInConnection {
     StopName: string
     DepartureTime: string
+}
+
+export interface ConnectionUnauth {
+    ID: string
+    LineName: string
+    ListStops: StopInConnection[]
+    Type: string
 }

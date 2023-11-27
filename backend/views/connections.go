@@ -89,7 +89,7 @@ func GetDetailOfConnection(ctx *gin.Context) {
 	}
 
 	var vehicle models.Vehicle
-	err = utils.DB.First(&vehicle, "id=?", connection_model.VehicleRegistration).Error
+	err = utils.DB.First(&vehicle, "registration=?", connection_model.VehicleRegistration).Error
 	if err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, err.Error())
 		return

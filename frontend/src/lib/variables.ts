@@ -1,9 +1,5 @@
 export class Endpoints {
-<<<<<<< Updated upstream
-    private static readonly baseUrl = "http://localhost:8080/api"; // Replace with your base URL
-=======
-    private static readonly baseUrl = "http://localhost:8080/api"; // Replace with your base URL https://adam.mihocka.cz/api
->>>>>>> Stashed changes
+    private static readonly baseUrl = "http://localhost:8080/api"; // Replace with your base URL https://adam.mihocka.cz
 
     static get connections(): string {
         return `${Endpoints.baseUrl}/connections`;
@@ -112,6 +108,10 @@ export class Endpoints {
     
     static listConnectionsNotLoggedDatetime(line: string, datetime: string): string {
         return `${Endpoints.baseUrl}/connections/search/${line}/${datetime}`;
+    }
+    
+    static ConnectionDetailNotLoggedDatetime(id: string): string {
+        return `${Endpoints.baseUrl}/connections/get/details/${id}`;
     }
 
 
