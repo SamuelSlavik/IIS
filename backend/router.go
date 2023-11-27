@@ -49,6 +49,7 @@ func Router() *gin.Engine {
 	router.PATCH("/api/connections/assign/:id", middleware.RequireAuth(string(models.DispatcherRole)), views.AssignToConnection)
 	router.PATCH("/api/connections/update/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.UpdateConnection)
 	router.DELETE("/api/connections/delete/:id", middleware.RequireAuth(string(models.SuperuserRole)), views.DeleteConnection)
+	router.GET("/api/connections/list/driver/:id", middleware.RequireAuth(string(models.DriverRole)), views.ListDriverConnections)
 
 	//stops
 	router.GET("/api/stops", middleware.RequireAuth(string(models.SuperuserRole)), views.ListStops)
