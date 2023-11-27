@@ -140,3 +140,13 @@ export interface NewRequest {
     CreatedByRef: string
     ResolvedByRef: string
 }
+
+export interface ConnectionList {
+    ConnectionID: string
+    LineName: string
+    InitialStop: string
+    DepartureTime: string
+    FinalStop: string
+    ArrivalTime: string
+    Direction: boolean
+}
