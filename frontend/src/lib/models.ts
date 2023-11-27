@@ -101,6 +101,14 @@ export interface SeqStop {
     Duration: number | null
 }
 
+export interface NewConnection {
+    LineName: string
+    DepartureTime: string
+    ArrivalTime: string
+    Direction: boolean
+    NumberOfDays: number | null
+}
+
 
 export interface MalfunctionReport {
     Title: string

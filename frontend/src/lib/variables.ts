@@ -96,6 +96,22 @@ export class Endpoints {
         return `${Endpoints.baseUrl}/lines/update/${id}`;
     }
 
+    static get listConnections(): string {
+        return `${Endpoints.baseUrl}/connections/list`;
+    }
+    static get createConnection(): string {
+        return `${Endpoints.baseUrl}/connections/create`;
+    }
+    static deleteConnection(id: string): string {
+        return `${Endpoints.baseUrl}/connections/delete/${id}`;
+    }
+    static retrieveConnection(id: string): string {
+        return `${Endpoints.baseUrl}/connections/get/${id}`;
+    }
+    static editConnection(id: string): string {
+        return `${Endpoints.baseUrl}/connections/update/${id}`;
+    }
+
 
     static get reportMalfunction(): string {
         return `${Endpoints.baseUrl}/maintenance/malfunc/create`;

@@ -32,6 +32,7 @@ import EditMyMalfunction from "@/pages/user/driver/EditMyMalfunction.vue";
 import MyMalfunctions from "@/pages/user/driver/MyMalfunctions.vue";
 import MalfunctionDetail from "@/pages/user/driver/MalfunctionDetail.vue";
 import Malfunctions from "@/pages/user/superuser/Malfunctions.vue";
+import NewConneection from "@/pages/user/superuser/NewConnection.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -143,6 +144,10 @@ const router = createRouter({
         {
           path: 'superuser/malfunctions',
           component: Malfunctions
+        },
+        {
+          path: 'superuser/connections/new',
+          component: NewConneection
         },
 
 
