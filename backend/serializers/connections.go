@@ -16,7 +16,7 @@ type ConnectionSerializer struct {
 	ArrivalTime   string
 	VehicleReg    *string
 	DriverID      *uint
-	Dirrection    bool
+	Direction    bool
 }
 
 type ConnectionLineSerializer struct {
@@ -24,7 +24,7 @@ type ConnectionLineSerializer struct {
 	LineName      string
 	DepartureTime string
 	ArrivalTime   string
-	Dirrection    bool
+	Direction    bool
 	InitialStop   string
 	FinalStop     string
 }
@@ -33,7 +33,7 @@ type ConnectionCreateSerializer struct {
 	LineName      string `binding:"required"`
 	DepartureTime string `binding:"required"`
 	VehicleReg    *string
-	Dirrection    bool `binding:"required"`
+	Direction    bool `binding:"required"`
 	DriverID      *uint
 	NumberOfDays  int       `binding:"required"`
 	ArrivalTime   time.Time //neplnit z fe
@@ -51,7 +51,7 @@ type ConnectionAssignSerializer struct {
 type ConnectionUpdateSerializer struct {
 	LineName      string
 	DepartureTime string
-	Dirrection    bool
+	Direction    bool
 	ArrivalTime   time.Time //neplnit z fe
 	DriverID      *uint
 	VehicleReg    *string
@@ -116,7 +116,7 @@ func (conn ConnectionCreateSerializer) CreateModel() (connection_model []models.
 			DepartureTime:       dep_time,
 			ArrivalTime:         conn.ArrivalTime,
 			VehicleRegistration: conn.VehicleReg,
-			Dirrection:          conn.Dirrection,
+			Direction:          conn.Direction,
 			DriverID:            conn.DriverID,
 		})
 		dep_time = dep_time.Add(time.Hour * 24)

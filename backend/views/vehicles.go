@@ -191,7 +191,7 @@ func DeleteVehicle(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
 		return
 	} else {
-		ctx.IndentedJSON(http.StatusOK, result)
+		ctx.IndentedJSON(http.StatusOK, gin.H{"message": "Vehicle deleted successfully"})
 	}
 }
 

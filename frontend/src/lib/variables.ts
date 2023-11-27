@@ -96,6 +96,12 @@ export class Endpoints {
         return `${Endpoints.baseUrl}/lines/update/${id}`;
     }
 
+    static listConnectionsDatetime(line: string, datetime: string): string {
+        return `${Endpoints.baseUrl}/connections/list/${line}/${datetime}`;
+    }
+
+
+
     static get listConnections(): string {
         return `${Endpoints.baseUrl}/connections/list`;
     }

@@ -29,7 +29,7 @@ func ListConnections(ctx *gin.Context) {
 			ArrivalTime:   model.ArrivalTime.Format("2006-01-02 15:04"),
 			DriverID:      model.DriverID,
 			VehicleReg:    model.VehicleRegistration,
-			Dirrection:    model.Dirrection,
+			Direction:    model.Direction,
 		}
 		connections = append(connections, connection)
 	}
@@ -117,7 +117,7 @@ func GetConnectionById(ctx *gin.Context) {
 		DepartureTime: connection_model.DepartureTime.Format("2006-01-02 15:04"),
 		DriverID:      connection_model.DriverID,
 		VehicleReg:    connection_model.VehicleRegistration,
-		Dirrection:    connection_model.Dirrection,
+		Direction:    connection_model.Direction,
 	}
 	ctx.IndentedJSON(http.StatusOK, connection)
 }
@@ -144,7 +144,7 @@ func ListConnectionsByLine(ctx *gin.Context) {
 			LineName:      model.LineName,
 			ArrivalTime:   model.ArrivalTime.Format("2006-01-02 15:04"),
 			DepartureTime: model.DepartureTime.Format("2006-01-02 15:04"),
-			Dirrection:    model.Dirrection,
+			Direction:    model.Direction,
 			InitialStop:   line_model.InitialStop,
 			FinalStop:     line_model.FinalStop,
 		}
@@ -177,7 +177,7 @@ func ListConnectionsByLineAndDate(ctx *gin.Context) {
 			LineName:      model.LineName,
 			ArrivalTime:   model.ArrivalTime.Format("2006-01-02 15:04"),
 			DepartureTime: model.DepartureTime.Format("2006-01-02 15:04"),
-			Dirrection:    model.Dirrection,
+			Direction:    model.Direction,
 			InitialStop:   line_model.InitialStop,
 			FinalStop:     line_model.FinalStop,
 		}
@@ -300,6 +300,6 @@ func DeleteConnection(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, result.Error)
 		return
 	} else {
-		ctx.IndentedJSON(http.StatusOK, result)
+		ctx.IndentedJSON(http.StatusOK, gin.H{"message": "Connection deleted successfully"})
 	}
 }

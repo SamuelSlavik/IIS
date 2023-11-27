@@ -27,7 +27,7 @@ type Connection struct {
 	ID                  uint `gorm:"primaryKey;autoIncrement;not null"`
 	DepartureTime       time.Time
 	ArrivalTime         time.Time
-	Dirrection          bool    //TRUE: Initial->Final FALSE: Final->Initial
+	Direction          bool    //TRUE: Initial->Final FALSE: Final->Initial
 	VehicleRegistration *string `gorm:"default:null"`
 	LineName            string  `gorm:"not null"`
 	DriverID            *uint   `gorm:"default:null"`
