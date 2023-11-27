@@ -23,6 +23,7 @@ import Close from 'vue-material-design-icons/Close.vue';
 // @ts-ignore
 import Hammer from "vue-material-design-icons/HammerSickle.vue";
 import {formatDate} from "../../../lib/utils";
+import Magnify from "vue-material-design-icons/Magnify.vue";
 
 
 const user = useUserStore()
@@ -30,12 +31,14 @@ const router = useRouter();
 let notifications = useNotificationStore();
 const loading = ref<boolean>(false)
 
+const statusQuery = ref<string>("")
+
 const requests = ref<RequestType[]>()
 
 const loadRequests = async () => {
   loading.value = true
   try {
-    const response = await axios.get(Endpoints.listRequests, {withCredentials: true})
+    const response = await axios.get(Endpoints.listRequests(statusQuery.value), {withCredentials: true})
     requests.value = response.data
   } catch (error) {
     notifications.addNotification("Failed to load maintenance requests: " + error, 'error')
@@ -75,6 +78,20 @@ onMounted(() => {
 
   <Loader v-if="loading"/>
   <div v-else>
+    <div class="toolbar">
+      <form @submit.prevent="loadRequests" class="search-form">
+        <select v-model="statusQuery">
+          <option value="">All</option>
+          <option value="pending">Pending</option>
+          <option value="progress">In progress</option>
+          <option value="done">Done</option>
+        </select>
+        <button type="submit" class="small-button">
+          <Magnify size="24px"/>
+        </button>
+      </form>
+    </div>
+
     <div class="table" v-if="requests">
       <div v-for="(request, index) in requests" :key="request.ID">
         <div class="list-item">

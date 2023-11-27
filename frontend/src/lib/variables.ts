@@ -154,7 +154,10 @@ export class Endpoints {
     }
 
 
-    static get listRequests(): string {
+    static listRequests(status?: string): string {
+        if (status) {
+            return `${Endpoints.baseUrl}/maintenance/maintenreq/list?status=${status}`;
+        }
         return `${Endpoints.baseUrl}/maintenance/maintenreq/list`;
     }
     static get createRequest(): string {
